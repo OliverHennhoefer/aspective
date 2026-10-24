@@ -78,15 +78,27 @@ def _firth_newton(X, y, w, max_iter, tol, max_step, max_halfstep):
     return beta, loglik, h, n_iter
 
 
-def _ml_newton(X, y, w, offset, max_iter, tol):
-    """Plain weighted maximum likelihood with an offset (used by FLIC and FLAC)."""
-    beta = np.zeros(X.shape[1])
+def _ml_newton(X, y, w, offset, beta, max_iter, tol, max_halfstep=25):
+    """Weighted maximum likelihood with an offset, started at ``beta``.
+
+    Used by FLIC and FLAC, started from the Firth estimate so that a large
+    offset does not saturate the first iterations. Steps are halved until the
+    log-likelihood does not decrease.
+    """
+    beta = np.asarray(beta, dtype=float).copy()
+    loglik = _log_likelihood(offset + X @ beta, y, w)
     for _ in range(max_iter):
         prob = expit(offset + X @ beta)
         v = w * prob * (1 - prob)
         info = X.T @ (v[:, None] * X)
         step = np.linalg.pinv(info, hermitian=True) @ (X.T @ (w * (y - prob)))
-        beta = beta + step
+        new_loglik = _log_likelihood(offset + X @ (beta + step), y, w)
+        for _ in range(max_halfstep):
+            if new_loglik >= loglik:
+                break
+            step /= 2
+            new_loglik = _log_likelihood(offset + X @ (beta + step), y, w)
+        beta, loglik = beta + step, new_loglik
         if np.max(np.abs(step)) < tol:
             break
     return beta
@@ -188,14 +200,16 @@ class FirthLogisticRegression(ClassifierMixin, BaseEstimator):
             raise ValueError("FLIC and FLAC need fit_intercept=True.")
         if self.correction == "flic":
             offset = X @ beta[1:]
-            beta[0] = _ml_newton(np.ones((len(X), 1)), y01, w, offset, self.max_iter, self.tol)[0]
+            beta[0] = _ml_newton(
+                np.ones((len(X), 1)), y01, w, offset, beta[:1], self.max_iter, self.tol
+            )[0]
         elif self.correction == "flac":
             n = len(X)
             aug_X = np.vstack([design, design, design])
             aug_X = np.column_stack([aug_X, np.r_[np.zeros(n), np.ones(2 * n)]])
             aug_y = np.r_[y01, y01, 1 - y01]
             aug_w = np.r_[w, w * h / 2, w * h / 2]
-            full = _ml_newton(aug_X, aug_y, aug_w, 0.0, self.max_iter, self.tol)
+            full = _ml_newton(aug_X, aug_y, aug_w, 0.0, np.r_[beta, 0.0], self.max_iter, self.tol)
             beta = full[:-1]
 
         if self.fit_intercept:

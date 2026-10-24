@@ -70,6 +70,15 @@ def test_feature_count_is_checked(detector, planted):
         model.decision_function(X[:, :2])
 
 
+@pytest.mark.parametrize("detector", DETECTORS, ids=repr)
+def test_integer_input_matches_float_input(detector):
+    # uint8 arithmetic used to wrap around in the distance computations.
+    X = np.random.RandomState(0).randint(0, 50, size=(200, 3)).astype(np.uint8)
+    ints = clone(detector).fit(X).decision_scores_
+    floats = clone(detector).fit(X.astype(float)).decision_scores_
+    np.testing.assert_allclose(ints, floats)
+
+
 def test_robust_kde_downweights_outliers(planted):
     X, y = planted
     model = RobustKDEDetector().fit(X)

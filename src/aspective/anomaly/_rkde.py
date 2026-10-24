@@ -101,7 +101,7 @@ class RobustKDEDetector(BaseDetector):
         return norm * np.exp(-cdist(A, B, "sqeuclidean") / (2 * h**2))
 
     def fit(self, X, y=None):
-        X = validate_data(self, X)
+        X = validate_data(self, X, dtype=[np.float64, np.float32])
         if self.loss not in ("huber", "hampel"):
             raise ValueError(f"loss must be 'huber' or 'hampel', got {self.loss!r}.")
         if not isinstance(self.max_iter, Integral) or self.max_iter < 1:
@@ -171,7 +171,7 @@ class RobustKDEDetector(BaseDetector):
     def score_log_samples(self, X):
         """Log of the robust density estimate at each point, computed stably."""
         check_is_fitted(self, "weights_")
-        X = validate_data(self, X, reset=False)
+        X = validate_data(self, X, reset=False, dtype=[np.float64, np.float32])
         d = X.shape[1]
         h = self.bandwidth_
         log_norm = -0.5 * d * np.log(2 * np.pi * h**2)

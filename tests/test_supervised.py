@@ -126,6 +126,18 @@ def test_flic_flac_match_event_rate(correction):
         np.testing.assert_allclose(fixed.coef_, firth.coef_)
 
 
+@pytest.mark.parametrize("correction", ["flic", "flac"])
+def test_flic_flac_with_uncentered_features(correction):
+    # A large offset must not saturate the intercept refit (it used to start at zero).
+    X = np.array([[98], [99], [99.5], [100.5], [101], [102]])
+    y = np.array([0, 0, 0, 1, 1, 1])
+    model = FirthLogisticRegression(correction=correction).fit(X, y)
+    centered = FirthLogisticRegression(correction=correction).fit(X - 100, y)
+    np.testing.assert_allclose(model.predict_proba(X), centered.predict_proba(X - 100), atol=1e-6)
+    if correction == "flic":
+        np.testing.assert_allclose(model.predict_proba(X)[:, 1].mean(), 0.5, atol=1e-6)
+
+
 def test_firth_rejects_multiclass():
     with pytest.raises(ValueError, match="Only binary"):
         FirthLogisticRegression().fit(np.random.randn(9, 2), np.arange(9) % 3)

@@ -81,7 +81,7 @@ class IDKDetector(BaseDetector):
         return self.embedding_[np.arange(self.n_estimators)[None, :], cells].mean(axis=1)
 
     def fit(self, X, y=None):
-        X = validate_data(self, X)
+        X = validate_data(self, X, dtype=[np.float64, np.float32])
         if not isinstance(self.n_estimators, Integral) or self.n_estimators < 1:
             raise ValueError("n_estimators must be a positive integer.")
         if not isinstance(self.max_samples, Integral) or self.max_samples < 2:
@@ -103,5 +103,5 @@ class IDKDetector(BaseDetector):
 
     def decision_function(self, X):
         check_is_fitted(self, ["centers_", "embedding_"])
-        X = validate_data(self, X, reset=False)
+        X = validate_data(self, X, reset=False, dtype=[np.float64, np.float32])
         return -self._similarity(X)

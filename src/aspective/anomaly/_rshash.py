@@ -77,7 +77,7 @@ class RSHashDetector(BaseDetector):
         return np.log2(1 + c)
 
     def fit(self, X, y=None):
-        X = validate_data(self, X)
+        X = validate_data(self, X, dtype=[np.float64, np.float32])
         for name in ("n_estimators", "max_samples"):
             value = getattr(self, name)
             if not isinstance(value, Integral) or value < 1:
@@ -120,7 +120,7 @@ class RSHashDetector(BaseDetector):
 
     def decision_function(self, X):
         check_is_fitted(self, "components_")
-        X = validate_data(self, X, reset=False)
+        X = validate_data(self, X, reset=False, dtype=[np.float64, np.float32])
         Xn = self._normalize(X)
         total = sum(self._component_scores(Xn, comp) for comp in self.components_)
         return -total / len(self.components_)
