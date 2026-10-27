@@ -173,8 +173,10 @@ def aspective_source_hash(estimator):
 
 
 def model_key(label, estimator, dataset, protocol):
+    """Identity of one model x dataset evaluation in the score cache."""
     return _hash({
         "label": label, "repr": model_repr(estimator), "dataset": dataset, "protocol": protocol,
+        "max_samples": get_suite(protocol["suite"]).max_samples,
         "aspective": aspective_source_hash(estimator), "sklearn": sklearn.__version__,
         "numpy": np.__version__,
     })

@@ -71,10 +71,12 @@ because "not shown to be worse" is not evidence of being competitive.
 3. Run it for real: `python -m benchmarks run my-model`. Baselines that
    other benchmarks already use come from the score cache. This writes
    `results/my-model.json` and regenerates `RESULTS.md`.
-4. Commit both. Or start the "benchmarks" workflow on GitHub Actions and
-   commit the results it uploads.
+4. Commit both.
 
-`tests/test_benchmark_gate.py` runs with the normal test suite. It fails if
+The benchmark is a local testbed that lives next to the package: the heavy
+runs happen only on your machine, never in CI.
+`tests/test_benchmark_gate.py` runs with the normal test suite (`pytest`,
+locally and in CI). It fails if
 a public estimator has no benchmark, if a committed result is stale (the spec,
 the suite or the candidate's source file changed since it was run), or if a
 benchmark does not pass. It reads the committed JSON only, so it is fast.

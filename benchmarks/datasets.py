@@ -20,6 +20,7 @@ import hashlib
 import io
 import json
 import os
+import tempfile
 import urllib.request
 from pathlib import Path
 
@@ -35,16 +36,24 @@ def cache_dir():
     return root
 
 
-def _download(url, path):
+def _write_atomic(path, data):
+    # Parallel workers may fetch the same file; each writes its own temporary
+    # file and publishes it with an atomic rename, so readers never see a
+    # partial file and concurrent writers do not collide.
     path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.name, suffix=".part")
+    with os.fdopen(fd, "wb") as f:
+        f.write(data)
+    os.replace(tmp, path)
+
+
+def _download(url, path):
     request = urllib.request.Request(url, headers={"User-Agent": "aspective-benchmarks"})
     with urllib.request.urlopen(request, timeout=120) as response:
         data = response.read()
     if data.startswith(b"version https://git-lfs"):
         raise RuntimeError(f"{url} returned a Git LFS pointer instead of the file")
-    tmp = path.with_suffix(path.suffix + ".part")
-    tmp.write_bytes(data)
-    tmp.replace(path)
+    _write_atomic(path, data)
 
 
 def _sha256(path):
@@ -62,7 +71,7 @@ def _fetch(source, name):
     digest_file = path.with_suffix(path.suffix + ".sha256")
     if not path.exists():
         _download(url, path)
-        digest_file.write_text(_sha256(path))
+        _write_atomic(digest_file, _sha256(path).encode())
     elif digest_file.exists() and digest_file.read_text().strip() != _sha256(path):
         raise RuntimeError(f"cached file {path} is corrupted; delete it to download it again")
     return path

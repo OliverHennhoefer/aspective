@@ -2,7 +2,7 @@
 
 This reads the committed results in ``benchmarks/results`` and runs no model,
 so it is fast and offline. Running the benchmarks themselves is a separate,
-manual step (``python -m benchmarks run``, or the "benchmarks" workflow).
+local step (``python -m benchmarks run``).
 """
 
 import inspect
