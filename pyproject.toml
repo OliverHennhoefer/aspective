@@ -11,7 +11,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Oliver Hennhöfer" }]
-keywords = ["machine learning", "scikit-learn", "anomaly detection", "ensembles"]
+keywords = ["machine learning", "scikit-learn", "anomaly detection"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Intended Audience :: Science/Research",
@@ -25,11 +25,28 @@ dependencies = [
 
 [project.optional-dependencies]
 pyod = ["pyod>=2.0"]
-test = ["pytest>=7", "pyod>=2.0"]
+
+[dependency-groups]
+test = ["pytest>=7"]
+# The benchmark testbed in bench/, a separate workspace package that is never
+# part of aspective's wheel or sdist.
+bench = ["aspective-bench"]
+dev = [{ include-group = "test" }, { include-group = "bench" }]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.workspace]
+members = ["bench"]
+
+[tool.uv.sources]
+aspective-bench = { workspace = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/aspective"]
 
+[tool.hatch.build.targets.sdist]
+exclude = ["bench", ".github", "uv.lock"]
+
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src", "."]
+testpaths = ["tests", "bench/tests"]

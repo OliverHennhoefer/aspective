@@ -7,7 +7,7 @@ are in [`RESULTS.md`](RESULTS.md).
 
 ## Protocol
 
-**Suites.** Fixed lists of public datasets, in [`suites.py`](suites.py):
+**Suites.** Fixed lists of public datasets, in [`suites.py`](src/aspective_bench/suites.py):
 
 | Suite | Datasets | Source |
 |---|---|---|
@@ -53,7 +53,7 @@ because "not shown to be worse" is not evidence of being competitive.
 
 ## Adding a model
 
-1. Add a `Benchmark` to [`specs.py`](specs.py): the candidate, its
+1. Add a `Benchmark` to [`specs.py`](src/aspective_bench/specs.py): the candidate, its
    predecessor(s), a suite and a metric. Configure the predecessor like the
    candidate's building blocks (same trees, same binning, same bandwidth),
    so the comparison measures the paper's idea and not a tuning difference.
@@ -66,16 +66,16 @@ because "not shown to be worse" is not evidence of being competitive.
        metric="accuracy",
    )
    ```
-2. Check that it runs: `python -m benchmarks run my-model --quick`
+2. Check that it runs: `uv run aspective-bench run my-model --quick`
    (4 datasets, 3 folds, nothing saved).
-3. Run it for real: `python -m benchmarks run my-model`. Baselines that
+3. Run it for real: `uv run aspective-bench run my-model`. Baselines that
    other benchmarks already use come from the score cache. This writes
    `results/my-model.json` and regenerates `RESULTS.md`.
 4. Commit both.
 
 The benchmark is a local testbed that lives next to the package: the heavy
 runs happen only on your machine, never in CI.
-`tests/test_benchmark_gate.py` runs with the normal test suite (`pytest`,
+`bench/tests/test_gate.py` runs with the normal test suite (`uv run pytest`,
 locally and in CI). It fails if
 a public estimator has no benchmark, if a committed result is stale (the spec,
 the suite or the candidate's source file changed since it was run), or if a
@@ -101,12 +101,12 @@ likelihood, which the docstring states. The code is in the git history
 ## Commands
 
 ```bash
-python -m benchmarks list            # benchmarks and suites
-python -m benchmarks fetch           # download all datasets
-python -m benchmarks run [names]     # run (all by default), save, report
-python -m benchmarks run name --quick
-python -m benchmarks report          # rebuild RESULTS.md
-python -m benchmarks check           # exit 1 unless the gate passes
+uv run aspective-bench list            # benchmarks and suites
+uv run aspective-bench fetch           # download all datasets
+uv run aspective-bench run [names]     # run (all by default), save, report
+uv run aspective-bench run name --quick
+uv run aspective-bench report          # rebuild RESULTS.md
+uv run aspective-bench check           # exit 1 unless the gate passes
 ```
 
 A full run of all benchmarks takes roughly an hour on four cores.

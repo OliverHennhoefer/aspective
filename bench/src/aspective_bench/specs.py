@@ -3,12 +3,12 @@
 To add a model, append a ``Benchmark`` to ``BENCHMARKS``: the candidate, the
 vanilla model(s) it improves on, a suite and a metric. Then run
 
-    python -m benchmarks run <name>
-    python -m benchmarks report
+    uv run aspective-bench run <name>
+    uv run aspective-bench report
 
-and commit ``benchmarks/results/<name>.json`` and ``benchmarks/RESULTS.md``.
-``tests/test_benchmark_gate.py`` fails while any public estimator has no
-benchmark, a stale result, or a failing verdict. See ``benchmarks/README.md``.
+and commit ``bench/results/<name>.json`` and ``bench/RESULTS.md``.
+``bench/tests/test_gate.py`` fails while any public estimator has no
+benchmark, a stale result, or a failing verdict. See ``bench/README.md``.
 
 Predecessors are configured like the candidate's own building blocks (same
 number of trees, same discretization, same bandwidth rule), so a comparison

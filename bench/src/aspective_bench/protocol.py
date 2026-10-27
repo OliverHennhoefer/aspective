@@ -1,7 +1,7 @@
 """Benchmark definitions and the evaluation protocol.
 
 Every estimator in aspective is registered as a ``Benchmark`` in
-``benchmarks/specs.py``: the candidate, the vanilla model(s) it claims to
+``specs.py``: the candidate, the vanilla model(s) it claims to
 improve on (``predecessors``), optional extra ``references`` shown in the
 report only, a suite and a metric. The gate is applied against every
 predecessor; references never affect it.
@@ -50,7 +50,7 @@ class Benchmark:
     predecessors : dict of label -> factory
         The vanilla model(s). The candidate must be non-inferior to each.
     suite : str
-        Name of a suite in ``benchmarks.suites``.
+        Name of a suite in ``aspective_bench.suites``.
     metric : str
         Key of ``METRICS``. Scores are oriented so that higher is better.
     references : dict of label -> factory

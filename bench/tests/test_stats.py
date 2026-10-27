@@ -5,9 +5,9 @@ import pytest
 from sklearn.ensemble import IsolationForest
 
 from aspective.anomaly import RSHashDetector
-from benchmarks import stats
-from benchmarks.protocol import anomaly_scores
-from benchmarks.specs import scaled
+from aspective_bench import stats
+from aspective_bench.protocol import anomaly_scores
+from aspective_bench.specs import scaled
 
 rng = np.random.RandomState(0)
 BASE = rng.uniform(0.6, 0.9, size=30)

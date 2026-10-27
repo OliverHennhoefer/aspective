@@ -121,7 +121,7 @@ class FirthLogisticRegression(ClassifierMixin, BaseEstimator):
       with pseudo-observations weighted by the hat values, plus an indicator
       for the pseudo-data.
 
-    In aspective's benchmark (``benchmarks/RESULTS.md``, 23 PMLB binary
+    In aspective's benchmark (``bench/RESULTS.md``, 23 PMLB binary
     datasets) Firth is non-inferior to maximum likelihood in Brier score. With
     only 100 training rows neither Firth nor FLIC/FLAC was shown to be better
     or worse than maximum likelihood, so the corrections are offered for

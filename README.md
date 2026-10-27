@@ -10,9 +10,9 @@ Every estimator in aspective
 - cites that paper in its docstring and says when to prefer it,
 - passes scikit-learn's `check_estimator` (supervised models) or follows
   PyOD's `BaseDetector` contract (anomaly detectors),
-- passes the benchmark gate in [`benchmarks/`](benchmarks/): on dozens of
+- passes the benchmark gate in [`bench/`](bench/): on dozens of
   public datasets it is statistically non-inferior to the vanilla model it
-  improves on (see [`benchmarks/RESULTS.md`](benchmarks/RESULTS.md)).
+  improves on (see [`bench/RESULTS.md`](bench/RESULTS.md)).
 
 ## Installation
 
@@ -61,7 +61,7 @@ detector.predict(X)         # 0 inlier, 1 outlier, as in PyOD
 ## Development
 
 ```bash
-pip install -e ".[test]"
-pytest
-python -m benchmarks run my-model   # see benchmarks/README.md
+uv sync --extra pyod                 # package, tests and the bench/ testbed
+uv run pytest                        # unit tests and the benchmark gate check
+uv run aspective-bench run my-model  # benchmark a model, see bench/README.md
 ```

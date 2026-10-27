@@ -16,7 +16,10 @@ from joblib import Parallel, delayed
 from . import protocol, stats
 from .suites import get_suite
 
-RESULTS_DIR = Path(__file__).parent / "results"
+# The testbed lives in bench/ next to the package: bench/src/aspective_bench/
+# holds the code, bench/results/ and bench/RESULTS.md the committed output.
+BENCH_DIR = Path(__file__).resolve().parents[2]
+RESULTS_DIR = BENCH_DIR / "results"
 ALPHA = 0.05
 MIN_DATASETS = 10
 
@@ -136,10 +139,10 @@ def check(benchmarks):
     for bench in benchmarks:
         result = results.get(bench.name)
         if result is None:
-            problems.append(f"{bench.name}: no committed results; run `python -m benchmarks run {bench.name}`")
+            problems.append(f"{bench.name}: no committed results; run `uv run aspective-bench run {bench.name}`")
         elif result["fingerprint"] != bench.fingerprint():
             problems.append(f"{bench.name}: results are stale (the spec, suite or the candidate's "
-                            f"source changed); rerun `python -m benchmarks run {bench.name}`")
+                            f"source changed); rerun `uv run aspective-bench run {bench.name}`")
         elif not result["passed"]:
             why = [f"{c['verdict']} vs {c['baseline']}" for c in result["comparisons"] if not c["passed"]]
             if result["candidate_failures"]:
@@ -157,4 +160,4 @@ def main_check(benchmarks):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    sys.exit("use `python -m benchmarks`")
+    sys.exit("use `uv run aspective-bench`")

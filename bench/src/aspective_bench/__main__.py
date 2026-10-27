@@ -1,8 +1,7 @@
-"""Command line: ``python -m benchmarks {fetch,run,report,check,list}``."""
+"""Command line: ``uv run aspective-bench {fetch,run,report,check,list}``."""
 
 import argparse
 import sys
-from pathlib import Path
 
 from . import datasets, report, runner
 from .specs import BENCHMARKS, BY_NAME
@@ -12,12 +11,12 @@ from .suites import SUITES
 def _select(names):
     unknown = [n for n in names if n not in BY_NAME]
     if unknown:
-        sys.exit(f"unknown benchmark(s) {unknown}; see `python -m benchmarks list`")
+        sys.exit(f"unknown benchmark(s) {unknown}; see `uv run aspective-bench list`")
     return [BY_NAME[n] for n in names] if names else BENCHMARKS
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="python -m benchmarks", description=__doc__)
+    parser = argparse.ArgumentParser(prog="aspective-bench", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("list", help="list benchmarks and suites")
     p = sub.add_parser("fetch", help="download every dataset into the cache")
@@ -27,7 +26,7 @@ def main(argv=None):
     p.add_argument("-j", "--n-jobs", type=int, default=-1)
     p.add_argument("--quick", action="store_true",
                    help="4 datasets, 3 folds, print only: checks that a new spec works")
-    sub.add_parser("report", help="write benchmarks/RESULTS.md from the saved results")
+    sub.add_parser("report", help="write bench/RESULTS.md from the saved results")
     sub.add_parser("check", help="exit 1 unless every benchmark is fresh and passes the gate")
     args = parser.parse_args(argv)
 
@@ -52,7 +51,7 @@ def main(argv=None):
         if not args.quick:
             main(["report"])
     elif args.command == "report":
-        path = Path(runner.__file__).parent / "RESULTS.md"
+        path = runner.BENCH_DIR / "RESULTS.md"
         path.write_text(report.render(list(runner.load_results().values())))
         print(f"wrote {path}")
     elif args.command == "check":
