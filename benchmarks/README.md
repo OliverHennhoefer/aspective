@@ -81,9 +81,22 @@ a public estimator has no benchmark, if a committed result is stale (the spec,
 the suite or the candidate's source file changed since it was run), or if a
 benchmark does not pass. It reads the committed JSON only, so it is fast.
 
-`PENDING` in `specs.py` lists the first-wave models that currently fail.
-They are expected to fail (strict xfail), so the test also breaks when one
-starts passing and should leave the list. New models must not be added to it.
+## Models removed by the gate
+
+The first wave had nine estimators. These failed and were removed after one
+retry with the setting their paper recommends, fixed before the retry ran:
+
+| Estimator | Paper | Result |
+|---|---|---|
+| `RandomRotationRegressor` | Blaser & Fryzlewicz, JMLR 2016 | inferior to random forest: median R² −0.023, worse on 15 of 25 datasets |
+| `RandomRotationClassifier` | Blaser & Fryzlewicz, JMLR 2016 | inconclusive vs random forest with min-max scaling (median −0.001) and with rank scaling (median −0.005) |
+| `IDKDetector` | Ting et al., KDD 2020 | inconclusive vs Gaussian KDE and one-class SVM with Voronoi cells; the paper's hypersphere kernel was inconclusive at ψ = 16 and worse at ψ = 64 and 256 |
+| `RobustKDEDetector` | Kim & Scott, JMLR 2012 | inconclusive vs plain KDE with Scott's bandwidth and with the paper's median nearest-neighbour bandwidth (median difference +0.000 both times) |
+
+Firth's FLIC/FLAC corrections stay as options of `FirthLogisticRegression`,
+which passes; at 100 training rows they were not shown better than maximum
+likelihood, which the docstring states. The code is in the git history
+(commit `aa38a9b` and earlier) if a better configuration turns up.
 
 ## Commands
 

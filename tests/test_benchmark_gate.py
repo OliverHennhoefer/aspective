@@ -12,15 +12,14 @@ from sklearn.base import BaseEstimator
 
 import aspective.anomaly
 import aspective.discriminant_analysis
-import aspective.ensemble
 import aspective.linear_model
 import aspective.naive_bayes
 from benchmarks import runner
 from benchmarks.protocol import _estimator_classes
-from benchmarks.specs import BENCHMARKS, COVERED_BY, PENDING
+from benchmarks.specs import BENCHMARKS, COVERED_BY
 
-MODULES = [aspective.anomaly, aspective.discriminant_analysis, aspective.ensemble,
-           aspective.linear_model, aspective.naive_bayes]
+MODULES = [aspective.anomaly, aspective.discriminant_analysis, aspective.linear_model,
+           aspective.naive_bayes]
 
 PUBLIC_ESTIMATORS = sorted(
     {obj for m in MODULES for obj in vars(m).values()
@@ -37,20 +36,7 @@ def test_every_estimator_has_a_benchmark(cls):
     )
 
 
-def _gate_cases():
-    for b in BENCHMARKS:
-        marks = [pytest.mark.xfail(reason=PENDING[b.name], strict=True)] if b.name in PENDING else []
-        yield pytest.param(b, id=b.name, marks=marks)
-
-
-@pytest.mark.parametrize("bench", list(_gate_cases()))
+@pytest.mark.parametrize("bench", BENCHMARKS, ids=lambda b: b.name)
 def test_benchmark_passes_gate(bench):
     problems = runner.check([bench])
-    assert not problems, problems[0]
-
-
-@pytest.mark.parametrize("name", sorted(PENDING))
-def test_pending_benchmarks_have_fresh_results(name):
-    # A pending benchmark may fail the gate, but its results must stay current.
-    problems = [p for p in runner.check([b for b in BENCHMARKS if b.name == name]) if "FAIL" not in p]
     assert not problems, problems[0]

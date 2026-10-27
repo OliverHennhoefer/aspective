@@ -13,7 +13,6 @@ import json
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
 
 import numpy as np
 import sklearn

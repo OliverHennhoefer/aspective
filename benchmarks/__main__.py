@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from . import datasets, report, runner
-from .specs import BENCHMARKS, BY_NAME, PENDING
+from .specs import BENCHMARKS, BY_NAME
 from .suites import SUITES
 
 
@@ -53,10 +53,10 @@ def main(argv=None):
             main(["report"])
     elif args.command == "report":
         path = Path(runner.__file__).parent / "RESULTS.md"
-        path.write_text(report.render(list(runner.load_results().values()), PENDING))
+        path.write_text(report.render(list(runner.load_results().values())))
         print(f"wrote {path}")
     elif args.command == "check":
-        return runner.main_check(BENCHMARKS, PENDING)
+        return runner.main_check(BENCHMARKS)
     return 0
 
 

@@ -148,14 +148,12 @@ def check(benchmarks):
     return problems
 
 
-def main_check(benchmarks, pending=()):
-    """Print the gate status; failures of ``pending`` benchmarks are reported but allowed."""
+def main_check(benchmarks):
     problems = check(benchmarks)
-    blocking = [p for p in problems if not (p.split(":")[0] in pending and "FAIL" in p)]
     for p in problems:
-        print(("pending  " if p not in blocking else "BLOCKING ") + p)
-    print("gate passed" if not blocking else f"{len(blocking)} benchmark(s) block the gate")
-    return 1 if blocking else 0
+        print(p)
+    print("gate passed" if not problems else f"{len(problems)} benchmark(s) block the gate")
+    return 1 if problems else 0
 
 
 if __name__ == "__main__":  # pragma: no cover

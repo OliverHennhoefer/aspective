@@ -30,13 +30,7 @@ def _display(result, value):
     return value if result["higher_is_better"] else -value
 
 
-def _gate(r, pending):
-    if r["passed"]:
-        return "PASS"
-    return "FAIL (pending)" if r["name"] in pending else "**FAIL**"
-
-
-def summary_table(results, pending=()):
+def summary_table(results):
     lines = [
         "| Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | "
         "Median Δ | p (non-inferior) | Verdict | Gate |",
@@ -48,7 +42,7 @@ def summary_table(results, pending=()):
             lines.append(
                 f"| [{r['name']}](#{r['name']}) | {r['candidate']} | {c['baseline']} | {c['n_datasets']} | "
                 f"{c['wins']} / {c['ties']} / {c['losses']} | {delta:+.3f} | {_p(c['p_noninferior'])} | "
-                f"{c['verdict']} | {_gate(r, pending)} |"
+                f"{c['verdict']} | {'PASS' if r['passed'] else '**FAIL**'} |"
             )
     return "\n".join(lines)
 
@@ -78,7 +72,7 @@ def section(r):
                    f"non-inferiority p = {_p(c['p_noninferior'])}, two-sided Wilcoxon p = {_p(c['p_two_sided'])}.")
     if r["candidate_failures"]:
         errs = r["errors"].get(r["candidate"], {})
-        out.append(f"- The candidate failed on: " + "; ".join(
+        out.append("- The candidate failed on: " + "; ".join(
             f"{d} ({errs.get(d, ['?'])[0]})" for d in r["candidate_failures"]))
     fr = r["friedman"]
     ranks = sorted(fr["ranks"].items(), key=lambda kv: kv[1])
@@ -120,15 +114,13 @@ the candidate is typically worse by more than the margin (0.01 for accuracy,
 R² and ROC AUC; 0.005 for the Brier score). Winning everywhere is not
 required. "Superior" additionally means significantly better (two-sided
 Wilcoxon, α = 0.05). "Inconclusive" fails the gate: the data do not show the
-candidate is competitive. "FAIL (pending)" marks failures listed in
-`PENDING` in `benchmarks/specs.py`: known open work that does not block CI,
-while any other failure does.
+candidate is competitive.
 """
 
 
-def render(results, pending=()):
+def render(results):
     results = sorted(results, key=lambda r: r["name"])
-    parts = [HEADER, "## Summary", "", summary_table(results, pending), "", "## Details", ""]
+    parts = [HEADER, "## Summary", "", summary_table(results), "", "## Details", ""]
     parts += [section(r) for r in results]
     env = results[0]["environment"] if results else {}
     if env:

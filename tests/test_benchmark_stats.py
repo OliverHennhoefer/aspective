@@ -3,11 +3,9 @@
 import numpy as np
 import pytest
 from sklearn.ensemble import IsolationForest
-from sklearn.neighbors import KernelDensity
 
-from aspective.anomaly import IDKDetector
+from aspective.anomaly import RSHashDetector
 from benchmarks import stats
-from benchmarks.baselines import ScottKDE
 from benchmarks.protocol import anomaly_scores
 from benchmarks.specs import scaled
 
@@ -69,14 +67,7 @@ def test_friedman_ranks():
     np.testing.assert_allclose(ranks, [1.5, 1.5, 3.0])
 
 
-def test_scott_kde_matches_sklearn():
-    X = rng.normal(size=(200, 3))
-    kde = ScottKDE().fit(X)
-    reference = KernelDensity(bandwidth=kde.bandwidth_).fit(X)
-    np.testing.assert_allclose(kde.score_samples(X[:20]), reference.score_samples(X[:20]))
-
-
-@pytest.mark.parametrize("model", [scaled(IsolationForest(random_state=0)), scaled(IDKDetector(random_state=0))])
+@pytest.mark.parametrize("model", [scaled(IsolationForest(random_state=0)), scaled(RSHashDetector(random_state=0))])
 def test_anomaly_scores_are_higher_for_outliers(model):
     X = np.r_[rng.normal(size=(300, 2)), rng.normal(8, 0.5, size=(5, 2))]
     scores = anomaly_scores(model.fit(X), X)
