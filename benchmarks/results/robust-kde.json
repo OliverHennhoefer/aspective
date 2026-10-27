@@ -1,6 +1,6 @@
 {
  "name": "robust-kde",
- "fingerprint": "551f4115116f2d95",
+ "fingerprint": "a26997ef4a7706f3",
  "quick": false,
  "suite": "adbench-classical",
  "metric": "roc_auc",

@@ -1,6 +1,6 @@
 {
  "name": "idk",
- "fingerprint": "e99e7401006189df",
+ "fingerprint": "67032ac449ecccc8",
  "quick": false,
  "suite": "adbench-classical",
  "metric": "roc_auc",

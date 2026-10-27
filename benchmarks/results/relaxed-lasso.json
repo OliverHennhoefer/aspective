@@ -1,6 +1,6 @@
 {
  "name": "relaxed-lasso",
- "fingerprint": "ce89da4d4b38b304",
+ "fingerprint": "9b6210d789b7bef6",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

@@ -43,7 +43,7 @@ def _gate_cases():
         yield pytest.param(b, id=b.name, marks=marks)
 
 
-@pytest.mark.parametrize("bench", _gate_cases())
+@pytest.mark.parametrize("bench", list(_gate_cases()))
 def test_benchmark_passes_gate(bench):
     problems = runner.check([bench])
     assert not problems, problems[0]

@@ -1,6 +1,6 @@
 {
  "name": "rotation-classifier",
- "fingerprint": "545874ff783e14b0",
+ "fingerprint": "36e16f0d41954893",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

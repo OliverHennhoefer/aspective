@@ -1,6 +1,6 @@
 {
  "name": "rotation-regressor",
- "fingerprint": "76a82f598e5cce48",
+ "fingerprint": "215ed8591452941e",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

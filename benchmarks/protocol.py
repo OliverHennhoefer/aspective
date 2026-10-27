@@ -105,10 +105,33 @@ class Benchmark:
             "margin": self.effective_margin,
             "datasets": list(suite.datasets),
             "max_samples": suite.max_samples,
-            "models": {label: model_repr(factory()) for label, factory in self.models()},
+            "models": {label: factory_source(factory) for label, factory in self.models()},
             "source": aspective_source_hash(self.candidate[1]()),
         }
         return _hash(parts)
+
+
+def factory_source(factory, _depth=0):
+    """How a model is specified, independent of the scikit-learn version.
+
+    The repr of a fitted-from-defaults estimator changes when a library changes
+    its defaults, which would mark every result stale on another version. The
+    source of the factory (plus the constants and helper functions it uses)
+    changes only when the spec does.
+    """
+    if inspect.isclass(factory):
+        return f"{factory.__module__}.{factory.__qualname__}"
+    if not inspect.isfunction(factory) or _depth > 3:
+        return repr(factory)
+    names = inspect.getclosurevars(factory)
+    used = {}
+    for name, value in {**names.nonlocals, **names.globals}.items():
+        if isinstance(value, (int, float, str, bool, type(None))):
+            used[name] = value
+        elif inspect.isfunction(value) and value.__module__ == factory.__module__:
+            used[name] = factory_source(value, _depth + 1)
+    source = " ".join(inspect.getsource(factory).split())
+    return {"source": source, "uses": used}
 
 
 def _hash(obj):

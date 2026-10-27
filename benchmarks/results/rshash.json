@@ -1,6 +1,6 @@
 {
  "name": "rshash",
- "fingerprint": "8a4244b50dd366e9",
+ "fingerprint": "cbc29bb57bf254c3",
  "quick": false,
  "suite": "adbench-classical",
  "metric": "roc_auc",
