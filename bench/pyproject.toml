@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aspective-bench"
+version = "0.1.0"
+description = "Benchmark gate for aspective: every estimator must be non-inferior to its predecessor."
+requires-python = ">=3.10"
+dependencies = [
+    "aspective",
+    "joblib>=1.2",
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "scikit-learn>=1.7",
+]
+
+[project.scripts]
+aspective-bench = "aspective_bench.__main__:main"
+
+[tool.uv.sources]
+aspective = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aspective_bench"]

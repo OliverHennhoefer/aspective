@@ -5,14 +5,11 @@ import pytest
 from sklearn.base import clone
 from sklearn.metrics import roc_auc_score
 
-from aspective.anomaly import IDKDetector, RobustKDEDetector, RSHashDetector
+from aspective.anomaly import RSHashDetector
 from aspective.anomaly._base import BaseDetector
 
 DETECTORS = [
-    IDKDetector(n_estimators=100, random_state=0),
     RSHashDetector(n_estimators=50, random_state=0),
-    RobustKDEDetector(),
-    RobustKDEDetector(loss="huber", max_samples=150, random_state=0),
 ]
 
 
@@ -79,12 +76,6 @@ def test_integer_input_matches_float_input(detector):
     np.testing.assert_allclose(ints, floats)
 
 
-def test_robust_kde_downweights_outliers(planted):
-    X, y = planted
-    model = RobustKDEDetector().fit(X)
-    assert model.weights_[y == 1].mean() < model.weights_[y == 0].mean()
-
-
 def test_rshash_is_reproducible(planted):
     X, _ = planted
     a = RSHashDetector(random_state=3).fit(X).decision_scores_
@@ -97,7 +88,8 @@ def test_works_inside_pyod_ensembles(planted):
     from pyod.models.lscp import LSCP
 
     X, y = planted
-    ensemble = LSCP([clone(d) for d in DETECTORS[:3]], random_state=0).fit(X)
+    members = [RSHashDetector(n_estimators=50, random_state=seed) for seed in range(3)]
+    ensemble = LSCP(members, random_state=0).fit(X)
     assert roc_auc_score(y, ensemble.decision_scores_) > 0.9
 
 

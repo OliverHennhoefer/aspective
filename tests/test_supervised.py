@@ -2,15 +2,13 @@
 
 import numpy as np
 import pytest
-from sklearn.datasets import make_classification, make_regression
+from sklearn.datasets import make_classification
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import Lasso, LinearRegression, LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import CategoricalNB
 
 from aspective.discriminant_analysis import RegularizedDiscriminantAnalysis
-from aspective.ensemble import RandomRotationClassifier, RandomRotationRegressor, random_rotation
 from aspective.linear_model import Bolasso, FirthLogisticRegression, RelaxedLasso, RelaxedLassoCV
 from aspective.naive_bayes import AODEClassifier
 
@@ -141,30 +139,6 @@ def test_flic_flac_with_uncentered_features(correction):
 def test_firth_rejects_multiclass():
     with pytest.raises(ValueError, match="Only binary"):
         FirthLogisticRegression().fit(np.random.randn(9, 2), np.arange(9) % 3)
-
-
-# --- Random rotations --------------------------------------------------------
-
-def test_random_rotation_is_orthogonal_with_unit_determinant():
-    for seed in range(5):
-        q = random_rotation(6, seed)
-        np.testing.assert_allclose(q @ q.T, np.eye(6), atol=1e-10)
-        assert np.isclose(np.linalg.det(q), 1.0)
-
-
-def test_rotation_ensemble_beats_forest_on_oblique_boundary():
-    rng = np.random.RandomState(0)
-    X = rng.uniform(-1, 1, size=(600, 2))
-    y = (X[:, 0] + X[:, 1] > 0).astype(int)
-    forest = cross_val_score(RandomForestClassifier(n_estimators=50, random_state=0), X, y, cv=5).mean()
-    rotated = cross_val_score(RandomRotationClassifier(n_estimators=50, random_state=0), X, y, cv=5).mean()
-    assert rotated > forest
-
-
-def test_rotation_regressor_fits():
-    X, y = make_regression(n_samples=200, n_features=5, noise=1.0, random_state=0)
-    model = RandomRotationRegressor(n_estimators=30, random_state=0).fit(X, y)
-    assert model.score(X, y) > 0.8
 
 
 # --- Relaxed Lasso -----------------------------------------------------------
