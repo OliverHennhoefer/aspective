@@ -4,13 +4,24 @@ import numpy as np
 import pytest
 from sklearn.datasets import make_classification
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.linear_model import Lasso, LinearRegression, LogisticRegression
+from sklearn.linear_model import Lasso, LassoCV, LinearRegression, LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import CategoricalNB
+from sklearn.neighbors import KNeighborsRegressor
 
-from aspective.discriminant_analysis import RegularizedDiscriminantAnalysis
-from aspective.linear_model import Bolasso, FirthLogisticRegression, RelaxedLasso, RelaxedLassoCV
-from aspective.naive_bayes import AODEClassifier
+from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
+from aspective.linear_model import (
+    AdaptiveLasso,
+    AdaptiveLassoCV,
+    Bolasso,
+    CauchyLogisticRegression,
+    FirthLogisticRegression,
+    L2BoostRegressor,
+    RelaxedLasso,
+    RelaxedLassoCV,
+)
+from aspective.naive_bayes import AODEClassifier, TANClassifier
+from aspective.neighbors import LoessRegressor
 
 
 # --- RDA ---------------------------------------------------------------------
@@ -189,3 +200,166 @@ def test_bolasso_soft_threshold_keeps_superset(sparse_problem):
     strict = Bolasso(alpha=0.05, threshold=1.0, n_bootstrap=32, random_state=0).fit(X, y)
     soft = Bolasso(alpha=0.05, threshold=0.5, n_bootstrap=32, random_state=0).fit(X, y)
     assert set(strict.support_) <= set(soft.support_)
+
+
+# --- TAN ---------------------------------------------------------------------
+
+def test_tan_learns_a_dependency_naive_bayes_misses():
+    # The class is the XOR of features 0 and 1; the tree must link them.
+    rng = np.random.RandomState(0)
+    X = rng.randint(0, 2, size=(800, 4))
+    y = X[:, 0] ^ X[:, 1]
+    model = TANClassifier().fit(X, y)
+    assert model.parents_[0] == -1
+    assert model.parents_[1] == 0
+    assert cross_val_score(TANClassifier(), X, y, cv=5).mean() > 0.95
+    assert cross_val_score(CategoricalNB(), X, y, cv=5).mean() < 0.65
+
+
+def test_tan_parents_form_a_tree():
+    X, y = make_classification(n_samples=300, n_features=7, random_state=0)
+    parents = TANClassifier(n_bins=4).fit(X, y).parents_
+    assert np.sum(parents == -1) == 1
+    for j in range(len(parents)):  # every feature reaches the root without a cycle
+        seen, node = set(), j
+        while parents[node] != -1:
+            assert node not in seen
+            seen.add(node)
+            node = parents[node]
+
+
+def test_tan_unseen_values_and_probabilities():
+    X = np.array([[0, 1], [1, 1], [0, 0], [1, 0]] * 5)
+    y = np.array([0, 1, 0, 1] * 5)
+    proba = TANClassifier().fit(X, y).predict_proba(np.array([[7, 9], [0, 1]]))
+    np.testing.assert_allclose(proba.sum(axis=1), 1.0)
+
+
+# --- MDA ---------------------------------------------------------------------
+
+def test_mda_one_subclass_is_lda(gaussian_classes):
+    X, y = gaussian_classes
+    mda = MixtureDiscriminantAnalysis(n_subclasses=1, reg_covar=0).fit(X, y)
+    lda = LinearDiscriminantAnalysis(solver="lsqr").fit(X, y)
+    np.testing.assert_allclose(mda.predict_proba(X), lda.predict_proba(X), atol=1e-6)
+
+
+def test_mda_separates_a_multimodal_class():
+    # Class 1 sits on both sides of class 0: no linear boundary works.
+    rng = np.random.RandomState(0)
+    X = np.vstack([rng.randn(200, 2), rng.randn(100, 2) + [6, 0], rng.randn(100, 2) - [6, 0]])
+    y = np.r_[np.zeros(200), np.ones(200)]
+    lda = cross_val_score(LinearDiscriminantAnalysis(), X, y, cv=5).mean()
+    mda = cross_val_score(MixtureDiscriminantAnalysis(n_subclasses=2, random_state=0), X, y,
+                          cv=5).mean()
+    assert lda < 0.7
+    assert mda > 0.95
+
+
+# --- Cauchy logistic ---------------------------------------------------------
+
+def test_cauchy_logistic_finite_under_complete_separation():
+    X = np.array([[-2.0], [-1.0], [-0.5], [0.5], [1.0], [2.0]])
+    y = np.array([0, 0, 0, 1, 1, 1])
+    model = CauchyLogisticRegression().fit(X, y)
+    assert np.all(np.isfinite(model.coef_))
+    assert model.predict_proba(X)[:, 1].round().tolist() == y.tolist()
+
+
+def test_cauchy_logistic_close_to_ml_with_much_data():
+    X, y = make_classification(n_samples=4000, n_features=4, n_informative=3, n_redundant=0,
+                               random_state=0)
+    cauchy = CauchyLogisticRegression().fit(X, y)
+    ml = LogisticRegression(penalty=None, max_iter=1000).fit(X, y)
+    np.testing.assert_allclose(cauchy.coef_, ml.coef_, rtol=0.02, atol=0.01)
+
+
+def test_cauchy_logistic_coef_on_original_scale():
+    X, y = make_classification(n_samples=300, n_features=3, n_informative=3, n_redundant=0,
+                               random_state=1)
+    model = CauchyLogisticRegression().fit(X * [1, 100, 0.01] + 5, y)
+    eta = (X * [1, 100, 0.01] + 5) @ model.coef_[0] + model.intercept_[0]
+    np.testing.assert_allclose(model.decision_function(X * [1, 100, 0.01] + 5), eta)
+    assert model.score(X * [1, 100, 0.01] + 5, y) > 0.8
+
+
+def test_cauchy_logistic_rejects_multiclass():
+    X, y = make_classification(n_samples=60, n_classes=3, n_informative=3, random_state=0)
+    with pytest.raises(ValueError, match="binary"):
+        CauchyLogisticRegression().fit(X, y)
+
+
+# --- Adaptive lasso ----------------------------------------------------------
+
+def test_adaptive_lasso_recovers_support_with_less_bias(sparse_problem):
+    X, y, coef = sparse_problem
+    true_support = np.flatnonzero(coef)
+    model = AdaptiveLassoCV(cv=5).fit(X, y)
+    lasso = LassoCV(cv=5).fit(X, y)
+    assert set(true_support) <= set(model.support_)
+    assert len(model.support_) <= len(np.flatnonzero(lasso.coef_))
+
+
+def test_adaptive_lasso_drops_features_with_zero_initial_coef():
+    rng = np.random.RandomState(0)
+    X = rng.randn(100, 3)
+    X[:, 2] = 0.0
+    y = X[:, 0] + 0.1 * rng.randn(100)
+    model = AdaptiveLasso(alpha=0.01, initial="ols").fit(X, y)
+    assert model.coef_[2] == 0
+    assert np.isinf(model.weights_[2])
+
+
+# --- L2 boosting -------------------------------------------------------------
+
+def test_l2boost_converges_to_least_squares():
+    rng = np.random.RandomState(0)
+    X = rng.randn(200, 5)
+    y = X @ [1.0, -2.0, 0.5, 0.0, 3.0] + 0.1 * rng.randn(200)
+    model = L2BoostRegressor(max_iter=3000, learning_rate=0.5, cv=None).fit(X, y)
+    ols = LinearRegression().fit(X, y)
+    np.testing.assert_allclose(model.coef_, ols.coef_, atol=1e-6)
+    np.testing.assert_allclose(model.intercept_, ols.intercept_, atol=1e-6)
+
+
+def test_l2boost_stops_early_on_sparse_problem(sparse_problem):
+    X, y, coef = sparse_problem
+    true_support = np.flatnonzero(coef)
+    model = L2BoostRegressor(cv=5).fit(X, y)
+    assert 0 < model.n_iter_ < model.max_iter
+    assert set(true_support) <= set(model.support_)
+    assert model.cv_mse_.shape == (model.max_iter + 1,)
+
+
+# --- LOESS -------------------------------------------------------------------
+
+def test_loess_reproduces_a_linear_function_exactly():
+    rng = np.random.RandomState(0)
+    X = rng.uniform(-1, 1, size=(200, 2))
+    y = 3 * X[:, 0] - 2 * X[:, 1] + 1
+    pred = LoessRegressor(span=0.2, ridge=0).fit(X, y).predict(X)
+    np.testing.assert_allclose(pred, y, atol=1e-8)
+
+
+def test_loess_less_biased_than_knn_at_the_boundary():
+    rng = np.random.RandomState(0)
+    X = np.sort(rng.uniform(0, 1, size=(300, 1)), axis=0)
+    y = 2 * X[:, 0]
+    edge = np.array([[0.0], [1.0]])
+    knn = KNeighborsRegressor(n_neighbors=30).fit(X, y).predict(edge)
+    loess = LoessRegressor(span=0.1).fit(X, y).predict(edge)
+    assert np.all(np.abs(loess - [0, 2]) < 0.01)
+    assert np.all(np.abs(knn - [0, 2]) > 0.05)
+
+
+def test_loess_degree_two_fits_a_parabola():
+    X = np.linspace(-1, 1, 101)[:, None]
+    y = X[:, 0] ** 2
+    pred = LoessRegressor(span=0.3, degree=2, ridge=0).fit(X, y).predict(X)
+    np.testing.assert_allclose(pred, y, atol=1e-8)
+
+
+def test_cauchy_logistic_rejects_a_single_class():
+    X = np.random.RandomState(0).randn(20, 2)
+    with pytest.raises(ValueError, match="2 classes"):
+        CauchyLogisticRegression().fit(X, np.ones(20))

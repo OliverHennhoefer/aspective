@@ -14,12 +14,13 @@ import aspective.anomaly
 import aspective.discriminant_analysis
 import aspective.linear_model
 import aspective.naive_bayes
+import aspective.neighbors
 from aspective_bench import runner
 from aspective_bench.protocol import _estimator_classes
 from aspective_bench.specs import BENCHMARKS, COVERED_BY
 
 MODULES = [aspective.anomaly, aspective.discriminant_analysis, aspective.linear_model,
-           aspective.naive_bayes]
+           aspective.naive_bayes, aspective.neighbors]
 
 PUBLIC_ESTIMATORS = sorted(
     {obj for m in MODULES for obj in vars(m).values()
