@@ -104,3 +104,11 @@ def test_pyod_extras(detector, planted):
     np.testing.assert_allclose(proba.sum(axis=1), 1.0)
     labels, confidence = model.predict(X, return_confidence=True)
     assert labels.shape == confidence.shape == (len(X),)
+
+
+@pytest.mark.parametrize("n_samples, max_samples", [(2, 8), (50, 1)])
+def test_lesinn_training_scores_finite_with_singleton_subsamples(n_samples, max_samples):
+    X = np.random.RandomState(0).randn(n_samples, 3)
+    model = LeSiNNDetector(max_samples=max_samples, random_state=0).fit(X)
+    assert np.all(np.isfinite(model.decision_scores_))
+    assert np.isfinite(model.threshold_)

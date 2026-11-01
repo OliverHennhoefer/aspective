@@ -106,6 +106,8 @@ class CauchyLogisticRegression(ClassifierMixin, BaseEstimator):
                 f"is {type_of_target(y)}. Wrap the model in OneVsRestClassifier for more classes."
             )
         self.classes_, y01 = np.unique(y, return_inverse=True)
+        if len(self.classes_) != 2:
+            raise ValueError(f"Need samples of 2 classes, got {len(self.classes_)} class.")
         y01 = y01.astype(float)
         n, p = X.shape
 

@@ -186,7 +186,7 @@ The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs ce
 
 - vs ML logistic: **superior**. Median difference +0.0003, mean +0.0070 (positive favours the candidate); better on 7, within margin on 16, worse on 0 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
 - Average ranks over 23 datasets where every model ran: Cauchy prior 1.74, Ridge logistic (C=1) 2.09, Firth 3.00, ML logistic 3.17. Nemenyi critical difference 0.98, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: ML logistic 1.6x.
+- Total fit and score time relative to the candidate: ML logistic 1.4x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -308,7 +308,7 @@ The paper's defaults: 50 subsamples of 8 points.
 
 - vs Isolation Forest: **non-inferior**. Median difference +0.0049, mean +0.0034 (positive favours the candidate); better on 13, within margin on 14, worse on 10 of 37 datasets; non-inferiority p = 0.013, two-sided Wilcoxon p = 0.577.
 - Average ranks over 37 datasets where every model ran: LeSiNN 1.80, Isolation Forest 1.88, LOF 2.32. Nemenyi critical difference 0.54, Friedman p = 0.050.
-- Total fit and score time relative to the candidate: Isolation Forest 3.2x.
+- Total fit and score time relative to the candidate: Isolation Forest 3x.
 
 <details><summary>Per-dataset scores</summary>
 

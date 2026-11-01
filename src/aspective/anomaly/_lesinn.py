@@ -78,12 +78,16 @@ class LeSiNNDetector(BaseDetector):
         psi = min(self.max_samples, n - 1)
         members = np.array([rng.choice(n, psi, replace=False) for _ in range(self.n_estimators)])
         self.subsamples_ = X[members]
-        total = np.zeros(n)
+        total, count = np.zeros(n), np.zeros(n)
         for sample_idx in members:
             dist = pairwise_distances(X, X[sample_idx])
             dist[sample_idx, np.arange(psi)] = np.inf  # a member is not its own neighbour
-            total += dist.min(axis=1)
-        self.decision_scores_ = total / self.n_estimators
+            nearest = dist.min(axis=1)
+            # With psi = 1 the member has no other point to compare with: skip that subsample.
+            usable = np.isfinite(nearest)
+            total[usable] += nearest[usable]
+            count += usable
+        self.decision_scores_ = np.where(count > 0, total / np.maximum(count, 1), 0.0)
         self._process_decision_scores()
         return self
 

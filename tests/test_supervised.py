@@ -357,3 +357,9 @@ def test_loess_degree_two_fits_a_parabola():
     y = X[:, 0] ** 2
     pred = LoessRegressor(span=0.3, degree=2, ridge=0).fit(X, y).predict(X)
     np.testing.assert_allclose(pred, y, atol=1e-8)
+
+
+def test_cauchy_logistic_rejects_a_single_class():
+    X = np.random.RandomState(0).randn(20, 2)
+    with pytest.raises(ValueError, match="2 classes"):
+        CauchyLogisticRegression().fit(X, np.ones(20))
