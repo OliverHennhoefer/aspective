@@ -5,13 +5,14 @@ from numbers import Integral, Real
 import numpy as np
 from scipy.special import logsumexp
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from ._discrete import _DiscreteEncoderMixin
 
-class AODEClassifier(ClassifierMixin, BaseEstimator):
+
+class AODEClassifier(_DiscreteEncoderMixin, ClassifierMixin, BaseEstimator):
     """Averaged One-Dependence Estimators.
 
     Naive Bayes assumes all features are independent given the class. AODE
@@ -62,26 +63,6 @@ class AODEClassifier(ClassifierMixin, BaseEstimator):
         self.n_bins = n_bins
         self.min_count = min_count
         self.alpha = alpha
-
-    def _encode(self, X, fit):
-        if self.n_bins is not None:
-            if fit:
-                self._binner = KBinsDiscretizer(
-                    n_bins=self.n_bins, encode="ordinal", strategy="quantile",
-                    quantile_method="averaged_inverted_cdf",
-                )
-                X = self._binner.fit_transform(X)
-            else:
-                X = self._binner.transform(X)
-        if fit:
-            self._categories = [np.unique(X[:, j]) for j in range(X.shape[1])]
-        codes = np.empty(X.shape, dtype=np.intp)
-        for j, cats in enumerate(self._categories):
-            pos = np.searchsorted(cats, X[:, j])
-            pos_clipped = np.minimum(pos, len(cats) - 1)
-            seen = cats[pos_clipped] == X[:, j]
-            codes[:, j] = np.where(seen, pos_clipped, len(cats))
-        return codes
 
     def fit(self, X, y):
         self._validate_params()

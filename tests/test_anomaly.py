@@ -5,11 +5,13 @@ import pytest
 from sklearn.base import clone
 from sklearn.metrics import roc_auc_score
 
-from aspective.anomaly import RSHashDetector
+from aspective.anomaly import LeSiNNDetector, LoOPDetector, RSHashDetector
 from aspective.anomaly._base import BaseDetector
 
 DETECTORS = [
     RSHashDetector(n_estimators=50, random_state=0),
+    LoOPDetector(),
+    LeSiNNDetector(random_state=0),
 ]
 
 
@@ -35,8 +37,9 @@ def test_pyod_contract(detector, planted):
     assert model.decision_scores_.shape == (len(X),)
     assert set(np.unique(model.labels_)) <= {0, 1}
     assert abs(model.labels_.mean() - model.contamination) < 0.03
-    if not isinstance(model, RSHashDetector):
-        # RS-Hash scores training points leave-one-out, so only new data uses decision_function.
+    if not isinstance(model, (RSHashDetector, LoOPDetector, LeSiNNDetector)):
+        # These score training points leave-one-out (a point is not its own neighbour),
+        # so decision_function on the training data differs from decision_scores_.
         np.testing.assert_allclose(model.decision_function(X), model.decision_scores_)
         np.testing.assert_array_equal(model.predict(X), model.labels_)
     assert set(np.unique(model.predict(X))) <= {0, 1}

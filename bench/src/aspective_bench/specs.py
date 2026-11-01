@@ -15,19 +15,29 @@ number of trees, same discretization, same bandwidth rule), so a comparison
 measures the paper's idea and not a tuning difference.
 """
 
+from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.ensemble import IsolationForest
-from sklearn.linear_model import LassoCV, LogisticRegression
+from sklearn.linear_model import LassoCV, LinearRegression, LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.naive_bayes import CategoricalNB, GaussianNB
-from sklearn.neighbors import LocalOutlierFactor
-from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsRegressor, LocalOutlierFactor
+from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 
-from aspective.anomaly import RSHashDetector
-from aspective.discriminant_analysis import RegularizedDiscriminantAnalysis
-from aspective.linear_model import Bolasso, FirthLogisticRegression, RelaxedLassoCV
-from aspective.naive_bayes import AODEClassifier
+from aspective.anomaly import LeSiNNDetector, LoOPDetector, RSHashDetector
+from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
+from aspective.linear_model import (
+    AdaptiveLassoCV,
+    Bolasso,
+    CauchyLogisticRegression,
+    FirthLogisticRegression,
+    L2BoostRegressor,
+    RelaxedLassoCV,
+    SupervisedPCARegressor,
+)
+from aspective.naive_bayes import AODEClassifier, TANClassifier
+from aspective.neighbors import LoessRegressor
 
 from .protocol import Benchmark
 
@@ -52,7 +62,27 @@ def firth(correction="none"):
     return lambda: scaled(FirthLogisticRegression(correction=correction))
 
 
+def pcr():
+    # Principal components regression with the number of components chosen by CV;
+    # a variance fraction keeps the grid valid for any number of features.
+    pipe = Pipeline([("scale", StandardScaler()), ("pca", PCA()), ("ols", LinearRegression())])
+    return GridSearchCV(pipe, {"pca__n_components": [0.5, 0.7, 0.8, 0.9, 0.95, 0.99, None]}, cv=5)
+
+
+# LOESS and k-NN get five neighbourhood sizes each, so neither is tuned more.
+def loess():
+    return GridSearchCV(scaled(LoessRegressor()),
+                        {"loessregressor__span": [0.02, 0.05, 0.1, 0.25, 0.5]}, cv=3)
+
+
+def knn_regression():
+    return GridSearchCV(scaled(KNeighborsRegressor()),
+                        {"kneighborsregressor__n_neighbors": [3, 5, 10, 20, 40]}, cv=3)
+
+
 # Shared factories, so the same baseline is computed once and reused.
+NB_5_BINS = ("Naive Bayes (5 bins)", binned_nb)
+ML_LOGISTIC = ("ML logistic", ml_logistic)
 ISOLATION_FOREST = ("Isolation Forest", lambda: scaled(IsolationForest(n_estimators=N_TREES, random_state=0)))
 LOF = ("LOF", lambda: scaled(LocalOutlierFactor(novelty=True)))
 LASSO_CV = ("LassoCV", lambda: scaled(LassoCV(cv=5)))
@@ -73,7 +103,7 @@ BENCHMARKS = [
     Benchmark(
         name="aode",
         candidate=("AODE (5 bins)", lambda: AODEClassifier(n_bins=5)),
-        predecessors={"Naive Bayes (5 bins)": binned_nb},
+        predecessors=dict([NB_5_BINS]),
         references={"Gaussian NB": GaussianNB},
         suite="pmlb-classification",
         metric="accuracy",
@@ -82,7 +112,7 @@ BENCHMARKS = [
     Benchmark(
         name="firth",
         candidate=("Firth", firth()),
-        predecessors={"ML logistic": ml_logistic},
+        predecessors=dict([ML_LOGISTIC]),
         suite="pmlb-binary",
         metric="brier",
         notes="Full-size training folds; features standardized for every model.",
@@ -112,6 +142,89 @@ BENCHMARKS = [
         suite="adbench-classical",
         metric="roc_auc",
     ),
+    Benchmark(
+        name="tan",
+        candidate=("TAN (5 bins)", lambda: TANClassifier(n_bins=5)),
+        predecessors=dict([NB_5_BINS]),
+        references={"AODE (5 bins)": lambda: AODEClassifier(n_bins=5)},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Both use the same 5-bin quantile discretization and Laplace smoothing.",
+    ),
+    Benchmark(
+        name="mda",
+        candidate=("MDA (tuned)", lambda: GridSearchCV(
+            MixtureDiscriminantAnalysis(random_state=0), {"n_subclasses": [1, 2, 3, 5]}, cv=3)),
+        predecessors={"LDA": LinearDiscriminantAnalysis},
+        references={"QDA": QuadraticDiscriminantAnalysis},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as "
+              "Hastie & Tibshirani (1996) did; one subclass is LDA.",
+    ),
+    Benchmark(
+        name="cauchy-logistic",
+        candidate=("Cauchy prior", CauchyLogisticRegression),
+        predecessors=dict([ML_LOGISTIC]),
+        references={"Ridge logistic (C=1)": lambda: scaled(LogisticRegression(max_iter=10_000)),
+                    "Firth": firth()},
+        suite="pmlb-binary",
+        metric="brier",
+        notes="The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs "
+              "centred); the other models get standardized inputs.",
+    ),
+    Benchmark(
+        name="adaptive-lasso",
+        candidate=("Adaptive LassoCV", lambda: scaled(AdaptiveLassoCV(cv=5))),
+        predecessors=dict([LASSO_CV]),
+        suite="pmlb-regression",
+        metric="r2",
+        notes="gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.",
+    ),
+    Benchmark(
+        name="l2boost",
+        candidate=("L2Boost (CV)", lambda: scaled(L2BoostRegressor(cv=5))),
+        predecessors=dict([LASSO_CV]),
+        suite="pmlb-regression",
+        metric="r2",
+        notes="Componentwise linear least squares, learning rate 0.1, number of steps (up to "
+              "2000) by 5-fold CV, as in mboost.",
+    ),
+    Benchmark(
+        name="supervised-pca",
+        candidate=("Supervised PCA", lambda: scaled(SupervisedPCARegressor(cv=5))),
+        predecessors={"PCR (CV)": pcr},
+        suite="pmlb-regression",
+        metric="r2",
+        notes="Both choose their complexity by 5-fold CV on standardized inputs.",
+    ),
+    Benchmark(
+        name="loess",
+        candidate=("LOESS (tuned span)", loess),
+        predecessors={"k-NN (tuned k)": knn_regression},
+        suite="pmlb-regression",
+        metric="r2",
+        notes="Local linear fits with tricube weights. Both tune their neighbourhood size over "
+              "five values by inner 3-fold CV on standardized inputs.",
+    ),
+    Benchmark(
+        name="loop",
+        candidate=("LoOP", lambda: scaled(LoOPDetector(n_neighbors=20))),
+        predecessors=dict([LOF]),
+        references=dict([ISOLATION_FOREST]),
+        suite="adbench-classical",
+        metric="roc_auc",
+        notes="Both use 20 neighbours, LOF's scikit-learn default.",
+    ),
+    Benchmark(
+        name="lesinn",
+        candidate=("LeSiNN", lambda: scaled(LeSiNNDetector(random_state=0))),
+        predecessors=dict([ISOLATION_FOREST]),
+        references=dict([LOF]),
+        suite="adbench-classical",
+        metric="roc_auc",
+        notes="The paper's defaults: 50 subsamples of 8 points.",
+    ),
 ]
 
 BY_NAME = {b.name: b for b in BENCHMARKS}
@@ -119,4 +232,5 @@ BY_NAME = {b.name: b for b in BENCHMARKS}
 # Public estimators whose benchmark is another estimator's, with the reason.
 COVERED_BY = {
     "RelaxedLasso": "relaxed-lasso: RelaxedLassoCV is RelaxedLasso with (alpha, phi) chosen by CV",
+    "AdaptiveLasso": "adaptive-lasso: AdaptiveLassoCV is AdaptiveLasso with (alpha, gamma) chosen by CV",
 }
