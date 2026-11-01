@@ -15,17 +15,16 @@ number of trees, same discretization, same bandwidth rule), so a comparison
 measures the paper's idea and not a tuning difference.
 """
 
-from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.ensemble import IsolationForest
-from sklearn.linear_model import LassoCV, LinearRegression, LogisticRegression
+from sklearn.linear_model import LassoCV, LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.naive_bayes import CategoricalNB, GaussianNB
 from sklearn.neighbors import KNeighborsRegressor, LocalOutlierFactor
-from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 
-from aspective.anomaly import LeSiNNDetector, LoOPDetector, RSHashDetector
+from aspective.anomaly import LeSiNNDetector, RSHashDetector
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
 from aspective.linear_model import (
     AdaptiveLassoCV,
@@ -34,7 +33,6 @@ from aspective.linear_model import (
     FirthLogisticRegression,
     L2BoostRegressor,
     RelaxedLassoCV,
-    SupervisedPCARegressor,
 )
 from aspective.naive_bayes import AODEClassifier, TANClassifier
 from aspective.neighbors import LoessRegressor
@@ -60,13 +58,6 @@ def binned_nb():
 
 def firth(correction="none"):
     return lambda: scaled(FirthLogisticRegression(correction=correction))
-
-
-def pcr():
-    # Principal components regression with the number of components chosen by CV;
-    # a variance fraction keeps the grid valid for any number of features.
-    pipe = Pipeline([("scale", StandardScaler()), ("pca", PCA()), ("ols", LinearRegression())])
-    return GridSearchCV(pipe, {"pca__n_components": [0.5, 0.7, 0.8, 0.9, 0.95, 0.99, None]}, cv=5)
 
 
 # LOESS and k-NN get five neighbourhood sizes each, so neither is tuned more.
@@ -191,14 +182,6 @@ BENCHMARKS = [
               "2000) by 5-fold CV, as in mboost.",
     ),
     Benchmark(
-        name="supervised-pca",
-        candidate=("Supervised PCA", lambda: scaled(SupervisedPCARegressor(cv=5))),
-        predecessors={"PCR (CV)": pcr},
-        suite="pmlb-regression",
-        metric="r2",
-        notes="Both choose their complexity by 5-fold CV on standardized inputs.",
-    ),
-    Benchmark(
         name="loess",
         candidate=("LOESS (tuned span)", loess),
         predecessors={"k-NN (tuned k)": knn_regression},
@@ -206,15 +189,6 @@ BENCHMARKS = [
         metric="r2",
         notes="Local linear fits with tricube weights. Both tune their neighbourhood size over "
               "five values by inner 3-fold CV on standardized inputs.",
-    ),
-    Benchmark(
-        name="loop",
-        candidate=("LoOP", lambda: scaled(LoOPDetector(n_neighbors=20))),
-        predecessors=dict([LOF]),
-        references=dict([ISOLATION_FOREST]),
-        suite="adbench-classical",
-        metric="roc_auc",
-        notes="Both use 20 neighbours, LOF's scikit-learn default.",
     ),
     Benchmark(
         name="lesinn",

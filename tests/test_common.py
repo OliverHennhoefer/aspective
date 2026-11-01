@@ -12,7 +12,6 @@ from aspective.linear_model import (
     L2BoostRegressor,
     RelaxedLasso,
     RelaxedLassoCV,
-    SupervisedPCARegressor,
 )
 from aspective.naive_bayes import AODEClassifier, TANClassifier
 from aspective.neighbors import LoessRegressor
@@ -37,7 +36,6 @@ ESTIMATORS = [
     AdaptiveLasso(alpha=0.1),
     AdaptiveLassoCV(cv=3),
     L2BoostRegressor(max_iter=200, cv=3),
-    SupervisedPCARegressor(cv=3),
     LoessRegressor(),
     LoessRegressor(degree=2, span=0.5),
 ]

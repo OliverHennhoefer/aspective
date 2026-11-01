@@ -25,13 +25,11 @@ candidate is competitive.
 | [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 25 | 0 / 25 / 0 | -0.000 | <0.001 | non-inferior | PASS |
 | [lesinn](#lesinn) | LeSiNN | Isolation Forest | 37 | 13 / 14 / 10 | +0.005 | 0.013 | non-inferior | PASS |
 | [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 25 | 19 / 1 / 5 | +0.037 | <0.001 | superior | PASS |
-| [loop](#loop) | LoOP | LOF | 37 | 13 / 4 / 20 | -0.013 | 0.689 | inconclusive | **FAIL** |
 | [mda](#mda) | MDA (tuned) | LDA | 43 | 14 / 24 / 5 | +0.001 | <0.001 | non-inferior | PASS |
 | [rda](#rda) | RDA (tuned) | LDA | 43 | 18 / 20 / 5 | +0.005 | <0.001 | superior | PASS |
 | [rda](#rda) | RDA (tuned) | QDA | 23 | 6 / 14 / 3 | +0.003 | 0.002 | non-inferior | PASS |
 | [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
 | [rshash](#rshash) | RS-Hash | Isolation Forest | 37 | 12 / 15 / 10 | +0.001 | 0.019 | non-inferior | PASS |
-| [supervised-pca](#supervised-pca) | Supervised PCA | PCR (CV) | 25 | 4 / 8 / 13 | -0.010 | 0.787 | inferior | **FAIL** |
 | [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 12 / 9 | +0.012 | <0.001 | superior | PASS |
 
 ## Details
@@ -188,7 +186,7 @@ The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs ce
 
 - vs ML logistic: **superior**. Median difference +0.0003, mean +0.0070 (positive favours the candidate); better on 7, within margin on 16, worse on 0 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
 - Average ranks over 23 datasets where every model ran: Cauchy prior 1.74, Ridge logistic (C=1) 2.09, Firth 3.00, ML logistic 3.17. Nemenyi critical difference 0.98, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: ML logistic 0.75x.
+- Total fit and score time relative to the candidate: ML logistic 1.6x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -395,60 +393,6 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 | 690_visualizing_galaxy | 0.951 | **0.970** |
 | 695_chatfield_4 | **0.807** | 0.791 |
 | solar_flare | 0.063 | **0.104** |
-
-</details>
-
-### loop
-
-**LoOP** vs LOF (references: Isolation Forest). Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
-
-Both use 20 neighbours, LOF's scikit-learn default.
-
-- vs LOF: **inconclusive**. Median difference -0.0126, mean -0.0205 (positive favours the candidate); better on 13, within margin on 4, worse on 20 of 37 datasets; non-inferiority p = 0.689, two-sided Wilcoxon p = 0.141.
-- Average ranks over 37 datasets where every model ran: Isolation Forest 1.62, LOF 2.03, LoOP 2.35. Nemenyi critical difference 0.54, Friedman p = 0.007.
-- Total fit and score time relative to the candidate: LOF 0.98x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | LoOP | LOF | Isolation Forest |
-|---|---|---|---|
-| 1_ALOI | **0.660** | 0.598 | 0.539 |
-| 2_annthyroid | 0.722 | 0.705 | **0.823** |
-| 4_breastw | 0.388 | 0.463 | **0.987** |
-| 6_cardio | 0.551 | 0.562 | **0.928** |
-| 7_Cardiotocography | 0.538 | 0.504 | **0.669** |
-| 12_fault | 0.583 | **0.601** | 0.581 |
-| 14_glass | 0.736 | 0.717 | **0.815** |
-| 15_Hepatitis | 0.561 | **0.749** | 0.740 |
-| 17_InternetAds | 0.575 | 0.588 | **0.668** |
-| 18_Ionosphere | 0.874 | **0.881** | 0.838 |
-| 19_landsat | 0.553 | **0.557** | 0.470 |
-| 20_letter | **0.914** | 0.876 | 0.610 |
-| 21_Lymphography | 0.985 | 0.986 | **0.999** |
-| 22_magic.gamma | 0.671 | **0.705** | **0.705** |
-| 23_mammography | 0.680 | 0.711 | **0.854** |
-| 24_mnist | 0.686 | 0.740 | **0.811** |
-| 25_musk | 0.596 | 0.639 | **1.000** |
-| 26_optdigits | 0.536 | 0.487 | **0.693** |
-| 27_PageBlocks | 0.698 | 0.777 | **0.895** |
-| 28_pendigits | 0.486 | 0.480 | **0.943** |
-| 29_Pima | 0.572 | 0.620 | **0.675** |
-| 30_satellite | 0.549 | 0.567 | **0.695** |
-| 31_satimage-2 | 0.513 | 0.418 | **0.993** |
-| 32_shuttle | 0.569 | 0.549 | **0.997** |
-| 35_SpamBase | 0.457 | 0.432 | **0.654** |
-| 36_speech | **0.494** | 0.469 | 0.446 |
-| 37_Stamps | 0.533 | 0.662 | **0.878** |
-| 38_thyroid | 0.653 | 0.742 | **0.981** |
-| 39_vertebral | **0.515** | 0.441 | 0.382 |
-| 40_vowels | 0.922 | **0.936** | 0.755 |
-| 41_Waveform | 0.673 | **0.719** | **0.719** |
-| 42_WBC | 0.824 | 0.916 | **0.995** |
-| 43_WDBC | 0.939 | 0.979 | **0.984** |
-| 44_Wilt | **0.708** | 0.652 | 0.460 |
-| 45_wine | 0.686 | **0.906** | 0.773 |
-| 46_WPBC | 0.485 | **0.530** | 0.499 |
-| 47_yeast | **0.468** | 0.451 | 0.396 |
 
 </details>
 
@@ -662,48 +606,6 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 | 45_wine | 0.808 | 0.773 | **0.906** |
 | 46_WPBC | 0.517 | 0.499 | **0.530** |
 | 47_yeast | 0.387 | 0.396 | **0.451** |
-
-</details>
-
-### supervised-pca
-
-**Supervised PCA** vs PCR (CV). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
-
-Both choose their complexity by 5-fold CV on standardized inputs.
-
-- vs PCR (CV): **inferior**. Median difference -0.0101, mean -0.0338 (positive favours the candidate); better on 4, within margin on 8, worse on 13 of 25 datasets; non-inferiority p = 0.787, two-sided Wilcoxon p = 0.010.
-- Average ranks over 25 datasets where every model ran: PCR (CV) 1.28, Supervised PCA 1.72. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: PCR (CV) 2.3x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | Supervised PCA | PCR (CV) |
-|---|---|---|
-| 1027_ESL | **0.855** | 0.854 |
-| 1028_SWD | 0.372 | **0.396** |
-| 1029_LEV | 0.492 | **0.558** |
-| 1030_ERA | 0.337 | **0.357** |
-| 197_cpu_act | 0.706 | **0.722** |
-| 201_pol | 0.203 | **0.475** |
-| 210_cloud | **0.854** | 0.825 |
-| 218_house_8L | 0.352 | **0.366** |
-| 225_puma8NH | **0.376** | 0.375 |
-| 230_machine_cpu | **0.804** | 0.752 |
-| 294_satellite_image | 0.695 | **0.698** |
-| 4544_GeographicalOriginalofMusic | 0.681 | **0.788** |
-| 503_wind | 0.725 | **0.758** |
-| 505_tecator | 0.989 | **0.996** |
-| 522_pm10 | 0.126 | **0.144** |
-| 529_pollen | 0.788 | **0.793** |
-| 537_houses | 0.471 | **0.631** |
-| 547_no2 | 0.392 | **0.485** |
-| 560_bodyfat | **0.970** | 0.966 |
-| 574_house_16H | 0.157 | **0.265** |
-| 665_sleuth_case2002 | 0.267 | **0.270** |
-| 666_rmftsa_ladata | 0.538 | **0.548** |
-| 690_visualizing_galaxy | 0.891 | **0.894** |
-| 695_chatfield_4 | **0.860** | 0.848 |
-| solar_flare | **0.127** | 0.108 |
 
 </details>
 

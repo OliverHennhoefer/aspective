@@ -25,16 +25,23 @@ The anomaly detectors work without PyOD through a small stand-in base class
 with the same contract. With PyOD installed they are genuine PyOD detectors
 and work inside PyOD's ensembles (LSCP, SUOD), thresholding and benchmarks.
 
-## Estimators (first wave)
+## Estimators
 
 | Estimator | Improves on | Paper |
 |---|---|---|
 | `discriminant_analysis.RegularizedDiscriminantAnalysis` | LDA, QDA | Friedman, JASA 1989 |
+| `discriminant_analysis.MixtureDiscriminantAnalysis` | LDA | Hastie & Tibshirani, JRSS-B 1996 |
 | `naive_bayes.AODEClassifier` | Naive Bayes | Webb, Boughton & Wang, Machine Learning 2005 |
+| `naive_bayes.TANClassifier` | Naive Bayes | Friedman, Geiger & Goldszmidt, Machine Learning 1997 |
 | `linear_model.FirthLogisticRegression` | Logistic regression | Firth, Biometrika 1993; Puhr et al., Statistics in Medicine 2017 (FLIC/FLAC) |
+| `linear_model.CauchyLogisticRegression` | Logistic regression | Gelman, Jakulin, Pittau & Su, Annals of Applied Statistics 2008 |
 | `linear_model.RelaxedLasso`, `RelaxedLassoCV` | Lasso | Meinshausen, CSDA 2007 |
+| `linear_model.AdaptiveLasso`, `AdaptiveLassoCV` | Lasso | Zou, JASA 2006 |
 | `linear_model.Bolasso` | Lasso (variable selection) | Bach, ICML 2008 |
+| `linear_model.L2BoostRegressor` | Lasso | Bühlmann & Yu, JASA 2003; Bühlmann, Annals of Statistics 2006 |
+| `neighbors.LoessRegressor` | k-NN regression | Cleveland & Devlin, JASA 1988 |
 | `anomaly.RSHashDetector` | Isolation Forest, subspace detectors | Sathe & Aggarwal, ICDM 2016 |
+| `anomaly.LeSiNNDetector` | Isolation Forest, k-NN detector | Pang, Ting & Albrecht, ICDM Workshops 2015 |
 
 ## Example
 

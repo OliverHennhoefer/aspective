@@ -4,12 +4,10 @@ import numpy as np
 import pytest
 from sklearn.datasets import make_classification
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.decomposition import PCA
 from sklearn.linear_model import Lasso, LassoCV, LinearRegression, LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import CategoricalNB
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.pipeline import make_pipeline
 
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
 from aspective.linear_model import (
@@ -21,7 +19,6 @@ from aspective.linear_model import (
     L2BoostRegressor,
     RelaxedLasso,
     RelaxedLassoCV,
-    SupervisedPCARegressor,
 )
 from aspective.naive_bayes import AODEClassifier, TANClassifier
 from aspective.neighbors import LoessRegressor
@@ -332,29 +329,6 @@ def test_l2boost_stops_early_on_sparse_problem(sparse_problem):
     assert 0 < model.n_iter_ < model.max_iter
     assert set(true_support) <= set(model.support_)
     assert model.cv_mse_.shape == (model.max_iter + 1,)
-
-
-# --- Supervised PCA ----------------------------------------------------------
-
-def test_supervised_pca_finds_factor_hidden_by_noise():
-    # The response depends on a latent factor seen by 10 features; 200 noise features
-    # with larger variance dominate the ordinary principal components.
-    rng = np.random.RandomState(0)
-    n = 150
-    factor = rng.randn(n)
-    signal = factor[:, None] + 0.5 * rng.randn(n, 10)
-    noise = 3 * rng.randn(n, 200)
-    X = np.hstack([signal, noise])
-    y = factor + 0.3 * rng.randn(n)
-    model = SupervisedPCARegressor(cv=5)
-    spc = cross_val_score(model, X, y, cv=5, scoring="r2").mean()
-    pcr = cross_val_score(make_pipeline(PCA(3), LinearRegression()), X, y, cv=5,
-                          scoring="r2").mean()
-    assert spc > 0.7
-    assert pcr < 0.3
-    model.fit(X, y)
-    assert model.n_features_kept_ <= 40
-    assert np.mean(model.support_ < 10) > 0.5
 
 
 # --- LOESS -------------------------------------------------------------------

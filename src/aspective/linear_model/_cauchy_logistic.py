@@ -76,7 +76,7 @@ class CauchyLogisticRegression(ClassifierMixin, BaseEstimator):
     _parameter_constraints = {
         "prior_scale": [Interval(Real, 0, None, closed="neither")],
         "intercept_prior_scale": [Interval(Real, 0, None, closed="neither")],
-        "prior_df": [Interval(Real, 0, None, closed="neither")],
+        "prior_df": [Interval(Real, 0, None, closed="right")],  # right-closed admits np.inf
         "scale_inputs": ["boolean"],
         "max_iter": [Interval(Integral, 1, None, closed="left")],
         "tol": [Interval(Real, 0, None, closed="neither")],

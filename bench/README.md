@@ -93,10 +93,22 @@ retry with the setting their paper recommends, fixed before the retry ran:
 | `IDKDetector` | Ting et al., KDD 2020 | inconclusive vs Gaussian KDE and one-class SVM with Voronoi cells; the paper's hypersphere kernel was inconclusive at ψ = 16 and worse at ψ = 64 and 256 |
 | `RobustKDEDetector` | Kim & Scott, JMLR 2012 | inconclusive vs plain KDE with Scott's bandwidth and with the paper's median nearest-neighbour bandwidth (median difference +0.000 both times) |
 
+The second wave added nine candidates and removed these two, which failed
+at the settings their paper recommends:
+
+| Estimator | Paper | Result |
+|---|---|---|
+| `SupervisedPCARegressor` | Bair, Hastie, Paul & Tibshirani, JASA 2006 | inferior to PCR with CV-chosen components: median R² −0.010, worse on 13 of 25 datasets; it is built for many more features than samples, which PMLB does not have |
+| `LoOPDetector` | Kriegel, Kröger, Schubert & Zimek, CIKM 2009 | inconclusive vs LOF at the same 20 neighbours (median ROC AUC −0.013, worse on 20 of 37): turning scores into probabilities with `erf` ties many points at 0 and near 1, which costs ranking quality |
+
+KDEOS (Schubert, Zimek & Kriegel, SDM 2014) was written but not benchmarked:
+the exact definition could not be checked against the paper, and the version
+built from the description lost to LOF on a planted-outlier sanity check.
+
 Firth's FLIC/FLAC corrections stay as options of `FirthLogisticRegression`,
 which passes; at 100 training rows they were not shown better than maximum
 likelihood, which the docstring states. The code is in the git history
-(commit `aa38a9b` and earlier) if a better configuration turns up.
+(commit `aa38a9b` and earlier for the first wave, commit `2aa9e33` for the second) if a better configuration turns up.
 
 ## Commands
 
