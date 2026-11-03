@@ -102,9 +102,10 @@ class RotationForestClassifier(ClassifierMixin, BaseEstimator):
             sub = Z[np.ix_(rows, group)]
             sub = sub - sub.mean(axis=0)
             # All components, including those of zero variance, so the rotation keeps every
-            # direction (a degenerate sample still gives an orthonormal basis).
-            _, _, vt = np.linalg.svd(sub, full_matrices=True)
-            R[group, col : col + M] += vt.T
+            # direction (a degenerate sample still gives an orthonormal basis). The M x M
+            # scatter matrix avoids SVD's n x n left factor.
+            _, vecs = np.linalg.eigh(sub.T @ sub)
+            R[group, col : col + M] += vecs[:, ::-1]  # decreasing variance
             col += M
         return R
 

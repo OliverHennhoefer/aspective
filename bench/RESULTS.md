@@ -39,11 +39,11 @@ candidate is competitive.
 | [mcp](#mcp) | MCP (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
 | [mda](#mda) | MDA (tuned) | LDA | 43 | 14 / 24 / 5 | +0.001 | <0.001 | non-inferior | PASS |
 | [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 43 | 13 / 21 / 9 | +0.003 | <0.001 | non-inferior | PASS |
-| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 25 | 13 / 6 / 6 | +0.019 | 0.018 | non-inferior | PASS |
+| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 25 | 13 / 6 / 6 | +0.019 | 0.031 | non-inferior | PASS |
 | [rda](#rda) | RDA (tuned) | LDA | 43 | 18 / 20 / 5 | +0.005 | <0.001 | superior | PASS |
 | [rda](#rda) | RDA (tuned) | QDA | 23 | 6 / 14 / 3 | +0.003 | 0.002 | non-inferior | PASS |
 | [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 43 | 12 / 27 / 4 | -0.001 | <0.001 | non-inferior | PASS |
+| [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 43 | 11 / 28 / 4 | +0.000 | <0.001 | non-inferior | PASS |
 | [rshash](#rshash) | RS-Hash | Isolation Forest | 37 | 12 / 15 / 10 | +0.001 | 0.019 | non-inferior | PASS |
 | [scad](#scad) | SCAD (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
 | [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 12 / 9 | +0.012 | <0.001 | superior | PASS |
@@ -1121,9 +1121,9 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 
 Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter chosen by GCV; the strongest smoothing is linear regression.
 
-- vs LassoCV: **non-inferior**. Median difference +0.0190, mean -0.0344 (positive favours the candidate); better on 13, within margin on 6, worse on 6 of 25 datasets; non-inferiority p = 0.018, two-sided Wilcoxon p = 0.210.
-- Average ranks over 25 datasets where every model ran: MARS (additive) 1.88, P-spline GAM 1.92, LassoCV 2.20. Nemenyi critical difference 0.66, Friedman p = 0.468.
-- Total fit and score time relative to the candidate: LassoCV 0.3x.
+- vs LassoCV: **non-inferior**. Median difference +0.0190, mean -0.0401 (positive favours the candidate); better on 13, within margin on 6, worse on 6 of 25 datasets; non-inferiority p = 0.031, two-sided Wilcoxon p = 0.275.
+- Average ranks over 25 datasets where every model ran: MARS (additive) 1.84, P-spline GAM 1.96, LassoCV 2.20. Nemenyi critical difference 0.66, Friedman p = 0.432.
+- Total fit and score time relative to the candidate: LassoCV 0.31x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1135,24 +1135,24 @@ Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter 
 | 1030_ERA | 0.351 | **0.357** | 0.346 |
 | 197_cpu_act | 0.951 | 0.722 | **0.957** |
 | 201_pol | **0.740** | 0.475 | 0.736 |
-| 210_cloud | -1.077 | **0.838** | 0.591 |
+| 210_cloud | -1.112 | **0.838** | 0.591 |
 | 218_house_8L | 0.564 | 0.367 | **0.571** |
 | 225_puma8NH | 0.438 | 0.376 | **0.440** |
 | 230_machine_cpu | 0.525 | 0.793 | **0.837** |
 | 294_satellite_image | **0.831** | 0.700 | 0.819 |
-| 4544_GeographicalOriginalofMusic | 0.788 | **0.795** | 0.764 |
+| 4544_GeographicalOriginalofMusic | 0.786 | **0.795** | 0.764 |
 | 503_wind | **0.787** | 0.758 | 0.785 |
 | 505_tecator | 0.958 | **0.996** | 0.994 |
 | 522_pm10 | 0.319 | 0.145 | **0.335** |
 | 529_pollen | **0.793** | **0.793** | 0.792 |
 | 537_houses | 0.697 | 0.631 | **0.698** |
-| 547_no2 | **0.560** | 0.485 | 0.543 |
-| 560_bodyfat | 0.823 | **0.968** | **0.968** |
+| 547_no2 | **0.559** | 0.485 | 0.543 |
+| 560_bodyfat | 0.748 | **0.968** | **0.968** |
 | 574_house_16H | **0.456** | 0.265 | 0.419 |
 | 665_sleuth_case2002 | 0.281 | 0.286 | **0.324** |
 | 666_rmftsa_ladata | **0.644** | 0.547 | 0.616 |
 | 690_visualizing_galaxy | **0.961** | 0.894 | 0.958 |
-| 695_chatfield_4 | 0.791 | **0.858** | 0.781 |
+| 695_chatfield_4 | 0.761 | **0.858** | 0.781 |
 | solar_flare | **0.147** | 0.128 | 0.139 |
 
 </details>
@@ -1264,57 +1264,57 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 
 Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 
-- vs Random forest: **non-inferior**. Median difference -0.0015, mean +0.0030 (positive favours the candidate); better on 12, within margin on 27, worse on 4 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.433.
-- Average ranks over 43 datasets where every model ran: Random forest 1.47, Rotation Forest 1.53. Nemenyi critical difference 0.30.
-- Total fit and score time relative to the candidate: Random forest 0.028x.
+- vs Random forest: **non-inferior**. Median difference +0.0001, mean +0.0032 (positive favours the candidate); better on 11, within margin on 28, worse on 4 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.254.
+- Average ranks over 43 datasets where every model ran: Rotation Forest 1.47, Random forest 1.53. Nemenyi critical difference 0.30.
+- Total fit and score time relative to the candidate: Random forest 0.15x.
 
 <details><summary>Per-dataset scores</summary>
 
 | Dataset | Rotation Forest | Random forest |
 |---|---|---|
-| analcatdata_lawsuit | 0.983 | **0.987** |
-| biomed | **0.902** | 0.900 |
-| breast_cancer | 0.713 | **0.734** |
-| breast_cancer_wisconsin_diagnostic | **0.972** | 0.963 |
-| bupa | **0.580** | 0.567 |
+| analcatdata_lawsuit | 0.985 | **0.987** |
+| biomed | **0.907** | 0.900 |
+| breast_cancer | 0.718 | **0.734** |
+| breast_cancer_wisconsin_diagnostic | **0.974** | 0.963 |
+| bupa | **0.577** | 0.567 |
 | churn | **0.964** | 0.957 |
-| congressional_voting_records | 0.951 | **0.953** |
-| credit_approval_germany | 0.763 | **0.765** |
+| congressional_voting_records | 0.949 | **0.953** |
+| credit_approval_germany | **0.766** | 0.765 |
 | glass2 | 0.853 | **0.859** |
-| haberman | 0.683 | **0.686** |
+| haberman | **0.686** | **0.686** |
 | hepatitis | 0.826 | **0.835** |
 | hypothyroid | **0.981** | **0.981** |
-| ionosphere | **0.950** | 0.936 |
+| ionosphere | **0.949** | 0.936 |
 | irish | **1.000** | 0.999 |
 | kr_vs_kp | **0.995** | 0.990 |
-| profb | 0.672 | **0.686** |
-| saheart | **0.696** | 0.680 |
-| sonar | **0.858** | 0.832 |
-| spambase | 0.951 | **0.953** |
+| profb | 0.673 | **0.686** |
+| saheart | **0.692** | 0.680 |
+| sonar | **0.851** | 0.832 |
+| spambase | 0.952 | **0.953** |
 | spect | 0.815 | **0.828** |
-| spectf | 0.911 | **0.918** |
+| spectf | 0.910 | **0.918** |
 | tic_tac_toe | 0.946 | **0.951** |
-| tokyo1 | 0.931 | **0.935** |
-| balance_scale | **0.891** | 0.834 |
+| tokyo1 | 0.932 | **0.935** |
+| balance_scale | **0.890** | 0.834 |
 | car_evaluation | **0.991** | 0.979 |
-| cars | 0.903 | **0.911** |
-| contraceptive_method | 0.507 | **0.516** |
-| dermatology | 0.969 | **0.971** |
-| ecoli | 0.881 | **0.885** |
-| iris | **0.960** | 0.950 |
+| cars | 0.902 | **0.911** |
+| contraceptive_method | 0.514 | **0.516** |
+| dermatology | 0.967 | **0.971** |
+| ecoli | **0.885** | **0.885** |
+| iris | **0.957** | 0.950 |
 | led7 | **0.729** | 0.727 |
-| mfeat_morphological | 0.703 | **0.708** |
-| mfeat_zernike | **0.799** | 0.783 |
-| new_thyroid | **0.972** | 0.956 |
-| segmentation | **0.984** | 0.979 |
-| soybean | 0.933 | **0.935** |
-| tae | 0.622 | **0.649** |
-| vehicle | **0.785** | 0.751 |
-| vowel | **0.986** | 0.964 |
-| waveform_21 | **0.864** | 0.852 |
-| wine_quality_red | 0.688 | **0.692** |
+| mfeat_morphological | 0.702 | **0.708** |
+| mfeat_zernike | **0.800** | 0.783 |
+| new_thyroid | **0.970** | 0.956 |
+| segmentation | **0.983** | 0.979 |
+| soybean | **0.935** | **0.935** |
+| tae | 0.629 | **0.649** |
+| vehicle | **0.781** | 0.751 |
+| vowel | **0.984** | 0.964 |
+| waveform_21 | **0.861** | 0.852 |
+| wine_quality_red | 0.691 | **0.692** |
 | wine_recognition | **0.986** | 0.980 |
-| yeast | 0.603 | **0.607** |
+| yeast | 0.602 | **0.607** |
 
 </details>
 

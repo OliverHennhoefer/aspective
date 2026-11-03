@@ -642,3 +642,22 @@ def test_pspline_gam_low_cardinality_features_enter_linearly():
     y = X[:, 0] + 3 * X[:, 1]
     model = PSplineGAMRegressor().fit(X, y)
     np.testing.assert_array_equal(model.spline_features_, [0])
+
+
+def test_pspline_gam_edf_counts_only_identifiable_directions():
+    # Centring removes one direction per spline block: a linear fit has 1 + p degrees of
+    # freedom, an unpenalized one 1 + p * (n_basis - 1).
+    rng = np.random.RandomState(0)
+    X = rng.randn(200, 3)
+    y = X @ [1.0, -2.0, 0.5] + rng.randn(200)
+    assert abs(PSplineGAMRegressor(alphas=[1e10]).fit(X, y).edf_ - 4) < 0.01
+    assert abs(PSplineGAMRegressor(n_knots=10, alphas=[1e-8]).fit(X, y).edf_ - 34) < 0.01
+
+
+def test_rotation_forest_handles_many_rows_cheaply():
+    # The rotation must not build an n x n factor; 20 000 rows would need gigabytes.
+    rng = np.random.RandomState(0)
+    X = rng.randn(20_000, 3)
+    y = (X[:, 0] > 0).astype(int)
+    model = RotationForestClassifier(n_estimators=1, random_state=0).fit(X, y)
+    assert model.score(X, y) > 0.99

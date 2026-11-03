@@ -129,19 +129,22 @@ class PSplineGAMRegressor(RegressorMixin, BaseEstimator):
         lam, U = linalg.eigh((S + S.T) / 2)
         lam = np.maximum(lam, 0.0)
         z = U.T @ (Linv @ (B.T @ yc))
-        BW = B @ (Linv.T @ U)  # columns are orthonormal in the data inner product
+        BW = B @ (Linv.T @ U)  # fitted values are BW @ (shrink * z), z = BW' yc
+        # trace(BW diag(shrink) BW'): the ridge on G leaves the directions that centring
+        # removed with near-zero norm, so they must not count as degrees of freedom.
+        col_norm = np.einsum("ij,ij->j", BW, BW)
         alphas = np.geomspace(1e-4, 1e6, 25) if self.alphas is None else np.asarray(self.alphas, float)
         gcv = np.empty(len(alphas))
         for a, alpha in enumerate(alphas):
             shrink = 1.0 / (1.0 + alpha * lam)
             fitted = BW @ (shrink * z)
-            edf = 1.0 + shrink.sum()
+            edf = 1.0 + shrink @ col_norm
             rss = float(np.sum((yc - fitted) ** 2))
             gcv[a] = n * rss / max(n - edf, 1e-12) ** 2
         best = int(np.argmin(gcv))
         self.gcv_, self.alpha_ = gcv, float(alphas[best])
         shrink = 1.0 / (1.0 + self.alpha_ * lam)
-        self.edf_ = float(1.0 + shrink.sum())
+        self.edf_ = float(1.0 + shrink @ col_norm)
         self.coef_ = Linv.T @ (U @ (shrink * z))
         self.intercept_ = float(y_mean)
         return self
