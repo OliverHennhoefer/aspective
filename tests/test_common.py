@@ -4,8 +4,6 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
 from aspective.ensemble import (
-    DARTClassifier,
-    DARTRegressor,
     LocalLinearForestRegressor,
     LogitBoostClassifier,
     MultiBoostClassifier,
@@ -24,7 +22,6 @@ from aspective.linear_model import (
     PSplineGAMRegressor,
     RelaxedLasso,
     RelaxedLassoCV,
-    SqrtLasso,
 )
 from aspective.naive_bayes import (
     A2DEClassifier,
@@ -69,8 +66,6 @@ ESTIMATORS = [
     RotationForestClassifier(n_estimators=5, random_state=0),
     LogitBoostClassifier(n_estimators=10, random_state=0),
     MultiBoostClassifier(n_estimators=10, random_state=0),
-    DARTClassifier(n_estimators=10, random_state=0),
-    DARTRegressor(n_estimators=10, random_state=0),
     LocalLinearForestRegressor(n_estimators=10, random_state=0),
     M5ModelTreeRegressor(),
     MARSRegressor(),
@@ -78,7 +73,6 @@ ESTIMATORS = [
     NonconvexPenaltyRegression(),
     NonconvexPenaltyRegression(penalty="scad"),
     NonconvexPenaltyRegressionCV(cv=3, n_alphas=10),
-    SqrtLasso(),
     A2DEClassifier(),
     A2DEClassifier(n_bins=4),
     PSplineGAMRegressor(),

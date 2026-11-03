@@ -1,4 +1,4 @@
-"""Array-based isolation trees with oblique splits, shared by EIF and SCiForest."""
+"""Array-based isolation trees with oblique splits, used by Extended Isolation Forest."""
 
 import numpy as np
 
@@ -19,13 +19,11 @@ class ObliqueIsolationTree:
     """One isolation tree whose nodes split on ``X @ normal <= offset``.
 
     ``choose_split(X, rng)`` returns ``(normal, offset)`` for the rows of a
-    node, or None when the node cannot be split. With ``use_range`` the
-    projections' range at every node is stored, and a point whose projection
-    falls outside it is isolated at that node (SCiForest's range check).
+    node, or None when the node cannot be split.
     """
 
-    def __init__(self, X, choose_split, height_limit, rng, use_range=False):
-        normals, offsets, left, right, sizes, lows, highs, depths = [], [], [], [], [], [], [], []
+    def __init__(self, X, choose_split, height_limit, rng):
+        normals, offsets, left, right, sizes, depths = [], [], [], [], [], []
 
         def new_node(size, depth):
             normals.append(None)
@@ -33,8 +31,6 @@ class ObliqueIsolationTree:
             left.append(-1)
             right.append(-1)
             sizes.append(size)
-            lows.append(-np.inf)
-            highs.append(np.inf)
             depths.append(depth)
             return len(sizes) - 1
 
@@ -53,8 +49,6 @@ class ObliqueIsolationTree:
             if go_left.all() or not go_left.any():
                 continue
             normals[node], offsets[node] = normal, offset
-            if use_range:
-                lows[node], highs[node] = proj.min(), proj.max()
             lnode = new_node(int(go_left.sum()), depth + 1)
             rnode = new_node(int((~go_left).sum()), depth + 1)
             left[node], right[node] = lnode, rnode
@@ -68,9 +62,6 @@ class ObliqueIsolationTree:
         self.right = np.array(right)
         self.depth = np.array(depths, dtype=float)
         self.leaf_correction = average_path_length(np.array(sizes))
-        self.low = np.array(lows)
-        self.high = np.array(highs)
-        self.use_range = use_range
 
     def path_length(self, X):
         node = np.zeros(len(X), dtype=np.intp)
@@ -87,10 +78,5 @@ class ObliqueIsolationTree:
             if not len(idx):
                 break
             proj = np.einsum("ij,ij->i", X[idx], self.normal[cur])
-            if self.use_range:
-                outside = (proj < self.low[cur]) | (proj > self.high[cur])
-                length[idx[outside]] = self.depth[cur[outside]]
-                active[idx[outside]] = False
-                idx, cur, proj = idx[~outside], cur[~outside], proj[~outside]
             node[idx] = np.where(proj <= self.offset[cur], self.left[cur], self.right[cur])
         return length

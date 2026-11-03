@@ -2,15 +2,9 @@
 
 import numpy as np
 import pytest
-from sklearn.datasets import make_classification
-from sklearn.datasets import make_regression
+from sklearn.datasets import make_classification, make_regression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.ensemble import (
-    AdaBoostClassifier,
-    GradientBoostingClassifier,
-    GradientBoostingRegressor,
-    RandomForestRegressor,
-)
+from sklearn.ensemble import AdaBoostClassifier, RandomForestRegressor
 from sklearn.linear_model import Lasso, LassoCV, LinearRegression, LogisticRegression
 from sklearn.metrics import log_loss
 from sklearn.model_selection import cross_val_score
@@ -20,8 +14,6 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
 from aspective.ensemble import (
-    DARTClassifier,
-    DARTRegressor,
     LocalLinearForestRegressor,
     LogitBoostClassifier,
     MultiBoostClassifier,
@@ -40,7 +32,6 @@ from aspective.linear_model import (
     PSplineGAMRegressor,
     RelaxedLasso,
     RelaxedLassoCV,
-    SqrtLasso,
 )
 from aspective.naive_bayes import (
     A2DEClassifier,
@@ -471,7 +462,7 @@ def test_dann_metric_is_identity_like_without_class_structure():
     assert agree > 0.95
 
 
-# --- Rotation Forest, LogitBoost, MultiBoost, DART ----------------------------
+# --- Rotation Forest, LogitBoost, MultiBoost ---------------------------------
 
 def test_rotation_forest_rotations_are_orthogonal_blocks():
     X, y = make_classification(n_samples=200, n_features=6, random_state=0)
@@ -514,24 +505,6 @@ def test_multiboost_restarts_after_a_perfect_member():
     model = MultiBoostClassifier(DecisionTreeClassifier(), n_estimators=12, random_state=0)
     model.fit(X, y)
     assert len(model.estimators_) == 12  # AdaBoost would stop after the first perfect tree
-
-
-def test_dart_without_dropout_is_gradient_boosting():
-    X, y = make_classification(n_samples=300, n_features=5, random_state=0)
-    dart = DARTClassifier(n_estimators=20, drop_rate=0.0, random_state=0).fit(X, y)
-    gb = GradientBoostingClassifier(n_estimators=20, max_depth=3, random_state=0).fit(X, y)
-    np.testing.assert_allclose(dart.decision_function(X), gb.decision_function(X), atol=1e-6)
-    Xr, yr = make_regression(n_samples=300, n_features=5, noise=5, random_state=0)
-    dart = DARTRegressor(n_estimators=20, drop_rate=0.0, random_state=0).fit(Xr, yr)
-    gb = GradientBoostingRegressor(n_estimators=20, max_depth=3, random_state=0).fit(Xr, yr)
-    np.testing.assert_allclose(dart.predict(Xr), gb.predict(Xr), rtol=1e-4, atol=1e-3)
-
-
-def test_dart_rescaling_keeps_weights_positive_and_fit_good():
-    Xr, yr = make_regression(n_samples=300, n_features=5, noise=5, random_state=0)
-    model = DARTRegressor(n_estimators=50, drop_rate=0.3, random_state=0).fit(Xr, yr)
-    assert np.all(model.estimator_weights_ > 0)
-    assert model.score(Xr, yr) > 0.75
 
 
 # --- Local linear forest, M5, MARS -------------------------------------------
@@ -585,7 +558,7 @@ def test_mars_degree_two_finds_an_interaction():
     assert additive < 0.2 < 0.9 < interact
 
 
-# --- MCP, SCAD, square-root lasso ---------------------------------------------
+# --- MCP, SCAD ------------------------------------------------------------------
 
 @pytest.mark.parametrize("penalty", ["mcp", "scad"])
 def test_nonconvex_unbiased_for_large_coefficients(sparse_problem, penalty):
@@ -618,17 +591,6 @@ def test_nonconvex_cv_selects_true_support(sparse_problem):
 def test_nonconvex_rejects_too_small_gamma():
     with pytest.raises(ValueError, match="gamma"):
         NonconvexPenaltyRegression(penalty="scad", gamma=1.5).fit(np.eye(3), [1.0, 2.0, 3.0])
-
-
-def test_sqrt_lasso_is_scale_free_in_the_noise(sparse_problem):
-    X, y, coef = sparse_problem
-    signal = X @ coef
-    noise = y - signal
-    a = SqrtLasso().fit(X, signal + noise)
-    b = SqrtLasso().fit(X, signal + 4 * noise)
-    assert 3.5 < b.sigma_ / a.sigma_ < 4.5
-    np.testing.assert_array_equal(a.support_, np.flatnonzero(coef))
-    assert abs(a.sigma_ - 0.5) < 0.15
 
 
 # --- A2DE, P-spline GAM -------------------------------------------------------

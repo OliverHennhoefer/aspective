@@ -7,29 +7,17 @@ from sklearn.metrics import roc_auc_score
 
 from sklearn.ensemble import IsolationForest
 
-from aspective.anomaly import (
-    AntiHubDetector,
-    ExtendedIsolationForestDetector,
-    INFLODetector,
-    LDOFDetector,
-    LeSiNNDetector,
-    RSHashDetector,
-    SCiForestDetector,
-)
+from aspective.anomaly import ExtendedIsolationForestDetector, LeSiNNDetector, RSHashDetector
 from aspective.anomaly._base import BaseDetector
 
 DETECTORS = [
     RSHashDetector(n_estimators=50, random_state=0),
     LeSiNNDetector(random_state=0),
     ExtendedIsolationForestDetector(n_estimators=50, random_state=0),
-    SCiForestDetector(n_estimators=50, random_state=0),
-    INFLODetector(),
-    AntiHubDetector(),
-    LDOFDetector(),
 ]
 # Detectors that score training points leave-one-out (a point is not its own neighbour),
 # so decision_function on the training data differs from decision_scores_.
-LEAVE_ONE_OUT = (RSHashDetector, LeSiNNDetector, INFLODetector, AntiHubDetector, LDOFDetector)
+LEAVE_ONE_OUT = (RSHashDetector, LeSiNNDetector)
 
 
 @pytest.fixture
@@ -130,7 +118,7 @@ def test_lesinn_training_scores_finite_with_singleton_subsamples(n_samples, max_
     assert np.isfinite(model.threshold_)
 
 
-# --- Isolation-forest variants -----------------------------------------------
+# --- Extended Isolation Forest -----------------------------------------------
 
 def test_eif_extension_level_zero_cuts_one_axis(planted):
     X, _ = planted
@@ -152,61 +140,3 @@ def test_eif_scores_are_rotation_symmetric_around_a_blob():
     iso = IsolationForest(n_estimators=300, random_state=0).fit(X)
     assert np.std(eif.decision_function(circle)) < np.std(iso.score_samples(circle))
 
-
-def test_sciforest_isolates_a_clustered_anomaly():
-    # A tight cluster of 30 anomalies next to the normal data: random cuts rarely separate it.
-    rng = np.random.RandomState(0)
-    normal = rng.randn(1000, 2)
-    cluster = rng.randn(30, 2) * 0.05 + [3.5, 0]
-    X = np.vstack([normal, cluster])
-    y = np.r_[np.zeros(1000), np.ones(30)]
-    sci = SCiForestDetector(n_estimators=100, random_state=0).fit(X)
-    iso = IsolationForest(n_estimators=100, random_state=0).fit(X)
-    auc_sci = roc_auc_score(y, sci.decision_scores_)
-    assert auc_sci > 0.95
-    assert auc_sci > roc_auc_score(y, -iso.score_samples(X))
-
-
-def test_sciforest_range_check_isolates_far_points(planted):
-    X, _ = planted
-    model = SCiForestDetector(n_estimators=20, random_state=0).fit(X)
-    far = np.full((1, X.shape[1]), 100.0)
-    assert model.decision_function(far)[0] > model.decision_scores_.max()
-
-
-# --- Nearest-neighbour detectors ---------------------------------------------
-
-def test_inflo_is_one_on_a_regular_grid():
-    g = np.arange(12.0)
-    X = np.array([[a, b] for a in g for b in g])
-    scores = INFLODetector(n_neighbors=4).fit(X).decision_scores_
-    interior = (X.min(axis=1) >= 2) & (X.max(axis=1) <= 9)
-    np.testing.assert_allclose(scores[interior], 1.0, atol=0.05)
-
-
-def test_antihub_counts_and_alpha():
-    rng = np.random.RandomState(0)
-    X = np.vstack([rng.randn(300, 5), [[8, 8, 8, 8, 8]]])
-    model = AntiHubDetector(n_neighbors=10).fit(X)
-    assert 0 <= model.alpha_ <= 1
-    assert model._counts[-1] == 0  # nobody counts the far point among their neighbours
-    assert model._counts.sum() == 10 * len(X)
-    rank = np.sum(model.decision_scores_ >= model.decision_scores_[-1])
-    assert rank <= 0.05 * len(X)
-
-
-def test_ldof_is_scale_invariant(planted):
-    X, _ = planted
-    a = LDOFDetector().fit(X).decision_scores_
-    b = LDOFDetector().fit(7.5 * X).decision_scores_
-    np.testing.assert_allclose(a, b, rtol=1e-8)
-
-
-def test_ldof_is_below_one_inside_a_cluster():
-    # Inside uniform data a point sits among its neighbours, so its mean distance to
-    # them is smaller than their mean distance to each other.
-    rng = np.random.RandomState(0)
-    X = rng.uniform(size=(2000, 2))
-    scores = LDOFDetector(n_neighbors=20).fit(X).decision_scores_
-    interior = np.all((X > 0.1) & (X < 0.9), axis=1)
-    assert np.median(scores[interior]) < 1

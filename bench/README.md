@@ -101,6 +101,22 @@ at the settings their paper recommends:
 | `SupervisedPCARegressor` | Bair, Hastie, Paul & Tibshirani, JASA 2006 | inferior to PCR with CV-chosen components: median R² −0.010, worse on 13 of 25 datasets; it is built for many more features than samples, which PMLB does not have |
 | `LoOPDetector` | Kriegel, Kröger, Schubert & Zimek, CIKM 2009 | inconclusive vs LOF at the same 20 neighbours (median ROC AUC −0.013, worse on 20 of 37): turning scores into probabilities with `erf` ties many points at 0 and near 1, which costs ranking quality |
 
+The third wave added twenty-two candidates. Fifteen pass; these seven failed
+at the settings their paper recommends, fixed before the run:
+
+| Estimator | Paper | Result |
+|---|---|---|
+| `DARTClassifier` | Rashmi & Gilad-Bachrach, AISTATS 2015 | inconclusive vs gradient boosting with the same 200 depth-3 trees and learning rate 0.1 (median accuracy −0.006, worse on 16 of 43) |
+| `DARTRegressor` | Rashmi & Gilad-Bachrach, AISTATS 2015 | inconclusive vs gradient boosting (median R² −0.001, worse on 11 of 25) |
+| `SqrtLasso` | Belloni, Chernozhukov & Wang, Biometrika 2011 | inferior to LassoCV: the pivotal penalty over-shrinks, median R² −0.012, worse on 14 of 25 |
+| `SCiForestDetector` | Liu, Ting & Zhou, ECML PKDD 2010 | inconclusive vs Isolation Forest (median ROC AUC −0.001, worse on 16 of 37) |
+| `INFLODetector` | Jin, Tung, Han & Wang, PAKDD 2006 | inferior to LOF at the same 20 neighbours (median ROC AUC −0.019, worse on 21 of 37) |
+| `AntiHubDetector` (AntiHub2) | Radovanović, Nanopoulos & Ivanović, IEEE TKDE 2015 | inferior to the k-NN distance detector (median ROC AUC −0.078, worse on 28 of 37); built for very high-dimensional data, which ADBench Classical mostly is not |
+| `LDOFDetector` | Zhang, Hutter & Jin, PAKDD 2009 | inferior to the k-NN distance detector (median ROC AUC −0.121, worse on 27 of 37) |
+
+SCiForest's range check at test time and AntiHub2's choice of the mixing
+weight follow secondary descriptions; the full papers could not be checked.
+
 KDEOS (Schubert, Zimek & Kriegel, SDM 2014) was written but not benchmarked:
 the exact definition could not be checked against the paper, and the version
 built from the description lost to LOF on a planted-outlier sanity check.
@@ -108,7 +124,7 @@ built from the description lost to LOF on a planted-outlier sanity check.
 Firth's FLIC/FLAC corrections stay as options of `FirthLogisticRegression`,
 which passes; at 100 training rows they were not shown better than maximum
 likelihood, which the docstring states. The code is in the git history
-(commit `aa38a9b` and earlier for the first wave, commit `2aa9e33` for the second) if a better configuration turns up.
+(commit `aa38a9b` and earlier for the first wave, commit `2aa9e33` for the second, commit `b2bf66c` for the third) if a better configuration turns up.
 
 ## Commands
 
@@ -121,4 +137,4 @@ uv run aspective-bench report          # rebuild RESULTS.md
 uv run aspective-bench check           # exit 1 unless the gate passes
 ```
 
-A full run of all benchmarks takes roughly an hour on four cores.
+A full run of all benchmarks takes roughly two to three hours on four cores.

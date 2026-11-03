@@ -19,21 +19,16 @@ candidate is competitive.
 |---|---|---|---|---|---|---|---|---|
 | [a2de](#a2de) | A2DE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 12 / 6 | +0.016 | <0.001 | superior | PASS |
 | [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [antihub](#antihub) | AntiHub2 | k-NN distance | 37 | 4 / 5 / 28 | -0.078 | 1.000 | inferior | **FAIL** |
 | [aode](#aode) | AODE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 16 / 2 | +0.016 | <0.001 | superior | PASS |
 | [bolasso](#bolasso) | Bolasso | LassoCV | 25 | 0 / 20 / 5 | -0.002 | 0.029 | non-inferior | PASS |
 | [cauchy-logistic](#cauchy-logistic) | Cauchy prior | ML logistic | 23 | 7 / 16 / 0 | +0.000 | <0.001 | superior | PASS |
 | [dann](#dann) | DANN (k=5) | k-NN (k=5) | 43 | 18 / 16 / 9 | +0.006 | <0.001 | non-inferior | PASS |
-| [dart-classification](#dart-classification) | DART (depth 3) | Gradient boosting (depth 3) | 43 | 10 / 17 / 16 | -0.006 | 0.173 | inconclusive | **FAIL** |
-| [dart-regression](#dart-regression) | DART (depth 3) | Gradient boosting (depth 3) | 25 | 7 / 7 / 11 | -0.001 | 0.356 | inconclusive | **FAIL** |
 | [extended-iforest](#extended-iforest) | Extended IF | Isolation Forest | 37 | 10 / 17 / 10 | -0.001 | 0.020 | non-inferior | PASS |
 | [firth](#firth) | Firth | ML logistic | 23 | 2 / 19 / 2 | +0.000 | <0.001 | non-inferior | PASS |
 | [flexible-nb](#flexible-nb) | Flexible NB | Gaussian NB | 43 | 23 / 11 / 9 | +0.021 | <0.001 | superior | PASS |
 | [hnb](#hnb) | Hidden NB (5 bins) | Naive Bayes (5 bins) | 43 | 24 / 14 / 5 | +0.014 | <0.001 | superior | PASS |
-| [inflo](#inflo) | INFLO | LOF | 37 | 10 / 6 / 21 | -0.019 | 0.879 | inferior | **FAIL** |
 | [kdb](#kdb) | KDB k=2 (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 9 / 12 | +0.012 | <0.001 | superior | PASS |
 | [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 25 | 0 / 25 / 0 | -0.000 | <0.001 | non-inferior | PASS |
-| [ldof](#ldof) | LDOF | k-NN distance | 37 | 8 / 2 / 27 | -0.121 | 1.000 | inferior | **FAIL** |
 | [lesinn](#lesinn) | LeSiNN | Isolation Forest | 37 | 13 / 14 / 10 | +0.005 | 0.013 | non-inferior | PASS |
 | [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 25 | 9 / 11 / 5 | +0.006 | 0.002 | non-inferior | PASS |
 | [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 25 | 19 / 1 / 5 | +0.037 | <0.001 | superior | PASS |
@@ -51,8 +46,6 @@ candidate is competitive.
 | [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 43 | 12 / 27 / 4 | -0.001 | <0.001 | non-inferior | PASS |
 | [rshash](#rshash) | RS-Hash | Isolation Forest | 37 | 12 / 15 / 10 | +0.001 | 0.019 | non-inferior | PASS |
 | [scad](#scad) | SCAD (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [sciforest](#sciforest) | SCiForest | Isolation Forest | 37 | 14 / 7 / 16 | -0.001 | 0.400 | inconclusive | **FAIL** |
-| [sqrt-lasso](#sqrt-lasso) | Square-root lasso | LassoCV | 25 | 0 / 11 / 14 | -0.012 | 0.974 | inferior | **FAIL** |
 | [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 12 / 9 | +0.012 | <0.001 | superior | PASS |
 
 ## Details
@@ -156,60 +149,6 @@ gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | **0.863** | 0.858 |
 | solar_flare | **0.132** | 0.128 |
-
-</details>
-
-### antihub
-
-**AntiHub2** vs k-NN distance (references: LOF). Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
-
-20 neighbours for every model.
-
-- vs k-NN distance: **inferior**. Median difference -0.0779, mean -0.1110 (positive favours the candidate); better on 4, within margin on 5, worse on 28 of 37 datasets; non-inferiority p = 1.000, two-sided Wilcoxon p = <0.001.
-- Average ranks over 37 datasets where every model ran: k-NN distance 1.46, LOF 2.22, AntiHub2 2.32. Nemenyi critical difference 0.54, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: k-NN distance 0.26x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | AntiHub2 | k-NN distance | LOF |
-|---|---|---|---|
-| 1_ALOI | 0.543 | 0.547 | **0.598** |
-| 2_annthyroid | 0.644 | **0.762** | 0.705 |
-| 4_breastw | 0.655 | **0.982** | 0.463 |
-| 6_cardio | 0.738 | **0.822** | 0.562 |
-| 7_Cardiotocography | **0.621** | 0.491 | 0.504 |
-| 12_fault | 0.636 | **0.717** | 0.601 |
-| 14_glass | 0.690 | **0.797** | 0.717 |
-| 15_Hepatitis | 0.808 | **0.812** | 0.749 |
-| 17_InternetAds | 0.530 | **0.603** | 0.588 |
-| 18_Ionosphere | 0.402 | 0.872 | **0.881** |
-| 19_landsat | 0.525 | **0.626** | 0.557 |
-| 20_letter | 0.627 | 0.808 | **0.876** |
-| 21_Lymphography | **0.997** | 0.991 | 0.986 |
-| 22_magic.gamma | 0.705 | **0.760** | 0.705 |
-| 23_mammography | 0.721 | **0.845** | 0.711 |
-| 24_mnist | 0.824 | **0.867** | 0.740 |
-| 25_musk | 0.304 | **0.963** | 0.639 |
-| 26_optdigits | 0.315 | 0.361 | **0.487** |
-| 27_PageBlocks | 0.746 | **0.923** | 0.777 |
-| 28_pendigits | 0.626 | **0.856** | 0.480 |
-| 29_Pima | 0.653 | **0.718** | 0.620 |
-| 30_satellite | 0.578 | **0.726** | 0.567 |
-| 31_satimage-2 | 0.692 | **0.994** | 0.418 |
-| 32_shuttle | 0.368 | **0.838** | 0.549 |
-| 35_SpamBase | 0.552 | **0.566** | 0.432 |
-| 36_speech | 0.338 | 0.457 | **0.469** |
-| 37_Stamps | 0.754 | **0.889** | 0.662 |
-| 38_thyroid | 0.818 | **0.969** | 0.742 |
-| 39_vertebral | **0.446** | 0.360 | 0.441 |
-| 40_vowels | 0.879 | **0.957** | 0.936 |
-| 41_Waveform | 0.683 | **0.746** | 0.719 |
-| 42_WBC | **0.989** | 0.988 | 0.916 |
-| 43_WDBC | 0.950 | **0.979** | **0.979** |
-| 44_Wilt | 0.628 | 0.509 | **0.652** |
-| 45_wine | **0.919** | 0.913 | 0.906 |
-| 46_WPBC | 0.502 | 0.524 | **0.530** |
-| 47_yeast | 0.424 | 0.397 | **0.451** |
 
 </details>
 
@@ -412,108 +351,6 @@ Both vote with 5 neighbours on standardized inputs; DANN estimates its metric fr
 | wine_quality_red | **0.585** | 0.574 |
 | wine_recognition | **0.983** | 0.964 |
 | yeast | **0.564** | 0.554 |
-
-</details>
-
-### dart-classification
-
-**DART (depth 3)** vs Gradient boosting (depth 3). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
-
-200 rounds of depth-3 trees with learning rate 0.1 for both; drop rate 0.1.
-
-- vs Gradient boosting (depth 3): **inconclusive**. Median difference -0.0057, mean -0.0099 (positive favours the candidate); better on 10, within margin on 17, worse on 16 of 43 datasets; non-inferiority p = 0.173, two-sided Wilcoxon p = 0.111.
-- Average ranks over 43 datasets where every model ran: Gradient boosting (depth 3) 1.43, DART (depth 3) 1.57. Nemenyi critical difference 0.30.
-- Total fit and score time relative to the candidate: Gradient boosting (depth 3) 0.92x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | DART (depth 3) | Gradient boosting (depth 3) |
-|---|---|---|
-| analcatdata_lawsuit | **0.979** | **0.979** |
-| biomed | 0.904 | **0.914** |
-| breast_cancer | **0.731** | 0.713 |
-| breast_cancer_wisconsin_diagnostic | 0.952 | **0.965** |
-| bupa | **0.610** | 0.575 |
-| churn | 0.946 | **0.954** |
-| congressional_voting_records | **0.956** | 0.944 |
-| credit_approval_germany | 0.762 | **0.776** |
-| glass2 | 0.825 | **0.868** |
-| haberman | **0.716** | 0.667 |
-| hepatitis | **0.790** | 0.777 |
-| hypothyroid | 0.976 | **0.982** |
-| ionosphere | 0.930 | **0.932** |
-| irish | **1.000** | **1.000** |
-| kr_vs_kp | 0.946 | **0.989** |
-| profb | **0.669** | 0.668 |
-| saheart | **0.707** | 0.670 |
-| sonar | 0.774 | **0.825** |
-| spambase | 0.933 | **0.950** |
-| spect | **0.833** | 0.827 |
-| spectf | 0.887 | **0.898** |
-| tic_tac_toe | 0.823 | **0.990** |
-| tokyo1 | **0.929** | 0.928 |
-| balance_scale | **0.869** | **0.869** |
-| car_evaluation | 0.950 | **0.994** |
-| cars | 0.931 | **0.977** |
-| contraceptive_method | **0.559** | 0.548 |
-| dermatology | **0.969** | 0.960 |
-| ecoli | **0.867** | 0.847 |
-| iris | **0.960** | 0.953 |
-| led7 | **0.733** | 0.730 |
-| mfeat_morphological | **0.727** | 0.693 |
-| mfeat_zernike | 0.756 | **0.774** |
-| new_thyroid | 0.947 | **0.956** |
-| segmentation | 0.974 | **0.979** |
-| soybean | **0.938** | 0.930 |
-| tae | 0.582 | **0.616** |
-| vehicle | 0.733 | **0.768** |
-| vowel | 0.836 | **0.897** |
-| waveform_21 | 0.845 | **0.853** |
-| wine_quality_red | 0.621 | **0.664** |
-| wine_recognition | 0.941 | **0.955** |
-| yeast | **0.596** | 0.581 |
-
-</details>
-
-### dart-regression
-
-**DART (depth 3)** vs Gradient boosting (depth 3). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
-
-200 rounds of depth-3 trees with learning rate 0.1 for both; drop rate 0.1.
-
-- vs Gradient boosting (depth 3): **inconclusive**. Median difference -0.0013, mean +0.0019 (positive favours the candidate); better on 7, within margin on 7, worse on 11 of 25 datasets; non-inferiority p = 0.356, two-sided Wilcoxon p = 0.339.
-- Average ranks over 25 datasets where every model ran: Gradient boosting (depth 3) 1.36, DART (depth 3) 1.64. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: Gradient boosting (depth 3) 0.94x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | DART (depth 3) | Gradient boosting (depth 3) |
-|---|---|---|
-| 1027_ESL | **0.842** | 0.837 |
-| 1028_SWD | **0.410** | 0.387 |
-| 1029_LEV | **0.541** | 0.532 |
-| 1030_ERA | **0.355** | 0.339 |
-| 197_cpu_act | 0.972 | **0.983** |
-| 201_pol | 0.893 | **0.941** |
-| 210_cloud | **0.742** | 0.728 |
-| 218_house_8L | 0.601 | **0.612** |
-| 225_puma8NH | 0.643 | **0.657** |
-| 230_machine_cpu | 0.863 | **0.864** |
-| 294_satellite_image | 0.838 | **0.874** |
-| 4544_GeographicalOriginalofMusic | 0.710 | **0.732** |
-| 503_wind | 0.754 | **0.787** |
-| 505_tecator | 0.992 | **0.994** |
-| 522_pm10 | 0.363 | **0.407** |
-| 529_pollen | 0.669 | **0.772** |
-| 537_houses | 0.653 | **0.785** |
-| 547_no2 | 0.569 | **0.570** |
-| 560_bodyfat | 0.959 | **0.960** |
-| 574_house_16H | 0.513 | **0.554** |
-| 665_sleuth_case2002 | **0.251** | -0.051 |
-| 666_rmftsa_ladata | **0.559** | 0.546 |
-| 690_visualizing_galaxy | 0.969 | **0.970** |
-| 695_chatfield_4 | **0.805** | 0.786 |
-| solar_flare | **0.092** | -0.056 |
 
 </details>
 
@@ -731,60 +568,6 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 
 </details>
 
-### inflo
-
-**INFLO** vs LOF. Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
-
-20 neighbours for both.
-
-- vs LOF: **inferior**. Median difference -0.0194, mean -0.0206 (positive favours the candidate); better on 10, within margin on 6, worse on 21 of 37 datasets; non-inferiority p = 0.879, two-sided Wilcoxon p = 0.032.
-- Average ranks over 37 datasets where every model ran: LOF 1.34, INFLO 1.66. Nemenyi critical difference 0.32.
-- Total fit and score time relative to the candidate: LOF 0.42x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | INFLO | LOF |
-|---|---|---|
-| 1_ALOI | **0.606** | 0.598 |
-| 2_annthyroid | 0.685 | **0.705** |
-| 4_breastw | **0.570** | 0.463 |
-| 6_cardio | 0.557 | **0.562** |
-| 7_Cardiotocography | **0.542** | 0.504 |
-| 12_fault | **0.614** | 0.601 |
-| 14_glass | 0.545 | **0.717** |
-| 15_Hepatitis | 0.684 | **0.749** |
-| 17_InternetAds | 0.575 | **0.588** |
-| 18_Ionosphere | 0.847 | **0.881** |
-| 19_landsat | 0.517 | **0.557** |
-| 20_letter | 0.869 | **0.876** |
-| 21_Lymphography | **0.986** | **0.986** |
-| 22_magic.gamma | 0.665 | **0.705** |
-| 23_mammography | 0.611 | **0.711** |
-| 24_mnist | 0.692 | **0.740** |
-| 25_musk | 0.497 | **0.639** |
-| 26_optdigits | **0.523** | 0.487 |
-| 27_PageBlocks | 0.708 | **0.777** |
-| 28_pendigits | **0.494** | 0.480 |
-| 29_Pima | 0.572 | **0.620** |
-| 30_satellite | 0.534 | **0.567** |
-| 31_satimage-2 | **0.554** | 0.418 |
-| 32_shuttle | 0.502 | **0.549** |
-| 35_SpamBase | **0.465** | 0.432 |
-| 36_speech | 0.466 | **0.469** |
-| 37_Stamps | 0.579 | **0.662** |
-| 38_thyroid | 0.669 | **0.742** |
-| 39_vertebral | **0.504** | 0.441 |
-| 40_vowels | 0.892 | **0.936** |
-| 41_Waveform | 0.672 | **0.719** |
-| 42_WBC | **0.938** | 0.916 |
-| 43_WDBC | 0.966 | **0.979** |
-| 44_Wilt | **0.708** | 0.652 |
-| 45_wine | 0.815 | **0.906** |
-| 46_WPBC | 0.470 | **0.530** |
-| 47_yeast | **0.456** | 0.451 |
-
-</details>
-
 ### kdb
 
 **KDB k=2 (5 bins)** vs Naive Bayes (5 bins) (references: TAN (5 bins)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
@@ -884,60 +667,6 @@ Componentwise linear least squares, learning rate 0.1, number of steps (up to 20
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | 0.858 | **0.858** |
 | solar_flare | **0.128** | **0.128** |
-
-</details>
-
-### ldof
-
-**LDOF** vs k-NN distance (references: LOF). Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
-
-20 neighbours for every model.
-
-- vs k-NN distance: **inferior**. Median difference -0.1205, mean -0.1136 (positive favours the candidate); better on 8, within margin on 2, worse on 27 of 37 datasets; non-inferiority p = 1.000, two-sided Wilcoxon p = <0.001.
-- Average ranks over 37 datasets where every model ran: k-NN distance 1.51, LOF 2.19, LDOF 2.30. Nemenyi critical difference 0.54, Friedman p = 0.001.
-- Total fit and score time relative to the candidate: k-NN distance 0.18x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | LDOF | k-NN distance | LOF |
-|---|---|---|---|
-| 1_ALOI | **0.654** | 0.547 | 0.598 |
-| 2_annthyroid | **0.772** | 0.762 | 0.705 |
-| 4_breastw | 0.466 | **0.982** | 0.463 |
-| 6_cardio | 0.614 | **0.822** | 0.562 |
-| 7_Cardiotocography | **0.555** | 0.491 | 0.504 |
-| 12_fault | 0.504 | **0.717** | 0.601 |
-| 14_glass | 0.675 | **0.797** | 0.717 |
-| 15_Hepatitis | 0.511 | **0.812** | 0.749 |
-| 17_InternetAds | 0.563 | **0.603** | 0.588 |
-| 18_Ionosphere | 0.870 | 0.872 | **0.881** |
-| 19_landsat | 0.515 | **0.626** | 0.557 |
-| 20_letter | 0.845 | 0.808 | **0.876** |
-| 21_Lymphography | 0.974 | **0.991** | 0.986 |
-| 22_magic.gamma | 0.637 | **0.760** | 0.705 |
-| 23_mammography | 0.759 | **0.845** | 0.711 |
-| 24_mnist | 0.672 | **0.867** | 0.740 |
-| 25_musk | 0.843 | **0.963** | 0.639 |
-| 26_optdigits | **0.702** | 0.361 | 0.487 |
-| 27_PageBlocks | 0.693 | **0.923** | 0.777 |
-| 28_pendigits | 0.547 | **0.856** | 0.480 |
-| 29_Pima | 0.559 | **0.718** | 0.620 |
-| 30_satellite | 0.499 | **0.726** | 0.567 |
-| 31_satimage-2 | 0.559 | **0.994** | 0.418 |
-| 32_shuttle | 0.645 | **0.838** | 0.549 |
-| 35_SpamBase | 0.461 | **0.566** | 0.432 |
-| 36_speech | **0.514** | 0.457 | 0.469 |
-| 37_Stamps | 0.562 | **0.889** | 0.662 |
-| 38_thyroid | 0.760 | **0.969** | 0.742 |
-| 39_vertebral | **0.522** | 0.360 | 0.441 |
-| 40_vowels | 0.824 | **0.957** | 0.936 |
-| 41_Waveform | 0.642 | **0.746** | 0.719 |
-| 42_WBC | 0.785 | **0.988** | 0.916 |
-| 43_WDBC | 0.905 | **0.979** | **0.979** |
-| 44_Wilt | **0.706** | 0.509 | 0.652 |
-| 45_wine | 0.492 | **0.913** | 0.906 |
-| 46_WPBC | 0.471 | 0.524 | **0.530** |
-| 47_yeast | **0.458** | 0.397 | 0.451 |
 
 </details>
 
@@ -1680,102 +1409,6 @@ gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | 0.856 | **0.858** |
 | solar_flare | **0.128** | **0.128** |
-
-</details>
-
-### sciforest
-
-**SCiForest** vs Isolation Forest. Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
-
-tau = 10 hyperplanes on q = 2 features per node, 200 trees of 256 points.
-
-- vs Isolation Forest: **inconclusive**. Median difference -0.0015, mean -0.0093 (positive favours the candidate); better on 14, within margin on 7, worse on 16 of 37 datasets; non-inferiority p = 0.400, two-sided Wilcoxon p = 0.464.
-- Average ranks over 37 datasets where every model ran: Isolation Forest 1.43, SCiForest 1.57. Nemenyi critical difference 0.32.
-- Total fit and score time relative to the candidate: Isolation Forest 0.082x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | SCiForest | Isolation Forest |
-|---|---|---|
-| 1_ALOI | **0.561** | 0.539 |
-| 2_annthyroid | 0.773 | **0.823** |
-| 4_breastw | 0.969 | **0.987** |
-| 6_cardio | 0.856 | **0.928** |
-| 7_Cardiotocography | 0.661 | **0.669** |
-| 12_fault | 0.569 | **0.581** |
-| 14_glass | **0.864** | 0.815 |
-| 15_Hepatitis | 0.670 | **0.740** |
-| 17_InternetAds | **0.681** | 0.668 |
-| 18_Ionosphere | **0.894** | 0.838 |
-| 19_landsat | 0.402 | **0.470** |
-| 20_letter | **0.690** | 0.610 |
-| 21_Lymphography | 0.995 | **0.999** |
-| 22_magic.gamma | **0.776** | 0.705 |
-| 23_mammography | 0.671 | **0.854** |
-| 24_mnist | **0.842** | 0.811 |
-| 25_musk | **1.000** | **1.000** |
-| 26_optdigits | 0.672 | **0.693** |
-| 27_PageBlocks | **0.929** | 0.895 |
-| 28_pendigits | **0.975** | 0.943 |
-| 29_Pima | 0.586 | **0.675** |
-| 30_satellite | 0.643 | **0.695** |
-| 31_satimage-2 | **0.995** | 0.993 |
-| 32_shuttle | 0.996 | **0.997** |
-| 35_SpamBase | 0.418 | **0.654** |
-| 36_speech | **0.447** | 0.446 |
-| 37_Stamps | **0.894** | 0.878 |
-| 38_thyroid | 0.980 | **0.981** |
-| 39_vertebral | **0.680** | 0.382 |
-| 40_vowels | **0.839** | 0.755 |
-| 41_Waveform | 0.615 | **0.719** |
-| 42_WBC | 0.977 | **0.995** |
-| 43_WDBC | 0.929 | **0.984** |
-| 44_Wilt | **0.491** | 0.460 |
-| 45_wine | 0.665 | **0.773** |
-| 46_WPBC | 0.453 | **0.499** |
-| 47_yeast | **0.450** | 0.396 |
-
-</details>
-
-### sqrt-lasso
-
-**Square-root lasso** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
-
-The paper's pivotal penalty (c = 1.1, a = 0.05) with no tuning, against the lasso tuned by 5-fold CV.
-
-- vs LassoCV: **inferior**. Median difference -0.0116, mean -0.0240 (positive favours the candidate); better on 0, within margin on 11, worse on 14 of 25 datasets; non-inferiority p = 0.974, two-sided Wilcoxon p = <0.001.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.04, Square-root lasso 1.96. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: LassoCV 10x.
-
-<details><summary>Per-dataset scores</summary>
-
-| Dataset | Square-root lasso | LassoCV |
-|---|---|---|
-| 1027_ESL | 0.851 | **0.855** |
-| 1028_SWD | 0.352 | **0.393** |
-| 1029_LEV | 0.539 | **0.558** |
-| 1030_ERA | 0.330 | **0.357** |
-| 197_cpu_act | 0.715 | **0.722** |
-| 201_pol | 0.456 | **0.475** |
-| 210_cloud | 0.829 | **0.838** |
-| 218_house_8L | 0.361 | **0.367** |
-| 225_puma8NH | 0.374 | **0.376** |
-| 230_machine_cpu | **0.794** | 0.793 |
-| 294_satellite_image | 0.689 | **0.700** |
-| 4544_GeographicalOriginalofMusic | 0.699 | **0.795** |
-| 503_wind | 0.737 | **0.758** |
-| 505_tecator | 0.992 | **0.996** |
-| 522_pm10 | 0.105 | **0.145** |
-| 529_pollen | 0.782 | **0.793** |
-| 537_houses | 0.585 | **0.631** |
-| 547_no2 | 0.410 | **0.485** |
-| 560_bodyfat | 0.967 | **0.968** |
-| 574_house_16H | 0.217 | **0.265** |
-| 665_sleuth_case2002 | 0.225 | **0.286** |
-| 666_rmftsa_ladata | 0.511 | **0.547** |
-| 690_visualizing_galaxy | 0.886 | **0.894** |
-| 695_chatfield_4 | 0.857 | **0.858** |
-| solar_flare | 0.119 | **0.128** |
 
 </details>
 

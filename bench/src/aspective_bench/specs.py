@@ -19,7 +19,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticD
 from sklearn.ensemble import (
     AdaBoostClassifier,
     GradientBoostingClassifier,
-    GradientBoostingRegressor,
     IsolationForest,
     RandomForestClassifier,
     RandomForestRegressor,
@@ -32,19 +31,9 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-from aspective.anomaly import (
-    AntiHubDetector,
-    ExtendedIsolationForestDetector,
-    INFLODetector,
-    LDOFDetector,
-    LeSiNNDetector,
-    RSHashDetector,
-    SCiForestDetector,
-)
+from aspective.anomaly import ExtendedIsolationForestDetector, LeSiNNDetector, RSHashDetector
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
 from aspective.ensemble import (
-    DARTClassifier,
-    DARTRegressor,
     LocalLinearForestRegressor,
     LogitBoostClassifier,
     MultiBoostClassifier,
@@ -60,7 +49,6 @@ from aspective.linear_model import (
     NonconvexPenaltyRegressionCV,
     PSplineGAMRegressor,
     RelaxedLassoCV,
-    SqrtLasso,
 )
 from aspective.naive_bayes import (
     A2DEClassifier,
@@ -73,13 +61,11 @@ from aspective.naive_bayes import (
 from aspective.neighbors import DANNClassifier, LoessRegressor
 from aspective.tree import M5ModelTreeRegressor
 
-from .baselines import KNNDistanceDetector
 from .protocol import Benchmark
 
 N_TREES = 200
 N_ROUNDS = 200  # boosting rounds
 DEPTH = 3  # depth of boosted trees
-N_NEIGHBORS = 20  # every neighbour-based detector, as LOF's default
 
 
 def scaled(estimator):
@@ -117,8 +103,6 @@ ML_LOGISTIC = ("ML logistic", ml_logistic)
 ISOLATION_FOREST = ("Isolation Forest", lambda: scaled(IsolationForest(n_estimators=N_TREES, random_state=0)))
 LOF = ("LOF", lambda: scaled(LocalOutlierFactor(novelty=True)))
 LASSO_CV = ("LassoCV", lambda: scaled(LassoCV(cv=5)))
-KNN_DETECTOR = ("k-NN distance", lambda: scaled(KNNDistanceDetector(n_neighbors=N_NEIGHBORS)))
-LOF_20 = ("LOF", lambda: scaled(LocalOutlierFactor(n_neighbors=N_NEIGHBORS, novelty=True)))
 ADABOOST = ("AdaBoost (depth 3)", lambda: AdaBoostClassifier(
     DecisionTreeClassifier(max_depth=DEPTH), n_estimators=N_ROUNDS, random_state=0))
 
@@ -329,26 +313,6 @@ BENCHMARKS = [
               "about every sqrt(200) = 14 members.",
     ),
     Benchmark(
-        name="dart-classification",
-        candidate=("DART (depth 3)", lambda: DARTClassifier(
-            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0)),
-        predecessors={"Gradient boosting (depth 3)": lambda: GradientBoostingClassifier(
-            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0)},
-        suite="pmlb-classification",
-        metric="accuracy",
-        notes="200 rounds of depth-3 trees with learning rate 0.1 for both; drop rate 0.1.",
-    ),
-    Benchmark(
-        name="dart-regression",
-        candidate=("DART (depth 3)", lambda: DARTRegressor(
-            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0)),
-        predecessors={"Gradient boosting (depth 3)": lambda: GradientBoostingRegressor(
-            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0)},
-        suite="pmlb-regression",
-        metric="r2",
-        notes="200 rounds of depth-3 trees with learning rate 0.1 for both; drop rate 0.1.",
-    ),
-    Benchmark(
         name="local-linear-forest",
         candidate=("Local linear forest", lambda: LocalLinearForestRegressor(
             n_estimators=N_TREES, min_samples_leaf=5, random_state=0)),
@@ -406,15 +370,6 @@ BENCHMARKS = [
         notes="gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.",
     ),
     Benchmark(
-        name="sqrt-lasso",
-        candidate=("Square-root lasso", SqrtLasso),
-        predecessors=dict([LASSO_CV]),
-        suite="pmlb-regression",
-        metric="r2",
-        notes="The paper's pivotal penalty (c = 1.1, a = 0.05) with no tuning, against the "
-              "lasso tuned by 5-fold CV.",
-    ),
-    Benchmark(
         name="extended-iforest",
         candidate=("Extended IF", lambda: scaled(ExtendedIsolationForestDetector(
             n_estimators=N_TREES, random_state=0))),
@@ -422,41 +377,6 @@ BENCHMARKS = [
         suite="adbench-classical",
         metric="roc_auc",
         notes="Fully extended cuts, 200 trees of 256 points like the Isolation Forest.",
-    ),
-    Benchmark(
-        name="sciforest",
-        candidate=("SCiForest", lambda: scaled(SCiForestDetector(
-            n_estimators=N_TREES, random_state=0))),
-        predecessors=dict([ISOLATION_FOREST]),
-        suite="adbench-classical",
-        metric="roc_auc",
-        notes="tau = 10 hyperplanes on q = 2 features per node, 200 trees of 256 points.",
-    ),
-    Benchmark(
-        name="inflo",
-        candidate=("INFLO", lambda: scaled(INFLODetector(n_neighbors=N_NEIGHBORS))),
-        predecessors=dict([LOF_20]),
-        suite="adbench-classical",
-        metric="roc_auc",
-        notes="20 neighbours for both.",
-    ),
-    Benchmark(
-        name="antihub",
-        candidate=("AntiHub2", lambda: scaled(AntiHubDetector(n_neighbors=N_NEIGHBORS))),
-        predecessors=dict([KNN_DETECTOR]),
-        references=dict([LOF_20]),
-        suite="adbench-classical",
-        metric="roc_auc",
-        notes="20 neighbours for every model.",
-    ),
-    Benchmark(
-        name="ldof",
-        candidate=("LDOF", lambda: scaled(LDOFDetector(n_neighbors=N_NEIGHBORS))),
-        predecessors=dict([KNN_DETECTOR]),
-        references=dict([LOF_20]),
-        suite="adbench-classical",
-        metric="roc_auc",
-        notes="20 neighbours for every model.",
     ),
 ]
 
