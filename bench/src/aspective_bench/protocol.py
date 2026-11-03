@@ -163,7 +163,7 @@ def aspective_source_hash(estimator):
     base class depends on whether PyOD is installed, and the hash must not.
     """
     files = {Path(inspect.getsourcefile(cls)) for cls in _estimator_classes(estimator)
-             if cls.__module__.startswith("aspective")}
+             if cls.__module__.split(".")[0] == "aspective"}
     if not files:
         return None
     root = Path(__import__("aspective").__file__).parent
