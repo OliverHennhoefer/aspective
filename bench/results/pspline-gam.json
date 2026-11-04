@@ -1,6 +1,6 @@
 {
  "name": "pspline-gam",
- "fingerprint": "04af06c0d9967410",
+ "fingerprint": "2822decbf94d022f",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

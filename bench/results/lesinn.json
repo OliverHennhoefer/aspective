@@ -1,6 +1,6 @@
 {
  "name": "lesinn",
- "fingerprint": "bf2c9127165ff741",
+ "fingerprint": "8c61e7e334cfaaa4",
  "quick": false,
  "suite": "adbench-classical",
  "metric": "roc_auc",

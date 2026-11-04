@@ -184,7 +184,25 @@ def code_fingerprint(source):
             if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant) \
                     and isinstance(body[0].value.value, str):
                 node.body = body[1:] or [ast.Pass()]
-    return ast.dump(tree)
+    return _canonical(tree)
+
+
+def _canonical(node):
+    """A dump of an AST that is the same on every supported Python version.
+
+    ``ast.dump`` itself is not: 3.13 leaves out empty and None fields, and
+    3.12 added ``type_params``. Empty and None fields are skipped here.
+    """
+    if isinstance(node, ast.AST):
+        fields = []
+        for name, value in ast.iter_fields(node):
+            if value is None or value == []:
+                continue
+            fields.append(f"{name}={_canonical(value)}")
+        return f"{type(node).__name__}({', '.join(fields)})"
+    if isinstance(node, list):
+        return "[" + ", ".join(_canonical(item) for item in node) + "]"
+    return repr(node)
 
 
 def model_key(label, estimator, dataset, protocol):

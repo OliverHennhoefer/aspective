@@ -1,6 +1,6 @@
 {
  "name": "logitboost",
- "fingerprint": "ce1410d9a0f4e0e8",
+ "fingerprint": "ff0fba52de66fa5d",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

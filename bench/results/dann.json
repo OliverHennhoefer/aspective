@@ -1,6 +1,6 @@
 {
  "name": "dann",
- "fingerprint": "b3a3636e2d823e78",
+ "fingerprint": "6d18d150549b7510",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

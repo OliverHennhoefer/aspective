@@ -1,6 +1,6 @@
 {
  "name": "mda",
- "fingerprint": "2f1d51bdf3b3a7e3",
+ "fingerprint": "cd7b29cff60390ce",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

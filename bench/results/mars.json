@@ -1,6 +1,6 @@
 {
  "name": "mars",
- "fingerprint": "6a93df16e70338af",
+ "fingerprint": "7efad89e682c4999",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

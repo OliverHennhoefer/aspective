@@ -1,6 +1,6 @@
 {
  "name": "aode",
- "fingerprint": "ff0e38736091a537",
+ "fingerprint": "67c42702ebc9aa08",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

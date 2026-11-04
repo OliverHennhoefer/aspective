@@ -1,6 +1,6 @@
 {
  "name": "hnb",
- "fingerprint": "ff85516591cd4d2c",
+ "fingerprint": "b52ba76ad12d882d",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",
