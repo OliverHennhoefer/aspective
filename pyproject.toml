@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aspective"
-version = "0.1.0.dev0"
+dynamic = ["version"]
 description = "Peer-reviewed variants of classic estimators, with the scikit-learn API."
 readme = "README.md"
 license = "MIT"
@@ -77,6 +77,9 @@ members = ["bench"]
 
 [tool.uv.sources]
 aspective-bench = { workspace = true }
+
+[tool.hatch.version]
+path = "src/aspective/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/aspective"]

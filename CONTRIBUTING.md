@@ -69,3 +69,13 @@ and smoke-tests the wheel.
 Keep a pull request to one estimator or one change. Fill in the checklist in
 the template. Every pull request needs green CI, and a new estimator also
 needs a passing benchmark gate.
+
+## Releasing (maintainers)
+
+1. Set `__version__` in `src/aspective/__init__.py` (the only place the
+   version lives) and move the *Unreleased* changelog entries under the new
+   version with today's date.
+2. Merge to `main`, then tag and push: `git tag v0.1.0 && git push origin v0.1.0`.
+3. The `release` workflow checks that the tag matches the version, runs lint
+   and tests, builds and smoke-tests the wheel, and publishes to PyPI through
+   trusted publishing.
