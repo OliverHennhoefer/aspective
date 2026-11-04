@@ -2,14 +2,23 @@
 
 import numpy as np
 import pytest
-from sklearn.datasets import make_classification
+from sklearn.datasets import make_classification, make_regression
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.ensemble import AdaBoostClassifier, RandomForestRegressor
 from sklearn.linear_model import Lasso, LassoCV, LinearRegression, LogisticRegression
+from sklearn.metrics import log_loss
 from sklearn.model_selection import cross_val_score
-from sklearn.naive_bayes import CategoricalNB
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.naive_bayes import CategoricalNB, GaussianNB
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
+from aspective.ensemble import (
+    LocalLinearForestRegressor,
+    LogitBoostClassifier,
+    MultiBoostClassifier,
+    RotationForestClassifier,
+)
 from aspective.linear_model import (
     AdaptiveLasso,
     AdaptiveLassoCV,
@@ -17,11 +26,23 @@ from aspective.linear_model import (
     CauchyLogisticRegression,
     FirthLogisticRegression,
     L2BoostRegressor,
+    MARSRegressor,
+    NonconvexPenaltyRegression,
+    NonconvexPenaltyRegressionCV,
+    PSplineGAMRegressor,
     RelaxedLasso,
     RelaxedLassoCV,
 )
-from aspective.naive_bayes import AODEClassifier, TANClassifier
-from aspective.neighbors import LoessRegressor
+from aspective.naive_bayes import (
+    A2DEClassifier,
+    AODEClassifier,
+    FlexibleNaiveBayes,
+    HiddenNaiveBayesClassifier,
+    KDBClassifier,
+    TANClassifier,
+)
+from aspective.neighbors import DANNClassifier, LoessRegressor
+from aspective.tree import M5ModelTreeRegressor
 
 
 # --- RDA ---------------------------------------------------------------------
@@ -363,3 +384,280 @@ def test_cauchy_logistic_rejects_a_single_class():
     X = np.random.RandomState(0).randn(20, 2)
     with pytest.raises(ValueError, match="2 classes"):
         CauchyLogisticRegression().fit(X, np.ones(20))
+
+
+# --- KDB, hidden naive Bayes, flexible naive Bayes ----------------------------
+
+def _xor_data(n=800, seed=0):
+    rng = np.random.RandomState(seed)
+    X = rng.randint(0, 2, size=(n, 4))
+    return X, X[:, 0] ^ X[:, 1]
+
+
+def test_kdb_k0_is_naive_bayes():
+    X, y = make_classification(n_samples=300, n_features=5, random_state=0)
+    kdb = KDBClassifier(k=0, n_bins=4).fit(X, y)
+    assert all(len(p) == 0 for p in kdb.parents_)
+    binned = AODEClassifier(n_bins=4).fit(X, y)._binner.transform(X)
+    prior = (np.bincount(y) + 1) / (len(y) + 2)  # KDB smooths the class prior too
+    nb = CategoricalNB(alpha=1.0, min_categories=kdb.n_categories_, class_prior=prior)
+    nb.fit(binned, y)
+    np.testing.assert_allclose(kdb.predict_proba(X), nb.predict_proba(binned), atol=1e-8)
+
+
+def test_kdb_learns_a_dependency_naive_bayes_misses():
+    X, y = _xor_data()
+    model = KDBClassifier(k=1).fit(X, y)
+    assert set(model.order_[:2]) == {0, 1} or 1 in model.parents_[0] or 0 in model.parents_[1]
+    assert cross_val_score(KDBClassifier(k=2), X, y, cv=5).mean() > 0.95
+
+
+def test_hnb_weights_are_a_mixture_and_capture_dependency():
+    X, y = _xor_data()
+    model = HiddenNaiveBayesClassifier().fit(X, y)
+    np.testing.assert_allclose(model.weights_.sum(axis=1), 1.0)
+    assert np.all(np.diag(model.weights_) == 0)
+    assert model.weights_[0, 1] > 0.9 and model.weights_[1, 0] > 0.9
+    assert cross_val_score(HiddenNaiveBayesClassifier(), X, y, cv=5).mean() > 0.95
+
+
+def test_hnb_single_feature_is_naive_bayes():
+    X = np.array([[0], [1], [1], [0], [1], [2]])
+    y = np.array([0, 1, 1, 0, 1, 0])
+    hnb = HiddenNaiveBayesClassifier().fit(X, y)
+    prior = (np.bincount(y) + 1) / (len(y) + 2)
+    nb = CategoricalNB(alpha=1.0, min_categories=hnb.n_categories_, class_prior=prior).fit(X, y)
+    np.testing.assert_allclose(hnb.predict_proba(X), nb.predict_proba(X))
+
+
+def test_flexible_nb_handles_bimodal_features():
+    # Both classes are bimodal with interleaved modes, and their means and variances
+    # are close: one Gaussian per class cannot tell them apart.
+    rng = np.random.RandomState(0)
+    x0 = np.r_[rng.randn(150) * 0.5 - 6, rng.randn(150) * 0.5]
+    x1 = np.r_[rng.randn(150) * 0.5 - 3, rng.randn(150) * 0.5 + 3]
+    X = np.r_[x0, x1][:, None]
+    y = np.r_[np.zeros(300), np.ones(300)]
+    assert cross_val_score(GaussianNB(), X, y, cv=5).mean() < 0.8
+    assert cross_val_score(FlexibleNaiveBayes(), X, y, cv=5).mean() > 0.95
+
+
+# --- DANN --------------------------------------------------------------------
+
+def test_dann_ignores_noise_directions():
+    # Only feature 0 matters; nine noise features dilute plain k-NN distances.
+    rng = np.random.RandomState(0)
+    X = rng.randn(600, 10)
+    y = (X[:, 0] > 0).astype(int)
+    knn = cross_val_score(KNeighborsClassifier(5), X, y, cv=3).mean()
+    dann = cross_val_score(DANNClassifier(5), X, y, cv=3).mean()
+    assert dann > knn + 0.05
+
+
+def test_dann_metric_is_identity_like_without_class_structure():
+    X, y = make_classification(n_samples=120, n_features=3, n_redundant=0, random_state=0)
+    model = DANNClassifier(epsilon=1e6).fit(X, y)  # huge epsilon: plain k-NN up to scale
+    knn = KNeighborsClassifier(5).fit((X - X.mean(0)) / X.std(0), y)
+    agree = np.mean(model.predict(X) == knn.predict((X - X.mean(0)) / X.std(0)))
+    assert agree > 0.95
+
+
+# --- Rotation Forest, LogitBoost, MultiBoost ---------------------------------
+
+def test_rotation_forest_rotations_are_orthogonal_blocks():
+    X, y = make_classification(n_samples=200, n_features=6, random_state=0)
+    model = RotationForestClassifier(n_estimators=3, random_state=0).fit(X, y)
+    for R in model.rotations_:
+        np.testing.assert_allclose(R.T @ R, np.eye(R.shape[1]), atol=1e-8)
+
+
+def test_rotation_forest_beats_a_single_tree_on_oblique_boundary():
+    rng = np.random.RandomState(0)
+    X = rng.randn(600, 4)
+    y = (X.sum(axis=1) > 0).astype(int)
+    rot = cross_val_score(RotationForestClassifier(n_estimators=30, random_state=0), X, y, cv=3)
+    tree = cross_val_score(DecisionTreeClassifier(random_state=0), X, y, cv=3)
+    assert rot.mean() > tree.mean() + 0.05
+
+
+@pytest.mark.parametrize("n_classes", [2, 3])
+def test_logitboost_probabilities_are_calibrated_scale(n_classes):
+    X, y = make_classification(n_samples=400, n_features=6, n_informative=4, n_classes=n_classes,
+                               random_state=0)
+    model = LogitBoostClassifier(n_estimators=30, random_state=0).fit(X, y)
+    proba = model.predict_proba(X)
+    np.testing.assert_allclose(proba.sum(axis=1), 1.0)
+    assert model.score(X, y) > 0.9
+    assert log_loss(y, proba) < log_loss(y, np.full_like(proba, 1 / n_classes))
+
+
+def test_multiboost_single_committee_without_restarts_is_adaboost():
+    X, y = make_classification(n_samples=300, n_features=6, random_state=0)
+    stump = DecisionTreeClassifier(max_depth=1, random_state=0)
+    mb = MultiBoostClassifier(stump, n_estimators=10, n_subcommittees=1, random_state=0).fit(X, y)
+    ada = AdaBoostClassifier(stump, n_estimators=10, random_state=0).fit(X, y)
+    np.testing.assert_allclose(mb.estimator_weights_, ada.estimator_weights_[: len(mb.estimators_)])
+    np.testing.assert_array_equal(mb.predict(X), ada.predict(X))
+
+
+def test_multiboost_restarts_after_a_perfect_member():
+    X, y = make_classification(n_samples=200, n_features=4, class_sep=3, random_state=0)
+    model = MultiBoostClassifier(DecisionTreeClassifier(), n_estimators=12, random_state=0)
+    model.fit(X, y)
+    assert len(model.estimators_) == 12  # AdaBoost would stop after the first perfect tree
+
+
+# --- Local linear forest, M5, MARS -------------------------------------------
+
+def test_local_linear_forest_follows_a_smooth_trend():
+    # Forests average within leaves and cannot follow a slope; the local fit can.
+    rng = np.random.RandomState(0)
+    X = rng.uniform(-1, 1, size=(400, 5))
+    y = X.sum(axis=1) + 0.1 * rng.randn(400)
+    Xt = rng.uniform(-1, 1, size=(300, 5))
+    rf = RandomForestRegressor(100, min_samples_leaf=5, random_state=0).fit(X, y).predict(Xt)
+    llf = LocalLinearForestRegressor(100, random_state=0).fit(X, y).predict(Xt)
+    assert np.mean(np.abs(llf - Xt.sum(axis=1))) < 0.5 * np.mean(np.abs(rf - Xt.sum(axis=1)))
+
+
+def test_m5_fits_a_piecewise_linear_function():
+    rng = np.random.RandomState(0)
+    X = rng.uniform(-1, 1, size=(600, 2))
+    y = np.where(X[:, 0] > 0, 2 * X[:, 1], -X[:, 1] + 1) + 0.2 * rng.randn(600)
+    model = M5ModelTreeRegressor().fit(X, y)
+    tree = DecisionTreeRegressor(min_samples_leaf=4).fit(X, y)
+    assert model.n_leaves_ < tree.get_n_leaves() / 5
+    Xt = rng.uniform(-1, 1, size=(300, 2))
+    yt = np.where(Xt[:, 0] > 0, 2 * Xt[:, 1], -Xt[:, 1] + 1)
+    assert model.score(Xt, yt) > tree.score(Xt, yt)
+
+
+def test_m5_unpruned_unsmoothed_leaves_are_constant_models():
+    X, y = make_regression(n_samples=100, n_features=3, random_state=0)
+    model = M5ModelTreeRegressor(prune=False, smoothing=0).fit(X, y)
+    leaf_tree = DecisionTreeRegressor(min_samples_leaf=4, random_state=0).fit(X, y)
+    np.testing.assert_allclose(model.predict(X), leaf_tree.predict(X))
+
+
+def test_mars_recovers_a_hinge():
+    rng = np.random.RandomState(0)
+    X = rng.uniform(-1, 1, size=(400, 3))
+    y = 2 * np.maximum(X[:, 0] - 0.2, 0) + X[:, 1]
+    model = MARSRegressor(n_knots=40).fit(X, y)
+    assert model.score(X, y) > 0.995
+    used = {j for term in model.terms_ for j, _, _ in term}
+    assert used <= {0, 1}
+
+
+def test_mars_degree_two_finds_an_interaction():
+    rng = np.random.RandomState(0)
+    X = rng.uniform(-1, 1, size=(500, 3))
+    y = X[:, 0] * X[:, 1]
+    additive = MARSRegressor().fit(X, y).score(X, y)
+    interact = MARSRegressor(max_degree=2).fit(X, y).score(X, y)
+    assert additive < 0.2 < 0.9 < interact
+
+
+# --- MCP, SCAD ------------------------------------------------------------------
+
+@pytest.mark.parametrize("penalty", ["mcp", "scad"])
+def test_nonconvex_unbiased_for_large_coefficients(sparse_problem, penalty):
+    X, y, coef = sparse_problem
+    # The smallest true coefficient, 1.0, exceeds gamma * alpha for both penalties.
+    model = NonconvexPenaltyRegression(alpha=0.25, penalty=penalty).fit(X, y)
+    lasso = Lasso(alpha=0.25).fit(X, y)
+    np.testing.assert_array_equal(model.support_, np.flatnonzero(coef))
+    ols = LinearRegression().fit(X[:, model.support_], y)
+    np.testing.assert_allclose(model.coef_[model.support_], ols.coef_, rtol=1e-4, atol=1e-4)
+    assert np.linalg.norm(model.coef_ - coef) < np.linalg.norm(lasso.coef_ - coef)
+
+
+@pytest.mark.parametrize("penalty", ["mcp", "scad"])
+def test_nonconvex_large_gamma_approaches_lasso(sparse_problem, penalty):
+    X, y, _ = sparse_problem
+    Xs = (X - X.mean(0)) / X.std(0)
+    model = NonconvexPenaltyRegression(alpha=0.1, penalty=penalty, gamma=1e6, tol=1e-10).fit(Xs, y)
+    lasso = Lasso(alpha=0.1, tol=1e-10).fit(Xs, y)
+    np.testing.assert_allclose(model.coef_, lasso.coef_, atol=1e-4)
+
+
+def test_nonconvex_cv_selects_true_support(sparse_problem):
+    X, y, coef = sparse_problem
+    model = NonconvexPenaltyRegressionCV(cv=5).fit(X, y)
+    assert set(np.flatnonzero(coef)) <= set(model.support_)
+    assert model.mse_path_.shape == (50, 5)
+
+
+def test_nonconvex_rejects_too_small_gamma():
+    with pytest.raises(ValueError, match="gamma"):
+        NonconvexPenaltyRegression(penalty="scad", gamma=1.5).fit(np.eye(3), [1.0, 2.0, 3.0])
+
+
+# --- A2DE, P-spline GAM -------------------------------------------------------
+
+def test_a2de_captures_a_three_way_interaction():
+    # The class is the parity of three features: only a model whose tables cover
+    # three features at once (two parents and a child) can represent it.
+    rng = np.random.RandomState(0)
+    X = rng.randint(0, 2, size=(1500, 5))
+    y = X[:, 0] ^ X[:, 1] ^ X[:, 2]
+    assert cross_val_score(AODEClassifier(), X, y, cv=5).mean() < 0.7
+    assert cross_val_score(A2DEClassifier(), X, y, cv=5).mean() > 0.95
+
+
+def test_a2de_single_feature_is_naive_bayes():
+    X = np.array([[0], [1], [1], [0], [1], [2]])
+    y = np.array([0, 1, 1, 0, 1, 0])
+    a2de = A2DEClassifier().fit(X, y)
+    prior = (np.bincount(y) + 1) / (len(y) + 2)
+    nb = CategoricalNB(alpha=1.0, min_categories=a2de.n_categories_, class_prior=prior).fit(X, y)
+    np.testing.assert_allclose(a2de.predict_proba(X), nb.predict_proba(X))
+
+
+def test_pspline_gam_recovers_additive_curves():
+    rng = np.random.RandomState(0)
+    X = rng.uniform(-1, 1, size=(600, 3))
+    f = np.sin(3 * X[:, 0]) + X[:, 1] ** 2
+    y = f + 0.1 * rng.randn(600)
+    model = PSplineGAMRegressor().fit(X, y)
+    Xt = rng.uniform(-1, 1, size=(300, 3))
+    ft = np.sin(3 * Xt[:, 0]) + Xt[:, 1] ** 2
+    assert np.mean((model.predict(Xt) - ft) ** 2) < 0.01
+    assert LinearRegression().fit(X, y).score(Xt, ft) < 0.6
+
+
+def test_pspline_gam_strong_smoothing_is_linear_regression():
+    rng = np.random.RandomState(0)
+    X = rng.randn(200, 3)
+    y = X @ [1.0, -2.0, 0.5] + rng.randn(200)
+    model = PSplineGAMRegressor(alphas=[1e10]).fit(X, y)
+    ols = LinearRegression().fit(X, y)
+    Xt = rng.randn(50, 3)
+    np.testing.assert_allclose(model.predict(Xt), ols.predict(Xt), atol=0.02)
+
+
+def test_pspline_gam_low_cardinality_features_enter_linearly():
+    rng = np.random.RandomState(0)
+    X = np.column_stack([rng.randn(100), rng.randint(0, 2, 100)])
+    y = X[:, 0] + 3 * X[:, 1]
+    model = PSplineGAMRegressor().fit(X, y)
+    np.testing.assert_array_equal(model.spline_features_, [0])
+
+
+def test_pspline_gam_edf_counts_only_identifiable_directions():
+    # Centring removes one direction per spline block: a linear fit has 1 + p degrees of
+    # freedom, an unpenalized one 1 + p * (n_basis - 1).
+    rng = np.random.RandomState(0)
+    X = rng.randn(200, 3)
+    y = X @ [1.0, -2.0, 0.5] + rng.randn(200)
+    assert abs(PSplineGAMRegressor(alphas=[1e10]).fit(X, y).edf_ - 4) < 0.01
+    assert abs(PSplineGAMRegressor(n_knots=10, alphas=[1e-8]).fit(X, y).edf_ - 34) < 0.01
+
+
+def test_rotation_forest_handles_many_rows_cheaply():
+    # The rotation must not build an n x n factor; 20 000 rows would need gigabytes.
+    rng = np.random.RandomState(0)
+    X = rng.randn(20_000, 3)
+    y = (X[:, 0] > 0).astype(int)
+    model = RotationForestClassifier(n_estimators=1, random_state=0).fit(X, y)
+    assert model.score(X, y) > 0.99

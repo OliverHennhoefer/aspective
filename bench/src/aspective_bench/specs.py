@@ -16,30 +16,56 @@ measures the paper's idea and not a tuning difference.
 """
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.ensemble import IsolationForest
+from sklearn.ensemble import (
+    AdaBoostClassifier,
+    GradientBoostingClassifier,
+    IsolationForest,
+    RandomForestClassifier,
+    RandomForestRegressor,
+)
 from sklearn.linear_model import LassoCV, LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.naive_bayes import CategoricalNB, GaussianNB
-from sklearn.neighbors import KNeighborsRegressor, LocalOutlierFactor
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, LocalOutlierFactor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-from aspective.anomaly import LeSiNNDetector, RSHashDetector
+from aspective.anomaly import ExtendedIsolationForestDetector, LeSiNNDetector, RSHashDetector
 from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
+from aspective.ensemble import (
+    LocalLinearForestRegressor,
+    LogitBoostClassifier,
+    MultiBoostClassifier,
+    RotationForestClassifier,
+)
 from aspective.linear_model import (
     AdaptiveLassoCV,
     Bolasso,
     CauchyLogisticRegression,
     FirthLogisticRegression,
     L2BoostRegressor,
+    MARSRegressor,
+    NonconvexPenaltyRegressionCV,
+    PSplineGAMRegressor,
     RelaxedLassoCV,
 )
-from aspective.naive_bayes import AODEClassifier, TANClassifier
-from aspective.neighbors import LoessRegressor
+from aspective.naive_bayes import (
+    A2DEClassifier,
+    AODEClassifier,
+    FlexibleNaiveBayes,
+    HiddenNaiveBayesClassifier,
+    KDBClassifier,
+    TANClassifier,
+)
+from aspective.neighbors import DANNClassifier, LoessRegressor
+from aspective.tree import M5ModelTreeRegressor
 
 from .protocol import Benchmark
 
 N_TREES = 200
+N_ROUNDS = 200  # boosting rounds
+DEPTH = 3  # depth of boosted trees
 
 
 def scaled(estimator):
@@ -77,6 +103,16 @@ ML_LOGISTIC = ("ML logistic", ml_logistic)
 ISOLATION_FOREST = ("Isolation Forest", lambda: scaled(IsolationForest(n_estimators=N_TREES, random_state=0)))
 LOF = ("LOF", lambda: scaled(LocalOutlierFactor(novelty=True)))
 LASSO_CV = ("LassoCV", lambda: scaled(LassoCV(cv=5)))
+ADABOOST = ("AdaBoost (depth 3)", lambda: AdaBoostClassifier(
+    DecisionTreeClassifier(max_depth=DEPTH), n_estimators=N_ROUNDS, random_state=0))
+
+
+def cart_regression():
+    return GridSearchCV(DecisionTreeRegressor(random_state=0),
+                        {"min_samples_leaf": [1, 5, 10, 20, 50]}, cv=3)
+
+
+CART_TUNED = ("CART (tuned leaf size)", cart_regression)
 
 BENCHMARKS = [
     Benchmark(
@@ -199,6 +235,149 @@ BENCHMARKS = [
         metric="roc_auc",
         notes="The paper's defaults: 50 subsamples of 8 points.",
     ),
+    # --- third wave -----------------------------------------------------------
+    Benchmark(
+        name="kdb",
+        candidate=("KDB k=2 (5 bins)", lambda: KDBClassifier(k=2, n_bins=5)),
+        predecessors=dict([NB_5_BINS]),
+        references={"TAN (5 bins)": lambda: TANClassifier(n_bins=5)},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Both use the same 5-bin quantile discretization and Laplace smoothing.",
+    ),
+    Benchmark(
+        name="hnb",
+        candidate=("Hidden NB (5 bins)", lambda: HiddenNaiveBayesClassifier(n_bins=5)),
+        predecessors=dict([NB_5_BINS]),
+        references={"AODE (5 bins)": lambda: AODEClassifier(n_bins=5)},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Both use the same 5-bin quantile discretization and Laplace smoothing.",
+    ),
+    Benchmark(
+        name="a2de",
+        candidate=("A2DE (5 bins)", lambda: A2DEClassifier(n_bins=5)),
+        predecessors=dict([NB_5_BINS]),
+        references={"AODE (5 bins)": lambda: AODEClassifier(n_bins=5)},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Both use the same 5-bin quantile discretization and Laplace smoothing.",
+    ),
+    Benchmark(
+        name="flexible-nb",
+        candidate=("Flexible NB", FlexibleNaiveBayes),
+        predecessors={"Gaussian NB": GaussianNB},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.",
+    ),
+    Benchmark(
+        name="dann",
+        candidate=("DANN (k=5)", lambda: DANNClassifier(n_neighbors=5)),
+        predecessors={"k-NN (k=5)": lambda: scaled(KNeighborsClassifier(n_neighbors=5))},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Both vote with 5 neighbours on standardized inputs; DANN estimates its metric "
+              "from max(n/5, 50) neighbours with epsilon = 1, as in the paper.",
+    ),
+    Benchmark(
+        name="rotation-forest",
+        candidate=("Rotation Forest", lambda: RotationForestClassifier(n_estimators=N_TREES,
+                                                                       random_state=0)),
+        predecessors={"Random forest": lambda: RandomForestClassifier(n_estimators=N_TREES,
+                                                                       random_state=0)},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Both grow 200 unpruned trees; groups of 3 features, as in the paper.",
+    ),
+    Benchmark(
+        name="logitboost",
+        candidate=("LogitBoost (depth 3)", lambda: LogitBoostClassifier(
+            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0)),
+        predecessors=dict([ADABOOST]),
+        references={"Gradient boosting (depth 3)": lambda: GradientBoostingClassifier(
+            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0)},
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="200 rounds of depth-3 trees for every model, no shrinkage for LogitBoost and "
+              "AdaBoost (SAMME), as in the paper.",
+    ),
+    Benchmark(
+        name="multiboost",
+        candidate=("MultiBoost (depth 3)", lambda: MultiBoostClassifier(
+            DecisionTreeClassifier(max_depth=DEPTH), n_estimators=N_ROUNDS, random_state=0)),
+        predecessors=dict([ADABOOST]),
+        suite="pmlb-classification",
+        metric="accuracy",
+        notes="Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights "
+              "about every sqrt(200) = 14 members.",
+    ),
+    Benchmark(
+        name="local-linear-forest",
+        candidate=("Local linear forest", lambda: LocalLinearForestRegressor(
+            n_estimators=N_TREES, min_samples_leaf=5, random_state=0)),
+        predecessors={"Random forest (leaf 5)": lambda: RandomForestRegressor(
+            n_estimators=N_TREES, min_samples_leaf=5, random_state=0)},
+        suite="pmlb-regression",
+        metric="r2",
+        notes="The same forest (200 trees, leaves of at least 5) supplies the weights; ridge "
+              "penalty 0.1 on the local slopes, grf's default.",
+    ),
+    Benchmark(
+        name="m5",
+        candidate=("M5 model tree", M5ModelTreeRegressor),
+        predecessors=dict([CART_TUNED]),
+        references=dict([LASSO_CV]),
+        suite="pmlb-regression",
+        metric="r2",
+        notes="M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its "
+              "minimum leaf size from five values by inner 3-fold CV.",
+    ),
+    Benchmark(
+        name="mars",
+        candidate=("MARS (additive)", MARSRegressor),
+        predecessors=dict([LASSO_CV, CART_TUNED]),
+        suite="pmlb-regression",
+        metric="r2",
+        notes="Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes "
+              "both stepwise linear regression and recursive partitioning, so it must keep up "
+              "with both.",
+    ),
+    Benchmark(
+        name="pspline-gam",
+        candidate=("P-spline GAM", PSplineGAMRegressor),
+        predecessors=dict([LASSO_CV]),
+        references={"MARS (additive)": MARSRegressor},
+        suite="pmlb-regression",
+        metric="r2",
+        notes="Cubic P-splines on 10 equally spaced knots per feature, one smoothing "
+              "parameter chosen by GCV; the strongest smoothing is linear regression.",
+    ),
+    Benchmark(
+        name="mcp",
+        candidate=("MCP (CV)", lambda: NonconvexPenaltyRegressionCV(penalty="mcp", cv=5)),
+        predecessors=dict([LASSO_CV]),
+        suite="pmlb-regression",
+        metric="r2",
+        notes="gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.",
+    ),
+    Benchmark(
+        name="scad",
+        candidate=("SCAD (CV)", lambda: NonconvexPenaltyRegressionCV(penalty="scad", cv=5)),
+        predecessors=dict([LASSO_CV]),
+        suite="pmlb-regression",
+        metric="r2",
+        notes="gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.",
+    ),
+    Benchmark(
+        name="extended-iforest",
+        candidate=("Extended IF", lambda: scaled(ExtendedIsolationForestDetector(
+            n_estimators=N_TREES, random_state=0))),
+        predecessors=dict([ISOLATION_FOREST]),
+        suite="adbench-classical",
+        metric="roc_auc",
+        notes="Fully extended cuts, 200 trees of 256 points like the Isolation Forest.",
+    ),
 ]
 
 BY_NAME = {b.name: b for b in BENCHMARKS}
@@ -207,4 +386,5 @@ BY_NAME = {b.name: b for b in BENCHMARKS}
 COVERED_BY = {
     "RelaxedLasso": "relaxed-lasso: RelaxedLassoCV is RelaxedLasso with (alpha, phi) chosen by CV",
     "AdaptiveLasso": "adaptive-lasso: AdaptiveLassoCV is AdaptiveLasso with (alpha, gamma) chosen by CV",
+    "NonconvexPenaltyRegression": "mcp, scad: NonconvexPenaltyRegressionCV is it with alpha chosen by CV",
 }

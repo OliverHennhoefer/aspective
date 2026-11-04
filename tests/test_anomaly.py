@@ -5,13 +5,19 @@ import pytest
 from sklearn.base import clone
 from sklearn.metrics import roc_auc_score
 
-from aspective.anomaly import LeSiNNDetector, RSHashDetector
+from sklearn.ensemble import IsolationForest
+
+from aspective.anomaly import ExtendedIsolationForestDetector, LeSiNNDetector, RSHashDetector
 from aspective.anomaly._base import BaseDetector
 
 DETECTORS = [
     RSHashDetector(n_estimators=50, random_state=0),
     LeSiNNDetector(random_state=0),
+    ExtendedIsolationForestDetector(n_estimators=50, random_state=0),
 ]
+# Detectors that score training points leave-one-out (a point is not its own neighbour),
+# so decision_function on the training data differs from decision_scores_.
+LEAVE_ONE_OUT = (RSHashDetector, LeSiNNDetector)
 
 
 @pytest.fixture
@@ -36,9 +42,7 @@ def test_pyod_contract(detector, planted):
     assert model.decision_scores_.shape == (len(X),)
     assert set(np.unique(model.labels_)) <= {0, 1}
     assert abs(model.labels_.mean() - model.contamination) < 0.03
-    if not isinstance(model, (RSHashDetector, LeSiNNDetector)):
-        # These score training points leave-one-out (a point is not its own neighbour),
-        # so decision_function on the training data differs from decision_scores_.
+    if not isinstance(model, LEAVE_ONE_OUT):
         np.testing.assert_allclose(model.decision_function(X), model.decision_scores_)
         np.testing.assert_array_equal(model.predict(X), model.labels_)
     assert set(np.unique(model.predict(X))) <= {0, 1}
@@ -112,3 +116,27 @@ def test_lesinn_training_scores_finite_with_singleton_subsamples(n_samples, max_
     model = LeSiNNDetector(max_samples=max_samples, random_state=0).fit(X)
     assert np.all(np.isfinite(model.decision_scores_))
     assert np.isfinite(model.threshold_)
+
+
+# --- Extended Isolation Forest -----------------------------------------------
+
+def test_eif_extension_level_zero_cuts_one_axis(planted):
+    X, _ = planted
+    model = ExtendedIsolationForestDetector(n_estimators=5, extension_level=0, random_state=0)
+    model.fit(X)
+    for tree in model.estimators_:
+        internal = tree.left != -1
+        assert np.all(np.count_nonzero(tree.normal[internal], axis=1) == 1)
+
+
+def test_eif_scores_are_rotation_symmetric_around_a_blob():
+    # On a round blob, Isolation Forest scores points on a circle differently along the
+    # axes and the diagonals (its star-shaped score map); oblique cuts remove that.
+    rng = np.random.RandomState(0)
+    X = rng.randn(2000, 2)
+    angles = np.linspace(0, 2 * np.pi, 72, endpoint=False)
+    circle = 2.5 * np.column_stack([np.cos(angles), np.sin(angles)])
+    eif = ExtendedIsolationForestDetector(n_estimators=300, random_state=0).fit(X)
+    iso = IsolationForest(n_estimators=300, random_state=0).fit(X)
+    assert np.std(eif.decision_function(circle)) < np.std(iso.score_samples(circle))
+

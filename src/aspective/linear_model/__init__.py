@@ -3,6 +3,9 @@ from ._bolasso import Bolasso
 from ._cauchy_logistic import CauchyLogisticRegression
 from ._firth import FirthLogisticRegression
 from ._l2boost import L2BoostRegressor
+from ._mars import MARSRegressor
+from ._pspline_gam import PSplineGAMRegressor
+from ._nonconvex import NonconvexPenaltyRegression, NonconvexPenaltyRegressionCV
 from ._relaxed_lasso import RelaxedLasso, RelaxedLassoCV
 
 __all__ = [
@@ -12,6 +15,10 @@ __all__ = [
     "CauchyLogisticRegression",
     "FirthLogisticRegression",
     "L2BoostRegressor",
+    "MARSRegressor",
+    "NonconvexPenaltyRegression",
+    "NonconvexPenaltyRegressionCV",
+    "PSplineGAMRegressor",
     "RelaxedLasso",
     "RelaxedLassoCV",
 ]
