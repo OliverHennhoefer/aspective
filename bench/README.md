@@ -55,6 +55,36 @@ all tests run on the per-dataset scores:
 - **Friedman test with Nemenyi critical difference** over all models of a
   benchmark, including references, for the average-rank summary.
 
+**Probabilistic track.** Point metrics cannot see what a probabilistic
+model is good at, so three proper scoring rules are available as benchmark
+metrics ([`probabilistic.py`](src/aspective_bench/probabilistic.py)):
+
+| Metric | Scores | Model must provide | Margin |
+|---|---|---|---|
+| `crps` | Gaussian predictive distribution (Gneiting & Raftery 2007) | `predict(X, return_std=True)` | 0.01 |
+| `nll` | the same, by negative log likelihood | `predict(X, return_std=True)` | 0.05 |
+| `log_loss` | class probabilities over all classes | `predict_proba` | 0.02 |
+
+CRPS and NLL are computed after dividing the target, mean and standard
+deviation by the training target's standard deviation, so scores are in the
+same units on every dataset and one margin fits all. CRPS is the metric of
+choice for a gate; NLL punishes overconfidence without bound and is better
+as a second look. The vanilla baseline for a probabilistic regressor is
+`ResidualGaussianRegressor`: any point regressor plus one constant spread,
+the root mean squared error of its out-of-fold predictions. A probabilistic
+method has to beat it to show that its spread carries information.
+
+```python
+Benchmark(
+    name="my-distributional-model",
+    candidate=("My model", lambda: MyModel(random_state=0)),
+    predecessors={"GB + residual Gaussian": lambda: ResidualGaussianRegressor(
+        GradientBoostingRegressor(random_state=0), random_state=0)},
+    suite="pmlb-regression",
+    metric="crps",
+)
+```
+
 **Verdicts.** `superior` (non-inferior and significantly better),
 `non-inferior`, `severe losses` (non-inferior in the typical case, but
 severe losses significantly outnumber severe wins), `inconclusive` (neither

@@ -128,7 +128,7 @@ ENTRIES = [
                "the accuracy-based gate cannot measure."),
     Entry("Distributional random forests", REG, "Ćevid, Michel, Näf, Bühlmann & Meinshausen, JMLR 2022",
           "Random forest, quantile regression forest", "not built",
-          note="Large effort; it predicts distributions, which needs a probabilistic benchmark track first."),
+          note="Large effort; it predicts distributions, so it would be judged on the probabilistic track (CRPS)."),
     Entry("Twin SVM", CLF, "Jayadeva, Khemchandani & Chandra, IEEE TPAMI 2007", "SVM", "not built",
           note="Not reached yet."),
     Entry("Relevance vector machine", f"{CLF}, {REG}", "Tipping, JMLR 2001", "SVM, SVR", "not built",
@@ -140,8 +140,8 @@ ENTRIES = [
 
     # Left out.
     Entry("NGBoost", f"{CLF}, {REG}", "Duan et al., ICML 2020", "Gradient boosting", "left out",
-          note="Maintained in `ngboost`; its strength is predictive distributions, which the gate does not "
-               "score yet (no NLL or CRPS metric)."),
+          note="Maintained in `ngboost`. Its strength is predictive distributions, which the probabilistic "
+               "track (CRPS, NLL, log loss) can now score if it is ever reconsidered."),
     Entry("Sparse projection oblique forests (SPORF)", f"{CLF}, {REG}", "Tomita et al., JMLR 2020",
           "Random forest", "left out", note="Maintained in `treeple`."),
     Entry("Quantile regression forests", REG, "Meinshausen, JMLR 2006", "Random forest", "left out",

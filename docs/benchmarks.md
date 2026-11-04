@@ -36,6 +36,13 @@ the comparison measures the paper's idea and not a tuning difference.
 - a Friedman test with Nemenyi critical differences ranks all models of a
   benchmark, including references.
 
+**Probabilistic track.** Models that predict distributions are scored with
+proper scoring rules instead: CRPS or Gaussian negative log likelihood for
+regressors that implement `predict(X, return_std=True)`, and log loss for
+classifiers. Against them stands a point model with an honest constant
+spread (its out-of-fold error), so a candidate has to show that its spread
+carries information.
+
 **Verdicts.** `superior` and `non-inferior` pass. `inconclusive` fails,
 because "not shown to be worse" is not evidence of being competitive.
 
