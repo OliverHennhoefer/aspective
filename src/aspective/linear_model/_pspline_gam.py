@@ -94,8 +94,9 @@ class PSplineGAMRegressor(RegressorMixin, BaseEstimator):
         self._splines, penalties, linear = [], [], []
         for j in range(p):
             if len(np.unique(X[:, j])) >= self.min_unique:
-                spline = SplineTransformer(n_knots=self.n_knots, degree=3, knots="uniform",
-                                           extrapolation="linear").fit(X[:, [j]])
+                spline = SplineTransformer(
+                    n_knots=self.n_knots, degree=3, knots="uniform", extrapolation="linear"
+                ).fit(X[:, [j]])
                 self._splines.append((j, spline))
                 k = spline.n_features_out_
                 D = np.diff(np.eye(k), n=2, axis=0)
@@ -113,9 +114,18 @@ class PSplineGAMRegressor(RegressorMixin, BaseEstimator):
         q = B.shape[1]
         y_mean = y.mean()
         yc = y - y_mean
-        P = linalg.block_diag(*penalties, np.zeros((len(linear), len(linear)))) if q else np.zeros((0, 0))
+        P = (
+            linalg.block_diag(*penalties, np.zeros((len(linear), len(linear))))
+            if q
+            else np.zeros((0, 0))
+        )
         if q == 0:
-            self.coef_, self.intercept_, self.alpha_, self.edf_ = np.zeros(0), float(y_mean), 0.0, 1.0
+            self.coef_, self.intercept_, self.alpha_, self.edf_ = (
+                np.zeros(0),
+                float(y_mean),
+                0.0,
+                1.0,
+            )
             self.gcv_ = np.zeros(0)
             return self
         G = B.T @ B
@@ -133,7 +143,9 @@ class PSplineGAMRegressor(RegressorMixin, BaseEstimator):
         # trace(BW diag(shrink) BW'): the ridge on G leaves the directions that centring
         # removed with near-zero norm, so they must not count as degrees of freedom.
         col_norm = np.einsum("ij,ij->j", BW, BW)
-        alphas = np.geomspace(1e-4, 1e6, 25) if self.alphas is None else np.asarray(self.alphas, float)
+        alphas = (
+            np.geomspace(1e-4, 1e6, 25) if self.alphas is None else np.asarray(self.alphas, float)
+        )
         gcv = np.empty(len(alphas))
         for a, alpha in enumerate(alphas):
             shrink = 1.0 / (1.0 + alpha * lam)

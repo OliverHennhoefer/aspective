@@ -106,11 +106,9 @@ exclude_also = [
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-# src/ and bench/ are not linted or formatted yet: the benchmark gate hashes
-# the raw source of each estimator's module, so even a whitespace-only change
-# would mark its committed results stale. They join once that hash ignores
-# formatting.
-extend-exclude = ["src", "bench"]
+# bench/ fingerprints its benchmark factories by their source text, so it stays
+# out of the formatter.
+extend-exclude = ["bench"]
 force-exclude = true
 
 [tool.ruff.lint]
@@ -131,6 +129,18 @@ ignore = [
     "B007",   # loop counters such as n_iter are read after the loop on purpose
     "SIM108", # if/else blocks are often clearer than nested ternaries
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Fixing these changes the code, which marks the estimator's committed
+# benchmark results stale. Fix them together with the next real change to the
+# module, then delete the entry.
+"src/aspective/discriminant_analysis/_mda.py" = ["B905"]
+"src/aspective/ensemble/_multiboost.py" = ["B905"]
+"src/aspective/ensemble/_rotation_forest.py" = ["B905"]
+"src/aspective/linear_model/_firth.py" = ["B028"]
+"src/aspective/linear_model/_mars.py" = ["F841"]
+"src/aspective/linear_model/_pspline_gam.py" = ["F401"]
+"src/aspective/linear_model/_relaxed_lasso.py" = ["F401"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["aspective"]

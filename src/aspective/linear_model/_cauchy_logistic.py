@@ -16,8 +16,7 @@ def _log_prior_and_grad(beta, scale, df):
     z = beta / scale
     if np.isinf(df):
         return -0.5 * np.sum(z**2), -z / scale
-    return (-0.5 * (df + 1) * np.sum(np.log1p(z**2 / df)),
-            -(df + 1) * z / (scale * (df + z**2)))
+    return (-0.5 * (df + 1) * np.sum(np.log1p(z**2 / df)), -(df + 1) * z / (scale * (df + z**2)))
 
 
 class CauchyLogisticRegression(ClassifierMixin, BaseEstimator):
@@ -82,8 +81,15 @@ class CauchyLogisticRegression(ClassifierMixin, BaseEstimator):
         "tol": [Interval(Real, 0, None, closed="neither")],
     }
 
-    def __init__(self, prior_scale=2.5, intercept_prior_scale=10.0, prior_df=1.0,
-                 scale_inputs=True, max_iter=1000, tol=1e-8):
+    def __init__(
+        self,
+        prior_scale=2.5,
+        intercept_prior_scale=10.0,
+        prior_df=1.0,
+        scale_inputs=True,
+        max_iter=1000,
+        tol=1e-8,
+    ):
         self.prior_scale = prior_scale
         self.intercept_prior_scale = intercept_prior_scale
         self.prior_df = prior_df
@@ -132,8 +138,13 @@ class CauchyLogisticRegression(ClassifierMixin, BaseEstimator):
             lp, lp_grad = _log_prior_and_grad(beta, priors, self.prior_df)
             return -(loglik + lp), -(grad + lp_grad)
 
-        result = minimize(objective, np.zeros(p + 1), jac=True, method="L-BFGS-B",
-                          options={"maxiter": self.max_iter, "gtol": self.tol})
+        result = minimize(
+            objective,
+            np.zeros(p + 1),
+            jac=True,
+            method="L-BFGS-B",
+            options={"maxiter": self.max_iter, "gtol": self.tol},
+        )
         beta = result.x
         self.n_iter_ = int(result.nit)
         self.coef_ = (beta[1:] / scale)[None, :]

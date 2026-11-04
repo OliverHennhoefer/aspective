@@ -111,7 +111,9 @@ class AODEClassifier(_DiscreteEncoderMixin, ClassifierMixin, BaseEstimator):
         parent = np.diagonal(counts, axis1=2, axis2=3)  # (n, k, p)
 
         log_parent = np.log(parent + alpha) - np.log(self._n_samples + alpha * n_classes * card)
-        log_child = np.log(counts + alpha) - np.log(parent[..., None] + alpha * card[None, None, None, :])
+        log_child = np.log(counts + alpha) - np.log(
+            parent[..., None] + alpha * card[None, None, None, :]
+        )
         eye = np.eye(p, dtype=bool)
         log_child = np.where(eye, 0.0, log_child)
         spode = log_parent + log_child.sum(axis=3)  # (n, k, p): one score per super-parent

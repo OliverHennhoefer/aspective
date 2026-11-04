@@ -18,8 +18,12 @@ def _mutual_information_with_class(codes, y_idx, n_categories, n_classes):
     n = len(codes)
     mi = np.zeros(codes.shape[1])
     for i in range(codes.shape[1]):
-        joint = np.bincount(y_idx * n_categories[i] + codes[:, i],
-                            minlength=n_classes * n_categories[i]).reshape(n_classes, -1) / n
+        joint = (
+            np.bincount(
+                y_idx * n_categories[i] + codes[:, i], minlength=n_classes * n_categories[i]
+            ).reshape(n_classes, -1)
+            / n
+        )
         outer = joint.sum(axis=1, keepdims=True) * joint.sum(axis=0, keepdims=True)
         with np.errstate(divide="ignore", invalid="ignore"):
             mi[i] = np.nansum(joint * np.log(joint / outer))
@@ -104,8 +108,11 @@ class KDBClassifier(_DiscreteEncoderMixin, ClassifierMixin, BaseEstimator):
 
         mi = _mutual_information_with_class(codes, y_idx, self.n_categories_, n_classes)
         self.order_ = np.argsort(-mi, kind="stable")
-        cmi = (_conditional_mutual_information(codes, y_idx, self.n_categories_, n_classes)
-               if p > 1 and self.k > 0 else np.zeros((p, p)))
+        cmi = (
+            _conditional_mutual_information(codes, y_idx, self.n_categories_, n_classes)
+            if p > 1 and self.k > 0
+            else np.zeros((p, p))
+        )
         self.parents_ = [np.empty(0, dtype=np.intp) for _ in range(p)]
         for pos, i in enumerate(self.order_):
             earlier = self.order_[:pos]

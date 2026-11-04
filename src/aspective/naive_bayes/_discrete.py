@@ -15,7 +15,9 @@ class _DiscreteEncoderMixin:
         if self.n_bins is not None:
             if fit:
                 self._binner = KBinsDiscretizer(
-                    n_bins=self.n_bins, encode="ordinal", strategy="quantile",
+                    n_bins=self.n_bins,
+                    encode="ordinal",
+                    strategy="quantile",
                     quantile_method="averaged_inverted_cdf",
                 )
                 X = self._binner.fit_transform(X)

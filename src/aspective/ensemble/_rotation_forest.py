@@ -70,8 +70,14 @@ class RotationForestClassifier(ClassifierMixin, BaseEstimator):
         "random_state": ["random_state"],
     }
 
-    def __init__(self, n_estimators=100, n_features_per_subset=3, sample_fraction=0.75,
-                 min_samples_leaf=1, random_state=None):
+    def __init__(
+        self,
+        n_estimators=100,
+        n_features_per_subset=3,
+        sample_fraction=0.75,
+        min_samples_leaf=1,
+        random_state=None,
+    ):
         self.n_estimators = n_estimators
         self.n_features_per_subset = n_features_per_subset
         self.sample_fraction = sample_fraction
@@ -122,8 +128,10 @@ class RotationForestClassifier(ClassifierMixin, BaseEstimator):
         self.estimators_, self.rotations_ = [], []
         for _ in range(self.n_estimators):
             R = self._rotation(Z, y_idx, len(self.classes_), rng)
-            tree = DecisionTreeClassifier(min_samples_leaf=self.min_samples_leaf,
-                                          random_state=rng.randint(np.iinfo(np.int32).max))
+            tree = DecisionTreeClassifier(
+                min_samples_leaf=self.min_samples_leaf,
+                random_state=rng.randint(np.iinfo(np.int32).max),
+            )
             tree.fit(Z @ R, y_idx)
             self.estimators_.append(tree)
             self.rotations_.append(R)

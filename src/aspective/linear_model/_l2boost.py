@@ -114,8 +114,9 @@ class L2BoostRegressor(RegressorMixin, BaseEstimator):
             errors = np.zeros(self.max_iter + 1)
             folds = list(check_cv(self.cv).split(X, y))
             for train, test in folds:
-                _, _, preds = _boost_path(X[train], y[train], self.max_iter, self.learning_rate,
-                                          X_eval=X[test])
+                _, _, preds = _boost_path(
+                    X[train], y[train], self.max_iter, self.learning_rate, X_eval=X[test]
+                )
                 errors += np.mean((preds - y[test]) ** 2, axis=1)
             self.cv_mse_ = errors / len(folds)
             self.n_iter_ = int(np.argmin(self.cv_mse_))

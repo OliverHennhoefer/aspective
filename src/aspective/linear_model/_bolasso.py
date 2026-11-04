@@ -65,8 +65,13 @@ class Bolasso(RegressorMixin, BaseEstimator):
     }
 
     def __init__(
-        self, alpha=None, n_bootstrap=128, threshold=1.0, fit_intercept=True,
-        max_iter=1000, random_state=None,
+        self,
+        alpha=None,
+        n_bootstrap=128,
+        threshold=1.0,
+        fit_intercept=True,
+        max_iter=1000,
+        random_state=None,
     ):
         self.alpha = alpha
         self.n_bootstrap = n_bootstrap
@@ -84,7 +89,8 @@ class Bolasso(RegressorMixin, BaseEstimator):
             cv = min(5, n) if n >= 2 else 2
             self.alpha_ = float(
                 LassoCV(fit_intercept=self.fit_intercept, max_iter=self.max_iter, cv=cv)
-                .fit(X, y).alpha_
+                .fit(X, y)
+                .alpha_
             )
         else:
             self.alpha_ = float(self.alpha)

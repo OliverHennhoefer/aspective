@@ -100,8 +100,9 @@ class MARSRegressor(RegressorMixin, BaseEstimator):
         max_terms = (min(200, max(20, 2 * p)) + 1) if self.max_terms is None else self.max_terms
         max_terms = min(max_terms, n)
         levels = np.linspace(0, 1, self.n_knots + 2)[1:-1]
-        self._knots = [np.unique(np.quantile(X[:, j], levels, method="inverted_cdf"))
-                       for j in range(p)]
+        self._knots = [
+            np.unique(np.quantile(X[:, j], levels, method="inverted_cdf")) for j in range(p)
+        ]
         n_cand = [len(k) for k in self._knots]
         offsets = np.concatenate([[0], np.cumsum(2 * np.array(n_cand))])
 
@@ -125,8 +126,12 @@ class MARSRegressor(RegressorMixin, BaseEstimator):
                 norms.append(np.einsum("ij,ij->j", C, C))
                 cy.append(y @ C)
                 proj.append(np.array(Q) @ C)
-            parents[idx] = (col, np.concatenate(norms), np.concatenate(cy),
-                            np.concatenate(proj, axis=1))
+            parents[idx] = (
+                col,
+                np.concatenate(norms),
+                np.concatenate(cy),
+                np.concatenate(proj, axis=1),
+            )
 
         def extend_parents(q):
             for idx, (col, norms, cy, proj) in parents.items():
@@ -158,13 +163,24 @@ class MARSRegressor(RegressorMixin, BaseEstimator):
                     single_b = np.where(ok_b, rb**2 / np.where(ok_b, uu_b, 1), 0.0)
                     det = uu_a * uu_b - uw**2
                     ok = ok_a & ok_b & (det > 1e-9 * uu_a * uu_b)
-                    pair = np.where(ok, (uu_b * ra**2 - 2 * uw * ra * rb + uu_a * rb**2)
-                                    / np.where(ok, det, 1), 0.0)
+                    pair = np.where(
+                        ok,
+                        (uu_b * ra**2 - 2 * uw * ra * rb + uu_a * rb**2) / np.where(ok, det, 1),
+                        0.0,
+                    )
                     gain = np.where(ok, pair, np.maximum(single_a, single_b))
                     i = int(np.argmax(gain))
                     if best is None or gain[i] > best[0]:
-                        best = (gain[i], idx, j, i, bool(ok[i]), bool(ok_a[i]), bool(ok_b[i]),
-                                single_a[i] >= single_b[i])
+                        best = (
+                            gain[i],
+                            idx,
+                            j,
+                            i,
+                            bool(ok[i]),
+                            bool(ok_a[i]),
+                            bool(ok_b[i]),
+                            single_a[i] >= single_b[i],
+                        )
             if best is None or best[0] <= self.threshold * tss or tss == 0:
                 break
             gain, idx, j, i, both, ok_a, ok_b, a_better = best

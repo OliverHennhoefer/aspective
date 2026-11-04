@@ -67,8 +67,9 @@ class LogitBoostClassifier(ClassifierMixin, BaseEstimator):
         "random_state": ["random_state"],
     }
 
-    def __init__(self, n_estimators=100, max_depth=3, learning_rate=1.0, z_max=4.0,
-                 random_state=None):
+    def __init__(
+        self, n_estimators=100, max_depth=3, learning_rate=1.0, z_max=4.0, random_state=None
+    ):
         self.n_estimators = n_estimators
         self.max_depth = max_depth
         self.learning_rate = learning_rate
@@ -76,8 +77,9 @@ class LogitBoostClassifier(ClassifierMixin, BaseEstimator):
         self.random_state = random_state
 
     def _tree(self, rng):
-        return DecisionTreeRegressor(max_depth=self.max_depth,
-                                     random_state=rng.randint(np.iinfo(np.int32).max))
+        return DecisionTreeRegressor(
+            max_depth=self.max_depth, random_state=rng.randint(np.iinfo(np.int32).max)
+        )
 
     def fit(self, X, y):
         self._validate_params()

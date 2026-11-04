@@ -96,8 +96,9 @@ class AdaptiveLasso(_AdaptiveLassoMixin, RegressorMixin, BaseEstimator):
         "tol": [Interval(Real, 0, None, closed="neither")],
     }
 
-    def __init__(self, alpha=1.0, gamma=1.0, initial="ridge", fit_intercept=True,
-                 max_iter=1000, tol=1e-4):
+    def __init__(
+        self, alpha=1.0, gamma=1.0, initial="ridge", fit_intercept=True, max_iter=1000, tol=1e-4
+    ):
         self.alpha = alpha
         self.gamma = gamma
         self.initial = initial
@@ -108,15 +109,19 @@ class AdaptiveLasso(_AdaptiveLassoMixin, RegressorMixin, BaseEstimator):
     def fit(self, X, y):
         self._validate_params()
         X, y = validate_data(self, X, y, y_numeric=True)
-        self.weights_ = _adaptive_weights(_initial_coef(X, y, self.initial, self.fit_intercept),
-                                          self.gamma)
+        self.weights_ = _adaptive_weights(
+            _initial_coef(X, y, self.initial, self.fit_intercept), self.gamma
+        )
         Xw, keep = self._rescaled(X, self.weights_)
         if Xw.shape[1] == 0:
-            self._set_coef(np.zeros(0), y.mean() if self.fit_intercept else 0.0, self.weights_, keep)
+            self._set_coef(
+                np.zeros(0), y.mean() if self.fit_intercept else 0.0, self.weights_, keep
+            )
             self.n_iter_ = 0
             return self
-        lasso = Lasso(alpha=self.alpha, fit_intercept=self.fit_intercept,
-                      max_iter=self.max_iter, tol=self.tol).fit(Xw, y)
+        lasso = Lasso(
+            alpha=self.alpha, fit_intercept=self.fit_intercept, max_iter=self.max_iter, tol=self.tol
+        ).fit(Xw, y)
         self.n_iter_ = lasso.n_iter_
         self._set_coef(lasso.coef_, lasso.intercept_, self.weights_, keep)
         return self
@@ -168,8 +173,17 @@ class AdaptiveLassoCV(_AdaptiveLassoMixin, RegressorMixin, BaseEstimator):
         "tol": [Interval(Real, 0, None, closed="neither")],
     }
 
-    def __init__(self, gammas=(0.5, 1.0, 2.0), n_alphas=100, eps=1e-3, cv=5, initial="ridge",
-                 fit_intercept=True, max_iter=1000, tol=1e-4):
+    def __init__(
+        self,
+        gammas=(0.5, 1.0, 2.0),
+        n_alphas=100,
+        eps=1e-3,
+        cv=5,
+        initial="ridge",
+        fit_intercept=True,
+        max_iter=1000,
+        tol=1e-4,
+    ):
         self.gammas = gammas
         self.n_alphas = n_alphas
         self.eps = eps
@@ -195,9 +209,14 @@ class AdaptiveLassoCV(_AdaptiveLassoMixin, RegressorMixin, BaseEstimator):
             Xw, keep = self._rescaled(X, weights)
             if Xw.shape[1] == 0:
                 continue
-            model = LassoCV(alphas=self.n_alphas, eps=self.eps, cv=folds,
-                            fit_intercept=self.fit_intercept, max_iter=self.max_iter,
-                            tol=self.tol).fit(Xw, y)
+            model = LassoCV(
+                alphas=self.n_alphas,
+                eps=self.eps,
+                cv=folds,
+                fit_intercept=self.fit_intercept,
+                max_iter=self.max_iter,
+                tol=self.tol,
+            ).fit(Xw, y)
             self.cv_mse_[g] = model.mse_path_.mean(axis=1).min()
             if best is None or self.cv_mse_[g] < best[0]:
                 best = (self.cv_mse_[g], gamma, model, weights, keep)
@@ -205,8 +224,12 @@ class AdaptiveLassoCV(_AdaptiveLassoMixin, RegressorMixin, BaseEstimator):
         if best is None:  # every initial coefficient was exactly zero
             self.gamma_, self.alpha_ = float(gammas[0]), np.inf
             self.weights_ = _adaptive_weights(init, gammas[0])
-            self._set_coef(np.zeros(0), y.mean() if self.fit_intercept else 0.0,
-                           self.weights_, np.zeros(X.shape[1], bool))
+            self._set_coef(
+                np.zeros(0),
+                y.mean() if self.fit_intercept else 0.0,
+                self.weights_,
+                np.zeros(X.shape[1], bool),
+            )
             self.n_iter_ = 0
             return self
         _, self.gamma_, model, self.weights_, keep = best
