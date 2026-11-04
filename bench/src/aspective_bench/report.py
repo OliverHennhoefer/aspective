@@ -153,6 +153,9 @@ def operating_characteristics(results, n_sim=1000):
     return "\n".join(lines + [""])
 
 
+MAX_FAILED_SHARE = 0.1
+
+
 def leaderboards(results, standards=()):
     """One table per suite and protocol with every model run on it, side by side.
 
@@ -192,7 +195,12 @@ def leaderboards(results, standards=()):
                 roles[ident] = min(role, roles.get(ident, role), key=order.index)
         if len(models) < 3:
             continue
-        idents = list(models)
+        # A model that fails on more than a tenth of the datasets would shrink
+        # the common set for everyone; it is named below the table instead.
+        n_data = len(rs[0]["datasets"])
+        failed = {i: sum(v is None for v in models[i][1]) for i in models}
+        left_out = [i for i in models if failed[i] > MAX_FAILED_SHARE * n_data]
+        idents = [i for i in models if i not in left_out]
         matrix = np.array([[np.nan if v is None else v for v in models[i][1]] for i in idents], float).T
         ranks, _, cd, n = stats.friedman_nemenyi(matrix)
         first = rs[0]
@@ -203,15 +211,20 @@ def leaderboards(results, standards=()):
                 f"(Nemenyi critical difference {cd:.2f}).", "",
                 f"| Rank | Model | Role | Average rank | Mean {METRIC_NAMES[metric]} | Median {METRIC_NAMES[metric]} |",
                 "|---|---|---|---|---|---|"]
+        # Means and medians over the same datasets as the ranks, so every row
+        # of the table describes one population.
+        complete = matrix[~np.isnan(matrix).any(axis=1)]
         order = np.argsort(ranks, kind="stable")
         for place, j in enumerate(order, 1):
             ident = idents[j]
-            col = matrix[:, j]
-            col = col[~np.isnan(col)]
+            col = complete[:, j]
             mean = _display(first, float(np.mean(col))) if col.size else None
             median = _display(first, float(np.median(col))) if col.size else None
             out.append(f"| {place} | {models[ident][0]} | {roles[ident]} | {ranks[j]:.2f} | "
                        f"{_fmt(mean)} | {_fmt(median)} |")
+        if left_out:
+            out += ["", "Not ranked, because they fail on more than a tenth of the datasets: "
+                    + ", ".join(f"{models[i][0]} ({failed[i]} of {n_data})" for i in left_out) + "."]
         out.append("")
     return "\n".join(out)
 

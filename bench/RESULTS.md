@@ -85,31 +85,32 @@ predecessors, configured like the candidate's building blocks.
 
 ### `pmlb-classification`, accuracy
 
-21 models on 33 of 68 datasets (Nemenyi critical difference 5.45).
+20 models on 68 of 68 datasets (Nemenyi critical difference 3.60).
 
 | Rank | Model | Role | Average rank | Mean accuracy | Median accuracy |
 |---|---|---|---|---|---|
-| 1 | Rotation Forest | candidate | 6.85 | 0.833 | 0.904 |
-| 2 | Random forest | predecessor | 7.48 | 0.832 | 0.902 |
-| 3 | RDA (tuned) | candidate | 7.68 | 0.811 | 0.862 |
-| 4 | MultiBoost (depth 3) | candidate | 7.71 | 0.823 | 0.873 |
-| 5 | Gradient boosting (depth 3) | reference | 7.83 | 0.832 | 0.891 |
-| 6 | MDA (tuned) | candidate | 8.55 | 0.793 | 0.824 |
-| 7 | LogitBoost (depth 3) | candidate | 9.48 | 0.831 | 0.901 |
-| 8 | QDA | predecessor | 9.98 | 0.755 | 0.790 |
-| 9 | LDA | predecessor | 10.17 | 0.778 | 0.811 |
-| 10 | AdaBoost (depth 3) | predecessor | 10.44 | 0.818 | 0.865 |
-| 11 | LDA (Ledoit-Wolf) | reference | 10.82 | 0.781 | 0.813 |
-| 12 | DANN (k=5) | candidate | 10.97 | 0.788 | 0.833 |
-| 13 | A2DE (5 bins) | candidate | 12.44 | 0.770 | 0.824 |
-| 14 | Hidden NB (5 bins) | candidate | 12.52 | 0.765 | 0.807 |
-| 15 | AODE (5 bins) | candidate | 12.59 | 0.766 | 0.815 |
-| 16 | Flexible NB | candidate | 13.29 | 0.763 | 0.804 |
-| 17 | TAN (5 bins) | candidate | 13.86 | 0.757 | 0.806 |
-| 18 | k-NN (k=5) | predecessor | 14.02 | 0.781 | 0.835 |
-| 19 | Gaussian NB | predecessor | 14.09 | 0.699 | 0.730 |
-| 20 | KDB k=2 (5 bins) | candidate | 14.14 | 0.760 | 0.807 |
-| 21 | Naive Bayes (5 bins) | predecessor | 16.09 | 0.727 | 0.772 |
+| 1 | Random forest | predecessor | 5.84 | 0.832 | 0.902 |
+| 2 | Rotation Forest | candidate | 5.88 | 0.833 | 0.904 |
+| 3 | MultiBoost (depth 3) | candidate | 7.29 | 0.823 | 0.873 |
+| 4 | Gradient boosting (depth 3) | reference | 7.29 | 0.832 | 0.891 |
+| 5 | RDA (tuned) | candidate | 7.35 | 0.811 | 0.862 |
+| 6 | LogitBoost (depth 3) | candidate | 7.81 | 0.831 | 0.901 |
+| 7 | AdaBoost (depth 3) | predecessor | 8.93 | 0.818 | 0.865 |
+| 8 | MDA (tuned) | candidate | 9.32 | 0.793 | 0.824 |
+| 9 | DANN (k=5) | candidate | 10.67 | 0.788 | 0.833 |
+| 10 | LDA | predecessor | 10.88 | 0.778 | 0.811 |
+| 11 | LDA (Ledoit-Wolf) | reference | 10.91 | 0.781 | 0.813 |
+| 12 | A2DE (5 bins) | candidate | 11.28 | 0.770 | 0.824 |
+| 13 | k-NN (k=5) | predecessor | 11.67 | 0.781 | 0.835 |
+| 14 | AODE (5 bins) | candidate | 12.02 | 0.766 | 0.815 |
+| 15 | Hidden NB (5 bins) | candidate | 12.34 | 0.765 | 0.807 |
+| 16 | Flexible NB | candidate | 13.16 | 0.763 | 0.804 |
+| 17 | KDB k=2 (5 bins) | candidate | 13.20 | 0.760 | 0.807 |
+| 18 | TAN (5 bins) | candidate | 13.32 | 0.757 | 0.806 |
+| 19 | Gaussian NB | predecessor | 15.15 | 0.699 | 0.730 |
+| 20 | Naive Bayes (5 bins) | predecessor | 15.69 | 0.727 | 0.772 |
+
+Not ranked, because they fail on more than a tenth of the datasets: QDA (35 of 68).
 
 ### `pmlb-ctr23-regression`, R²
 
