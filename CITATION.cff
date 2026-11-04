@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: >-
+  If you use aspective in your work, please cite it as below, and cite the
+  original paper of each estimator you use (listed in its docstring and in the
+  README).
+title: "aspective: peer-reviewed variants of classic estimators, with the scikit-learn API"
+type: software
+abstract: >-
+  aspective collects variants of classic estimators that improve on their
+  vanilla versions in peer-reviewed studies but never made it into
+  scikit-learn: regularized and mixture discriminant analysis, semi-naive
+  Bayes, adaptive nearest neighbours, rotation forests and boosting variants,
+  model trees, bias-reduced and penalized linear models, MARS and GAMs, and
+  anomaly detectors. Every estimator follows the scikit-learn or PyOD API and
+  passes a public benchmark gate that tests it for non-inferiority against
+  the model it improves on.
+authors:
+  - family-names: Hennhoefer
+    given-names: Oliver
+    email: oliver.hennhoefer@mail.de
+repository-code: "https://github.com/OliverHennhoefer/aspective"
+license: MIT
+keywords:
+  - machine learning
+  - scikit-learn
+  - statistics
+  - classification
+  - regression
+  - anomaly detection
+  - benchmarking
+  - python

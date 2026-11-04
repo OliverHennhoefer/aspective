@@ -75,8 +75,8 @@ search = GridSearchCV(
 from aspective.anomaly import RSHashDetector
 
 detector = RSHashDetector(contamination=0.05, random_state=0).fit(X)
-detector.decision_scores_   # higher means more anomalous
-detector.predict(X)         # 0 inlier, 1 outlier, as in PyOD
+detector.decision_scores_  # higher means more anomalous
+detector.predict(X)  # 0 inlier, 1 outlier, as in PyOD
 ```
 
 ## Development

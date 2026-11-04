@@ -2,7 +2,10 @@
 
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
+from aspective.discriminant_analysis import (
+    MixtureDiscriminantAnalysis,
+    RegularizedDiscriminantAnalysis,
+)
 from aspective.ensemble import (
     LocalLinearForestRegressor,
     LogitBoostClassifier,

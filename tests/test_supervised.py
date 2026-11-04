@@ -12,7 +12,10 @@ from sklearn.naive_bayes import CategoricalNB, GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
-from aspective.discriminant_analysis import MixtureDiscriminantAnalysis, RegularizedDiscriminantAnalysis
+from aspective.discriminant_analysis import (
+    MixtureDiscriminantAnalysis,
+    RegularizedDiscriminantAnalysis,
+)
 from aspective.ensemble import (
     LocalLinearForestRegressor,
     LogitBoostClassifier,
@@ -44,13 +47,20 @@ from aspective.naive_bayes import (
 from aspective.neighbors import DANNClassifier, LoessRegressor
 from aspective.tree import M5ModelTreeRegressor
 
-
 # --- RDA ---------------------------------------------------------------------
+
 
 @pytest.fixture
 def gaussian_classes():
-    X, y = make_classification(n_samples=300, n_features=5, n_informative=4, n_redundant=0,
-                               n_classes=3, n_clusters_per_class=1, random_state=0)
+    X, y = make_classification(
+        n_samples=300,
+        n_features=5,
+        n_informative=4,
+        n_redundant=0,
+        n_classes=3,
+        n_clusters_per_class=1,
+        random_state=0,
+    )
     return X, y
 
 
@@ -82,6 +92,7 @@ def test_rda_handles_more_features_than_samples():
 
 # --- AODE --------------------------------------------------------------------
 
+
 def test_aode_beats_naive_bayes_on_dependent_features():
     # The class is the XOR of two binary features: naive Bayes cannot represent it.
     rng = np.random.RandomState(0)
@@ -110,6 +121,7 @@ def test_aode_min_count_falls_back_to_naive_bayes():
 
 # --- Firth -------------------------------------------------------------------
 
+
 def test_firth_finite_under_complete_separation():
     X = np.array([[-2.0], [-1.0], [-0.5], [0.5], [1.0], [2.0]])
     y = np.array([0, 0, 0, 1, 1, 1])
@@ -119,8 +131,9 @@ def test_firth_finite_under_complete_separation():
 
 
 def test_firth_score_is_zero_at_solution():
-    X, y = make_classification(n_samples=80, n_features=3, n_informative=3, n_redundant=0,
-                               random_state=1)
+    X, y = make_classification(
+        n_samples=80, n_features=3, n_informative=3, n_redundant=0, random_state=1
+    )
     model = FirthLogisticRegression().fit(X, y)
     design = np.column_stack([np.ones(len(X)), X])
     beta = np.r_[model.intercept_, model.coef_[0]]
@@ -134,8 +147,9 @@ def test_firth_score_is_zero_at_solution():
 
 
 def test_firth_shrinks_toward_zero_relative_to_ml():
-    X, y = make_classification(n_samples=40, n_features=2, n_informative=2, n_redundant=0,
-                               class_sep=1.5, random_state=3)
+    X, y = make_classification(
+        n_samples=40, n_features=2, n_informative=2, n_redundant=0, class_sep=1.5, random_state=3
+    )
     firth = FirthLogisticRegression().fit(X, y)
     ml = LogisticRegression(C=np.inf, max_iter=10_000).fit(X, y)
     assert np.linalg.norm(firth.coef_) < np.linalg.norm(ml.coef_)
@@ -150,7 +164,9 @@ def test_flic_flac_match_event_rate(correction):
     firth = FirthLogisticRegression().fit(X, y)
     fixed = FirthLogisticRegression(correction=correction).fit(X, y)
     rate = y.mean()
-    assert abs(fixed.predict_proba(X)[:, 1].mean() - rate) < abs(firth.predict_proba(X)[:, 1].mean() - rate)
+    assert abs(fixed.predict_proba(X)[:, 1].mean() - rate) < abs(
+        firth.predict_proba(X)[:, 1].mean() - rate
+    )
     if correction == "flic":
         np.testing.assert_allclose(fixed.predict_proba(X)[:, 1].mean(), rate, atol=1e-6)
         np.testing.assert_allclose(fixed.coef_, firth.coef_)
@@ -170,10 +186,13 @@ def test_flic_flac_with_uncentered_features(correction):
 
 def test_firth_rejects_multiclass():
     with pytest.raises(ValueError, match="Only binary"):
-        FirthLogisticRegression().fit(np.random.randn(9, 2), np.arange(9) % 3)
+        FirthLogisticRegression().fit(
+            np.random.default_rng(0).normal(size=(9, 2)), np.arange(9) % 3
+        )
 
 
 # --- Relaxed Lasso -----------------------------------------------------------
+
 
 @pytest.fixture
 def sparse_problem():
@@ -209,6 +228,7 @@ def test_relaxed_lasso_cv_reduces_shrinkage_bias(sparse_problem):
 
 # --- Bolasso -----------------------------------------------------------------
 
+
 def test_bolasso_recovers_support(sparse_problem):
     X, y, coef = sparse_problem
     model = Bolasso(random_state=0).fit(X, y)
@@ -224,6 +244,7 @@ def test_bolasso_soft_threshold_keeps_superset(sparse_problem):
 
 
 # --- TAN ---------------------------------------------------------------------
+
 
 def test_tan_learns_a_dependency_naive_bayes_misses():
     # The class is the XOR of features 0 and 1; the tree must link them.
@@ -258,6 +279,7 @@ def test_tan_unseen_values_and_probabilities():
 
 # --- MDA ---------------------------------------------------------------------
 
+
 def test_mda_one_subclass_is_lda(gaussian_classes):
     X, y = gaussian_classes
     mda = MixtureDiscriminantAnalysis(n_subclasses=1, reg_covar=0).fit(X, y)
@@ -271,13 +293,15 @@ def test_mda_separates_a_multimodal_class():
     X = np.vstack([rng.randn(200, 2), rng.randn(100, 2) + [6, 0], rng.randn(100, 2) - [6, 0]])
     y = np.r_[np.zeros(200), np.ones(200)]
     lda = cross_val_score(LinearDiscriminantAnalysis(), X, y, cv=5).mean()
-    mda = cross_val_score(MixtureDiscriminantAnalysis(n_subclasses=2, random_state=0), X, y,
-                          cv=5).mean()
+    mda = cross_val_score(
+        MixtureDiscriminantAnalysis(n_subclasses=2, random_state=0), X, y, cv=5
+    ).mean()
     assert lda < 0.7
     assert mda > 0.95
 
 
 # --- Cauchy logistic ---------------------------------------------------------
+
 
 def test_cauchy_logistic_finite_under_complete_separation():
     X = np.array([[-2.0], [-1.0], [-0.5], [0.5], [1.0], [2.0]])
@@ -288,16 +312,18 @@ def test_cauchy_logistic_finite_under_complete_separation():
 
 
 def test_cauchy_logistic_close_to_ml_with_much_data():
-    X, y = make_classification(n_samples=4000, n_features=4, n_informative=3, n_redundant=0,
-                               random_state=0)
+    X, y = make_classification(
+        n_samples=4000, n_features=4, n_informative=3, n_redundant=0, random_state=0
+    )
     cauchy = CauchyLogisticRegression().fit(X, y)
     ml = LogisticRegression(penalty=None, max_iter=1000).fit(X, y)
     np.testing.assert_allclose(cauchy.coef_, ml.coef_, rtol=0.02, atol=0.01)
 
 
 def test_cauchy_logistic_coef_on_original_scale():
-    X, y = make_classification(n_samples=300, n_features=3, n_informative=3, n_redundant=0,
-                               random_state=1)
+    X, y = make_classification(
+        n_samples=300, n_features=3, n_informative=3, n_redundant=0, random_state=1
+    )
     model = CauchyLogisticRegression().fit(X * [1, 100, 0.01] + 5, y)
     eta = (X * [1, 100, 0.01] + 5) @ model.coef_[0] + model.intercept_[0]
     np.testing.assert_allclose(model.decision_function(X * [1, 100, 0.01] + 5), eta)
@@ -311,6 +337,7 @@ def test_cauchy_logistic_rejects_multiclass():
 
 
 # --- Adaptive lasso ----------------------------------------------------------
+
 
 def test_adaptive_lasso_recovers_support_with_less_bias(sparse_problem):
     X, y, coef = sparse_problem
@@ -333,6 +360,7 @@ def test_adaptive_lasso_drops_features_with_zero_initial_coef():
 
 # --- L2 boosting -------------------------------------------------------------
 
+
 def test_l2boost_converges_to_least_squares():
     rng = np.random.RandomState(0)
     X = rng.randn(200, 5)
@@ -353,6 +381,7 @@ def test_l2boost_stops_early_on_sparse_problem(sparse_problem):
 
 
 # --- LOESS -------------------------------------------------------------------
+
 
 def test_loess_reproduces_a_linear_function_exactly():
     rng = np.random.RandomState(0)
@@ -387,6 +416,7 @@ def test_cauchy_logistic_rejects_a_single_class():
 
 
 # --- KDB, hidden naive Bayes, flexible naive Bayes ----------------------------
+
 
 def _xor_data(n=800, seed=0):
     rng = np.random.RandomState(seed)
@@ -444,6 +474,7 @@ def test_flexible_nb_handles_bimodal_features():
 
 # --- DANN --------------------------------------------------------------------
 
+
 def test_dann_ignores_noise_directions():
     # Only feature 0 matters; nine noise features dilute plain k-NN distances.
     rng = np.random.RandomState(0)
@@ -464,6 +495,7 @@ def test_dann_metric_is_identity_like_without_class_structure():
 
 # --- Rotation Forest, LogitBoost, MultiBoost ---------------------------------
 
+
 def test_rotation_forest_rotations_are_orthogonal_blocks():
     X, y = make_classification(n_samples=200, n_features=6, random_state=0)
     model = RotationForestClassifier(n_estimators=3, random_state=0).fit(X, y)
@@ -482,8 +514,9 @@ def test_rotation_forest_beats_a_single_tree_on_oblique_boundary():
 
 @pytest.mark.parametrize("n_classes", [2, 3])
 def test_logitboost_probabilities_are_calibrated_scale(n_classes):
-    X, y = make_classification(n_samples=400, n_features=6, n_informative=4, n_classes=n_classes,
-                               random_state=0)
+    X, y = make_classification(
+        n_samples=400, n_features=6, n_informative=4, n_classes=n_classes, random_state=0
+    )
     model = LogitBoostClassifier(n_estimators=30, random_state=0).fit(X, y)
     proba = model.predict_proba(X)
     np.testing.assert_allclose(proba.sum(axis=1), 1.0)
@@ -508,6 +541,7 @@ def test_multiboost_restarts_after_a_perfect_member():
 
 
 # --- Local linear forest, M5, MARS -------------------------------------------
+
 
 def test_local_linear_forest_follows_a_smooth_trend():
     # Forests average within leaves and cannot follow a slope; the local fit can.
@@ -560,6 +594,7 @@ def test_mars_degree_two_finds_an_interaction():
 
 # --- MCP, SCAD ------------------------------------------------------------------
 
+
 @pytest.mark.parametrize("penalty", ["mcp", "scad"])
 def test_nonconvex_unbiased_for_large_coefficients(sparse_problem, penalty):
     X, y, coef = sparse_problem
@@ -594,6 +629,7 @@ def test_nonconvex_rejects_too_small_gamma():
 
 
 # --- A2DE, P-spline GAM -------------------------------------------------------
+
 
 def test_a2de_captures_a_three_way_interaction():
     # The class is the parity of three features: only a model whose tables cover

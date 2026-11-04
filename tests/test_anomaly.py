@@ -3,9 +3,8 @@
 import numpy as np
 import pytest
 from sklearn.base import clone
-from sklearn.metrics import roc_auc_score
-
 from sklearn.ensemble import IsolationForest
+from sklearn.metrics import roc_auc_score
 
 from aspective.anomaly import ExtendedIsolationForestDetector, LeSiNNDetector, RSHashDetector
 from aspective.anomaly._base import BaseDetector
@@ -120,6 +119,7 @@ def test_lesinn_training_scores_finite_with_singleton_subsamples(n_samples, max_
 
 # --- Extended Isolation Forest -----------------------------------------------
 
+
 def test_eif_extension_level_zero_cuts_one_axis(planted):
     X, _ = planted
     model = ExtendedIsolationForestDetector(n_estimators=5, extension_level=0, random_state=0)
@@ -139,4 +139,3 @@ def test_eif_scores_are_rotation_symmetric_around_a_blob():
     eif = ExtendedIsolationForestDetector(n_estimators=300, random_state=0).fit(X)
     iso = IsolationForest(n_estimators=300, random_state=0).fit(X)
     assert np.std(eif.decision_function(circle)) < np.std(iso.score_samples(circle))
-

@@ -4,21 +4,86 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: uv sync --locked --only-group lint
+      - name: Ruff lint
+        run: uv run --no-sync ruff check .
+      - name: Ruff format
+        run: uv run --no-sync ruff format --check .
+
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
         pyod: [true, false]
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: uv sync --locked ${{ matrix.pyod && '--extra pyod' || '' }}
       - name: Test
-        run: uv run --no-sync pytest -q
+        run: uv run --no-sync pytest -q --cov --cov-report=xml
+      - name: Upload coverage to Codecov
+        # One upload per run is enough. Fork pull requests cannot mint an OIDC
+        # token, so they skip the upload instead of failing.
+        if: >-
+          matrix.python-version == '3.13' && matrix.pyod &&
+          (github.event_name == 'push' ||
+           github.event.pull_request.head.repo.full_name == github.repository)
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
+        with:
+          use_oidc: true
+          files: coverage.xml
+          fail_ci_if_error: false
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          python-version: "3.13"
+      - name: Build sdist and wheel
+        run: uv build --package aspective
+      - name: Check distribution metadata
+        run: uvx twine check --strict dist/*
+      - name: Smoke-test the wheel in a clean environment
+        run: |
+          uv venv .smoke
+          uv pip install --python .smoke/bin/python dist/*.whl
+          .smoke/bin/python -I - <<'PY'
+          import sys
+          from pathlib import Path
+
+          import aspective
+          from aspective.anomaly import RSHashDetector
+          from aspective.discriminant_analysis import RegularizedDiscriminantAnalysis
+          from sklearn.datasets import load_wine
+
+          assert Path(aspective.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          X, y = load_wine(return_X_y=True)
+          assert RegularizedDiscriminantAnalysis().fit(X, y).score(X, y) > 0.9
+          assert RSHashDetector(random_state=0).fit(X).decision_scores_.shape == (len(X),)
+          print(f"aspective {aspective.__version__}: wheel smoke test passed")
+          PY

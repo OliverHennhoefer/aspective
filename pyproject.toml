@@ -11,11 +11,32 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Oliver Hennhöfer" }]
-keywords = ["machine learning", "scikit-learn", "anomaly detection"]
+keywords = [
+    "machine learning",
+    "scikit-learn",
+    "statistics",
+    "classification",
+    "regression",
+    "anomaly detection",
+    "naive bayes",
+    "lasso",
+    "discriminant analysis",
+    "pyod",
+]
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
 ]
 dependencies = [
     "numpy>=1.23",
@@ -23,15 +44,27 @@ dependencies = [
     "scikit-learn>=1.7",
 ]
 
+[project.urls]
+Homepage = "https://github.com/OliverHennhoefer/aspective"
+Source = "https://github.com/OliverHennhoefer/aspective"
+Issues = "https://github.com/OliverHennhoefer/aspective/issues"
+Changelog = "https://github.com/OliverHennhoefer/aspective/blob/main/CHANGELOG.md"
+Benchmarks = "https://github.com/OliverHennhoefer/aspective/blob/main/bench/RESULTS.md"
+
 [project.optional-dependencies]
 pyod = ["pyod>=2.0"]
 
 [dependency-groups]
-test = ["pytest>=7"]
+test = ["pytest>=7", "pytest-cov>=5"]
+lint = ["ruff>=0.14", "pre-commit>=3.5"]
 # The benchmark testbed in bench/, a separate workspace package that is never
 # part of aspective's wheel or sdist.
 bench = ["aspective-bench"]
-dev = [{ include-group = "test" }, { include-group = "bench" }]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    { include-group = "bench" },
+]
 
 [tool.uv]
 default-groups = ["dev"]
@@ -50,3 +83,48 @@ exclude = ["bench", ".github", "uv.lock"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "bench/tests"]
+
+[tool.coverage.run]
+source = ["aspective"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "except ImportError:",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# src/ and bench/ are not linted or formatted yet: the benchmark gate hashes
+# the raw source of each estimator's module, so even a whitespace-only change
+# would mark its committed results stale. They join once that hash ignores
+# formatting.
+extend-exclude = ["src", "bench"]
+force-exclude = true
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "NPY", # NumPy-specific rules
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",   # line length is the formatter's job
+    "E741",   # single-letter names such as l and I are standard in the math
+    "B007",   # loop counters such as n_iter are read after the loop on purpose
+    "SIM108", # if/else blocks are often clearer than nested ternaries
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["aspective"]
