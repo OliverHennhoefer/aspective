@@ -35,7 +35,11 @@ uv run pre-commit install # optional: lint and format on every commit
 uv run pytest                      # tests, including scikit-learn's check_estimator
 uv run pytest --cov                # the same, with a coverage report
 uv run ruff check . && uv run ruff format --check .
+uv run zensical serve              # the docs site at http://localhost:8000
 ```
+
+`tests/test_docs.py` runs every Python example in the README and in
+`docs/`, so examples cannot silently go stale.
 
 CI runs the tests on Python 3.10 to 3.14, with and without PyOD, and builds
 and smoke-tests the wheel.
@@ -56,8 +60,9 @@ and smoke-tests the wheel.
   limiting case that reduces to the vanilla model).
 - Add a benchmark to `bench/`, run the gate, and commit the updated
   `bench/RESULTS.md`. See [`bench/README.md`](bench/README.md).
-- Add a row to the estimator table in `README.md` and an entry to
-  `CHANGELOG.md` under *Unreleased*.
+- Add a row to the estimator table in `README.md`, add the estimator to its
+  page in `docs/api/` and to the table in `docs/user_guide/choosing.md`, and
+  add an entry to `CHANGELOG.md` under *Unreleased*.
 
 ## Pull requests
 

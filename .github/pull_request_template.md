@@ -14,4 +14,4 @@
 - [ ] The docstring cites the paper and says when to prefer the estimator
 - [ ] It passes `check_estimator` (supervised) or the PyOD detector contract (anomaly)
 - [ ] It passes the benchmark gate in `bench/`, and `bench/RESULTS.md` is updated
-- [ ] It is listed in the README's estimator table
+- [ ] It is listed in the README, `docs/api/` and `docs/user_guide/choosing.md`

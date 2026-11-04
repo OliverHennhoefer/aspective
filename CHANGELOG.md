@@ -14,5 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   comes from and each passing the benchmark gate in `bench/`.
 - Ruff lint and format checks, test coverage reported to Codecov, CI on
   Python 3.10 to 3.14 with and without PyOD, and a wheel build check.
+- Documentation site at https://oliverhennhoefer.github.io/aspective/ with a
+  quickstart, a guide to choosing an estimator, the benchmark protocol and an
+  API reference built from the docstrings. Every Python example in the docs
+  and the README runs as a test.
 - Contributor guide, citation file, security policy, and issue and pull
   request templates.
