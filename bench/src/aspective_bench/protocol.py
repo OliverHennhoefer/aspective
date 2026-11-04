@@ -23,6 +23,7 @@ from sklearn.model_selection import RepeatedKFold, RepeatedStratifiedKFold, Stra
 from sklearn.pipeline import Pipeline
 
 from . import datasets
+from .probabilistic import gaussian_crps, gaussian_nll, log_loss, standardized_dist
 from .suites import get_suite
 
 # Metric name -> (function of (y_true, prediction), what the model must output,
@@ -33,6 +34,11 @@ METRICS = {
     "brier": (brier_score_loss, "proba", -1, 0.005),
     "roc_auc": (roc_auc_score, "anomaly_score", 1, 0.01),
     "average_precision": (average_precision_score, "anomaly_score", 1, 0.01),
+    # The probabilistic track (see probabilistic.py). CRPS and NLL are in
+    # units of the training target's standard deviation.
+    "crps": (gaussian_crps, "dist", -1, 0.01),
+    "nll": (gaussian_nll, "dist", -1, 0.05),
+    "log_loss": (log_loss, "proba_all", -1, 0.02),
 }
 
 
@@ -254,11 +260,17 @@ def evaluate(factory, label, suite_name, dataset, metric, n_splits, n_repeats, t
                 model.fit(X[train], y[train])
                 if output == "proba":
                     pred = model.predict_proba(X[test])[:, 1]
+                elif output == "proba_all":
+                    pred = (model.predict_proba(X[test]), model.classes_)
+                elif output == "dist":
+                    mean, std, scale = standardized_dist(model, X[test], y[train])
+                    pred = (mean, std)
                 else:
                     pred = model.predict(X[test])
-            if not np.all(np.isfinite(pred)):
+            if not all(np.all(np.isfinite(p)) for p in (pred if isinstance(pred, tuple) else (pred,))):
                 raise FloatingPointError("non-finite predictions")
-            scores.append(sign * float(func(y[test], pred)))
+            truth = y[test] / scale if output == "dist" else y[test]
+            scores.append(sign * float(func(truth, pred)))
         except Exception as exc:  # recorded, so one failure does not stop a run
             scores.append(float("nan"))
             errors.append(f"{type(exc).__name__}: {exc}".splitlines()[0][:300])

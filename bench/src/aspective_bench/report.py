@@ -12,6 +12,9 @@ METRIC_NAMES = {
     "brier": "Brier score",
     "roc_auc": "ROC AUC",
     "average_precision": "average precision",
+    "crps": "CRPS (in target standard deviations)",
+    "nll": "Gaussian NLL (in target standard deviations)",
+    "log_loss": "log loss",
 }
 
 

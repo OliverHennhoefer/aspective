@@ -86,7 +86,7 @@ and the committed benchmark results; do not edit by hand.
 |---|---|---|---|---|
 | `Logistic Model Trees` | classification | Landwehr, Hall & Frank, Machine Learning 2005 | C4.5 / CART, logistic regression | Needs a tree builder with LogitBoost carried down the tree; only Weka has it. |
 | `Conditional inference forests` | classification, regression | Hothorn, Hornik & Zeileis, JCGS 2006 | CART, random forest | Large effort (permutation-test splits); its gain is unbiased variable importance, which the accuracy-based gate cannot measure. |
-| `Distributional random forests` | regression | Ćevid, Michel, Näf, Bühlmann & Meinshausen, JMLR 2022 | Random forest, quantile regression forest | Large effort; it predicts distributions, which needs a probabilistic benchmark track first. |
+| `Distributional random forests` | regression | Ćevid, Michel, Näf, Bühlmann & Meinshausen, JMLR 2022 | Random forest, quantile regression forest | Large effort; it predicts distributions, so it would be judged on the probabilistic track (CRPS). |
 | `Twin SVM` | classification | Jayadeva, Khemchandani & Chandra, IEEE TPAMI 2007 | SVM | Not reached yet. |
 | `Relevance vector machine` | classification, regression | Tipping, JMLR 2001 | SVM, SVR | Not reached yet. |
 | `PIDForest` | anomaly detection | Gopalan, Sharan & Wieder, NeurIPS 2019 | Isolation Forest | Not reached yet. |
@@ -96,7 +96,7 @@ and the committed benchmark results; do not edit by hand.
 
 | Model | Task | Paper | Improves on | Why |
 |---|---|---|---|---|
-| `NGBoost` | classification, regression | Duan et al., ICML 2020 | Gradient boosting | Maintained in `ngboost`; its strength is predictive distributions, which the gate does not score yet (no NLL or CRPS metric). |
+| `NGBoost` | classification, regression | Duan et al., ICML 2020 | Gradient boosting | Maintained in `ngboost`. Its strength is predictive distributions, which the probabilistic track (CRPS, NLL, log loss) can now score if it is ever reconsidered. |
 | `Sparse projection oblique forests (SPORF)` | classification, regression | Tomita et al., JMLR 2020 | Random forest | Maintained in `treeple`. |
 | `Quantile regression forests` | regression | Meinshausen, JMLR 2006 | Random forest | Maintained in `quantile-forest`. |
 | `Generalized and causal random forests` | regression | Athey, Tibshirani & Wager, Annals of Statistics 2019 | Random forest | Maintained in `EconML`. |
