@@ -14,6 +14,7 @@ are in [`RESULTS.md`](RESULTS.md).
 | `pmlb-classification` | 68 (31 binary, 37 multiclass) | [PMLB](https://github.com/EpistasisLab/pmlb) (Olson et al. 2017; Romano et al. 2022) |
 | `pmlb-binary` | the 31 binary ones | PMLB |
 | `pmlb-regression` | 31 | PMLB |
+| `pmlb-ctr23-regression` | 52 (31 PMLB, 21 OpenML-CTR23) | PMLB and [OpenML-CTR23](https://www.openml.org/search?type=study&study_type=task&id=353) (Fischer, Feurer & Bischl 2023) |
 | `adbench-classical` | 46 | [ADBench](https://github.com/Minqi824/ADBench) Classical, which includes ODDS (Han et al. 2022) |
 
 Only real-world datasets are used, without missing values, and duplicates
@@ -22,10 +23,15 @@ least 10 rows in the smallest class and are dropped when a default decision
 tree already reaches 99.5% accuracy, since every model ties on them. The
 full rule is in `suites.py`; it was fixed before the added datasets were
 run, and the suites change only on purpose, never to rescue a model.
-PMLB has no more real regression datasets that meet the rule; growing that
-suite further would need a second source such as OpenML-CTR23. Datasets above 5000 rows are
+PMLB has no more real regression datasets that meet the rule, so the
+regression benchmarks run on `pmlb-ctr23-regression`, which adds the 21
+OpenML-CTR23 datasets that meet it. Of CTR23's 35, six were produced by a
+simulator, four are already in PMLB, two have missing values and two have
+more than 60k rows; `suites.py` names them. OpenML files are pinned by data
+id, file id and MD5, categorical features are coded as integers as in PMLB,
+and the attributes OpenML marks to ignore are dropped. Datasets above 5000 rows are
 subsampled once with a fixed seed, stratified by class. Files are downloaded
-from GitHub on first use and cached in `$ASPECTIVE_BENCH_CACHE` (default
+from GitHub or openml.org on first use and cached in `$ASPECTIVE_BENCH_CACHE` (default
 `~/.cache/aspective-bench`) with a SHA-256 check.
 
 **Evaluation.** 2x repeated 5-fold cross-validation, stratified for

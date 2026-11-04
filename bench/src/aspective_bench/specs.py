@@ -148,7 +148,7 @@ BENCHMARKS = [
         name="relaxed-lasso",
         candidate=("Relaxed LassoCV", lambda: scaled(RelaxedLassoCV(cv=5))),
         predecessors=dict([LASSO_CV]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
     ),
     Benchmark(
@@ -156,7 +156,7 @@ BENCHMARKS = [
         candidate=("Bolasso", lambda: scaled(Bolasso(random_state=0))),
         predecessors=dict([LASSO_CV]),
         references={"Bolasso-S (0.9)": lambda: scaled(Bolasso(threshold=0.9, random_state=0))},
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="Bolasso is mainly a variable-selection method; this checks that its predictions "
               "keep up with the lasso.",
@@ -204,7 +204,7 @@ BENCHMARKS = [
         name="adaptive-lasso",
         candidate=("Adaptive LassoCV", lambda: scaled(AdaptiveLassoCV(cv=5))),
         predecessors=dict([LASSO_CV]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.",
     ),
@@ -212,7 +212,7 @@ BENCHMARKS = [
         name="l2boost",
         candidate=("L2Boost (CV)", lambda: scaled(L2BoostRegressor(cv=5))),
         predecessors=dict([LASSO_CV]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="Componentwise linear least squares, learning rate 0.1, number of steps (up to "
               "2000) by 5-fold CV, as in mboost.",
@@ -221,7 +221,7 @@ BENCHMARKS = [
         name="loess",
         candidate=("LOESS (tuned span)", loess),
         predecessors={"k-NN (tuned k)": knn_regression},
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="Local linear fits with tricube weights. Both tune their neighbourhood size over "
               "five values by inner 3-fold CV on standardized inputs.",
@@ -318,7 +318,7 @@ BENCHMARKS = [
             n_estimators=N_TREES, min_samples_leaf=5, random_state=0)),
         predecessors={"Random forest (leaf 5)": lambda: RandomForestRegressor(
             n_estimators=N_TREES, min_samples_leaf=5, random_state=0)},
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="The same forest (200 trees, leaves of at least 5) supplies the weights; ridge "
               "penalty 0.1 on the local slopes, grf's default.",
@@ -328,7 +328,7 @@ BENCHMARKS = [
         candidate=("M5 model tree", M5ModelTreeRegressor),
         predecessors=dict([CART_TUNED]),
         references=dict([LASSO_CV]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its "
               "minimum leaf size from five values by inner 3-fold CV.",
@@ -337,7 +337,7 @@ BENCHMARKS = [
         name="mars",
         candidate=("MARS (additive)", MARSRegressor),
         predecessors=dict([LASSO_CV, CART_TUNED]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes "
               "both stepwise linear regression and recursive partitioning, so it must keep up "
@@ -348,7 +348,7 @@ BENCHMARKS = [
         candidate=("P-spline GAM", PSplineGAMRegressor),
         predecessors=dict([LASSO_CV]),
         references={"MARS (additive)": MARSRegressor},
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="Cubic P-splines on 10 equally spaced knots per feature, one smoothing "
               "parameter chosen by GCV; the strongest smoothing is linear regression.",
@@ -357,7 +357,7 @@ BENCHMARKS = [
         name="mcp",
         candidate=("MCP (CV)", lambda: NonconvexPenaltyRegressionCV(penalty="mcp", cv=5)),
         predecessors=dict([LASSO_CV]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.",
     ),
@@ -365,7 +365,7 @@ BENCHMARKS = [
         name="scad",
         candidate=("SCAD (CV)", lambda: NonconvexPenaltyRegressionCV(penalty="scad", cv=5)),
         predecessors=dict([LASSO_CV]),
-        suite="pmlb-regression",
+        suite="pmlb-ctr23-regression",
         metric="r2",
         notes="gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.",
     ),

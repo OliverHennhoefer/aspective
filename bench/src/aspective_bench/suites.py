@@ -14,6 +14,15 @@ The lists were chosen once by a rule and are now edited only on purpose:
   default CART tree classifies with at least 99.5% 5-fold accuracy (as
   OpenML-CC18 does), since every model ties on them. PMLB holds 31 regression
   datasets that meet the rule.
+* OpenML-CTR23 regression, the same rule applied to its 35 datasets. Real
+  data rules out the six produced by a simulator (naval_propulsion_plant,
+  kin8nm, pumadyn32nh, grid_stability, auction_verification,
+  energy_efficiency); one copy of each dataset rules out the four PMLB
+  already has (california_housing is 537_houses, cpu_activity is
+  197_cpu_act, geographical_origin_of_music is 4544, solar_flare); no
+  missing values rules out fps_benchmark and Moneyball; at most 60k rows
+  rules out video_transcoding and wave_energy. That leaves 21, which join
+  the 31 PMLB datasets in ``pmlb-ctr23-regression``.
 * ADBench Classical: every dataset with at least 6 anomalies after
   subsampling to 5000 rows (the smallest count among the original 37). This
   leaves out only smtp, which keeps about 2.
@@ -70,6 +79,17 @@ PMLB_REGRESSION = (
     "678_visualizing_environmental", "712_chscase_geyser1",
 )
 
+# OpenML-CTR23 (study 353) datasets that meet the rule; see datasets.OPENML.
+CTR23_REGRESSION = (
+    "openml:44956_abalone", "openml:44957_airfoil_self_noise", "openml:44959_concrete_compressive_strength",
+    "openml:44962_forest_fires", "openml:44963_physiochemical_protein", "openml:44964_superconductivity",
+    "openml:44967_student_performance_por", "openml:44970_QSAR_fish_toxicity", "openml:44971_white_wine",
+    "openml:44972_red_wine", "openml:44976_sarcos", "openml:44979_diamonds", "openml:44983_miami_housing",
+    "openml:44984_cps88wages", "openml:44987_socmob", "openml:44989_kings_county",
+    "openml:44990_brazilian_houses", "openml:44993_health_insurance", "openml:44994_cars",
+    "openml:45012_fifa", "openml:45402_space_ga",
+)
+
 ADBENCH_CLASSICAL = (
     "1_ALOI", "2_annthyroid", "4_breastw", "6_cardio", "7_Cardiotocography", "12_fault",
     "14_glass", "15_Hepatitis", "17_InternetAds", "18_Ionosphere", "19_landsat", "20_letter",
@@ -92,6 +112,9 @@ SUITES = {
               description=f"the {len(PMLB_BINARY)} binary datasets of pmlb-classification"),
         Suite("pmlb-regression", "pmlb", "regression", PMLB_REGRESSION,
               description=f"{len(PMLB_REGRESSION)} real-world PMLB regression datasets"),
+        Suite("pmlb-ctr23-regression", "pmlb", "regression", PMLB_REGRESSION + CTR23_REGRESSION,
+              description=f"{len(PMLB_REGRESSION + CTR23_REGRESSION)} real-world regression datasets "
+                          f"({len(PMLB_REGRESSION)} from PMLB, {len(CTR23_REGRESSION)} from OpenML-CTR23)"),
         Suite("adbench-classical", "adbench", "anomaly", ADBENCH_CLASSICAL,
               description=f"{len(ADBENCH_CLASSICAL)} ADBench Classical anomaly detection datasets (ODDS and others)"),
     ]
