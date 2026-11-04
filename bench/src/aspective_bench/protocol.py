@@ -7,6 +7,7 @@ report only, a suite and a metric. The gate is applied against every
 predecessor; references never affect it.
 """
 
+import ast
 import hashlib
 import inspect
 import json
@@ -157,18 +158,51 @@ def _estimator_classes(estimator):
 
 
 def aspective_source_hash(estimator):
-    """Hash of the source files that define the aspective classes the estimator uses.
+    """Hash of the code of the files that define the aspective classes the estimator uses.
 
     Only each class's own module counts, not its bases: the anomaly detectors'
     base class depends on whether PyOD is installed, and the hash must not.
+    The code is compared as a syntax tree without docstrings, so formatting,
+    comments and documentation edits keep results fresh; any change to what
+    the code does marks them stale.
     """
     files = {Path(inspect.getsourcefile(cls)) for cls in _estimator_classes(estimator)
              if cls.__module__.split(".")[0] == "aspective"}
     if not files:
         return None
     root = Path(__import__("aspective").__file__).parent
-    contents = {str(f.relative_to(root)): f.read_text().replace("\r\n", "\n") for f in sorted(files)}
+    contents = {f.relative_to(root).as_posix(): code_fingerprint(f.read_text()) for f in sorted(files)}
     return _hash(contents)
+
+
+def code_fingerprint(source):
+    """The syntax tree of ``source`` with docstrings removed, as a string."""
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            body = node.body
+            if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant) \
+                    and isinstance(body[0].value.value, str):
+                node.body = body[1:] or [ast.Pass()]
+    return _canonical(tree)
+
+
+def _canonical(node):
+    """A dump of an AST that is the same on every supported Python version.
+
+    ``ast.dump`` itself is not: 3.13 leaves out empty and None fields, and
+    3.12 added ``type_params``. Empty and None fields are skipped here.
+    """
+    if isinstance(node, ast.AST):
+        fields = []
+        for name, value in ast.iter_fields(node):
+            if value is None or value == []:
+                continue
+            fields.append(f"{name}={_canonical(value)}")
+        return f"{type(node).__name__}({', '.join(fields)})"
+    if isinstance(node, list):
+        return "[" + ", ".join(_canonical(item) for item in node) + "]"
+    return repr(node)
 
 
 def model_key(label, estimator, dataset, protocol):

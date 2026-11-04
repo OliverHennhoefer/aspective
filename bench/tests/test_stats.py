@@ -72,3 +72,51 @@ def test_anomaly_scores_are_higher_for_outliers(model):
     X = np.r_[rng.normal(size=(300, 2)), rng.normal(8, 0.5, size=(5, 2))]
     scores = anomaly_scores(model.fit(X), X)
     assert scores[-5:].min() > np.median(scores[:300])
+
+
+def test_lopsided_severe_losses_fail_the_gate():
+    # Typically equal, but six datasets lose 0.1 (ten margins) and none win big.
+    d = np.r_[np.zeros(30), np.full(6, -0.1)]
+    c = stats.compare(BASE.mean() + d, np.full(36, BASE.mean()), "base", margin=0.01)
+    assert c.p_noninferior < 0.05
+    assert (c.severe_wins, c.severe_losses) == (0, 6)
+    assert c.verdict == "severe losses" and not c.passed
+
+
+def test_balanced_severe_differences_pass():
+    d = np.r_[np.zeros(30), np.full(6, -0.1), np.full(6, 0.1)]
+    c = stats.compare(d, np.zeros(42), "base", margin=0.01)
+    assert c.passed and (c.severe_wins, c.severe_losses) == (6, 6)
+
+
+def test_hodges_lehmann():
+    assert stats.hodges_lehmann([0.0, 1.0, 2.0, 10.0]) == pytest.approx(1.75)
+
+
+def test_gate_controls_false_passes_and_misses():
+    # Heavy-tailed, heterogeneous differences like those between real datasets.
+    pools = [np.random.RandomState(s).standard_t(3, size=40) * 0.01 for s in range(5)]
+    oc = stats.operating_characteristic(pools, 0.01, 40, [-0.015, -0.01, 0.0], n_sim=400)
+    assert oc[-0.015] <= 0.02
+    assert oc[-0.01] <= 0.08  # the nominal level is 0.05; allow simulation error
+    assert oc[0.0] >= 0.6
+
+
+def test_check_recomputes_verdicts():
+    from aspective_bench import runner
+
+    result = next(iter(runner.load_results().values()))
+    tampered = dict(result, passed=False, comparisons=[])
+    assert runner.assess(tampered)["passed"] == result["passed"]
+    worse = dict(result, scores={**result["scores"], result["candidate"]: {
+        d: None if v is None else v - 0.5 for d, v in result["scores"][result["candidate"]].items()}})
+    assert not runner.assess(worse)["passed"]
+
+
+def test_code_fingerprint_ignores_formatting_comments_and_docstrings():
+    from aspective_bench.protocol import code_fingerprint
+
+    a = 'def f(x):\n    """Doc."""\n    return x + 1\n'
+    b = "def f(x):  # comment\n    return (x +\n            1)\n"
+    assert code_fingerprint(a) == code_fingerprint(b)
+    assert code_fingerprint(a) != code_fingerprint("def f(x):\n    return x + 2\n")

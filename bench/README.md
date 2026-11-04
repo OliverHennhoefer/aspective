@@ -11,13 +11,19 @@ are in [`RESULTS.md`](RESULTS.md).
 
 | Suite | Datasets | Source |
 |---|---|---|
-| `pmlb-classification` | 43 (23 binary, 20 multiclass) | [PMLB](https://github.com/EpistasisLab/pmlb) (Olson et al. 2017; Romano et al. 2022) |
-| `pmlb-binary` | the 23 binary ones | PMLB |
-| `pmlb-regression` | 25 | PMLB |
-| `adbench-classical` | 37 | [ADBench](https://github.com/Minqi824/ADBench) Classical, which includes ODDS (Han et al. 2022) |
+| `pmlb-classification` | 68 (31 binary, 37 multiclass) | [PMLB](https://github.com/EpistasisLab/pmlb) (Olson et al. 2017; Romano et al. 2022) |
+| `pmlb-binary` | the 31 binary ones | PMLB |
+| `pmlb-regression` | 31 | PMLB |
+| `adbench-classical` | 46 | [ADBench](https://github.com/Minqi824/ADBench) Classical, which includes ODDS (Han et al. 2022) |
 
 Only real-world datasets are used, without missing values, and duplicates
-of the same underlying data are removed. Datasets above 5000 rows are
+of the same underlying data are removed. Classification datasets need at
+least 10 rows in the smallest class and are dropped when a default decision
+tree already reaches 99.5% accuracy, since every model ties on them. The
+full rule is in `suites.py`; it was fixed before the added datasets were
+run, and the suites change only on purpose, never to rescue a model.
+PMLB has no more real regression datasets that meet the rule; growing that
+suite further would need a second source such as OpenML-CTR23. Datasets above 5000 rows are
 subsampled once with a fixed seed, stratified by class. Files are downloaded
 from GitHub on first use and cached in `$ASPECTIVE_BENCH_CACHE` (default
 `~/.cache/aspective-bench`) with a SHA-256 check.
@@ -35,21 +41,48 @@ all tests run on the per-dataset scores:
 
 - **Non-inferiority (the gate):** a one-sided Wilcoxon signed-rank test of
   H0 "the candidate is typically worse than the predecessor by more than the
-  margin". The margin is 0.01 for accuracy, R² and ROC AUC and 0.005 for the
-  Brier score.
+  margin". "Typically" is the pseudo-median of the per-dataset differences
+  (their Hodges-Lehmann location), which is what the signed-rank test
+  measures. The margin is 0.01 for accuracy, R² and ROC AUC and 0.005 for
+  the Brier score.
+- **Severe losses (tail guard):** a rank test barely notices a few very
+  large losses. Among the datasets where the two models differ by more than
+  five margins, a one-sided exact sign test asks whether the candidate loses
+  significantly more often than it wins. Severe losses balanced by severe
+  wins are a trade-off the docstring can state; severe losses with nothing
+  in return fail the gate.
 - **Two-sided Wilcoxon** for superiority or inferiority.
 - **Friedman test with Nemenyi critical difference** over all models of a
   benchmark, including references, for the average-rank summary.
 
 **Verdicts.** `superior` (non-inferior and significantly better),
-`non-inferior`, `inconclusive` (neither shown non-inferior nor significantly
-worse), `inferior` (significantly worse by more than the margin), and
-`too few datasets` (fewer than 10 usable).
+`non-inferior`, `severe losses` (non-inferior in the typical case, but
+severe losses significantly outnumber severe wins), `inconclusive` (neither
+shown non-inferior nor significantly worse), `inferior` (significantly worse
+by more than the margin), and `too few datasets` (fewer than 10 usable).
 
 **Gate.** A benchmark passes when the candidate runs without error on every
 dataset of its suite and is `superior` or `non-inferior` against every
 predecessor. References are shown for context only. `inconclusive` fails,
 because "not shown to be worse" is not evidence of being competitive.
+Verdicts are never read from the committed files: `check`, the tests and the
+report recompute them from the committed per-dataset scores, so a change to
+the statistics applies to every result without rerunning a model.
+
+**How reliable the gate is.** `RESULTS.md` has a table of the gate's pass
+rate for a candidate whose true typical difference is known, simulated per
+suite from the committed comparisons (their per-dataset differences,
+centred at zero and resampled, so the real spread and tails between
+datasets are kept). At one margin worse the gate passes about 6% of
+candidates, close to the 5% it is designed for. An exactly equivalent
+candidate, though, is still missed about a third of the time (33% on
+classification, 34% on regression, 41% on anomaly detection; almost never
+on the binary Brier suite). Most of the spread is genuine variation between
+datasets, not fold noise (fold noise is 15 to 50% of it), so more CV
+repeats do not help; only more datasets do. Growing the suites from
+43/25/37 to 68/31/46 datasets lowered the miss rate less than hoped,
+because the added datasets also widened the spread. A candidate that is
+genuinely better by half a margin passes 70 to 85% of the time.
 
 ## Adding a model
 

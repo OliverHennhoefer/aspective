@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from . import stats
+from .runner import comparison_diffs
 from .suites import SUITES
 
 METRIC_NAMES = {
@@ -33,8 +35,8 @@ def _display(result, value):
 def summary_table(results):
     lines = [
         "| Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | "
-        "Median Δ | p (non-inferior) | Verdict | Gate |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "Median Δ | p (non-inferior) | Severe wins / losses | Verdict | Gate |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in results:
         for c in r["comparisons"]:
@@ -42,7 +44,7 @@ def summary_table(results):
             lines.append(
                 f"| [{r['name']}](#{r['name']}) | {r['candidate']} | {c['baseline']} | {c['n_datasets']} | "
                 f"{c['wins']} / {c['ties']} / {c['losses']} | {delta:+.3f} | {_p(c['p_noninferior'])} | "
-                f"{c['verdict']} | {'PASS' if r['passed'] else '**FAIL**'} |"
+                f"{c['severe_wins']} / {c['severe_losses']} | {c['verdict']} | {'PASS' if r['passed'] else '**FAIL**'} |"
             )
     return "\n".join(lines)
 
@@ -69,7 +71,9 @@ def section(r):
         out.append(f"- vs {c['baseline']}: **{c['verdict']}**. Median difference {c['median_diff']:+.4f}, "
                    f"mean {c['mean_diff']:+.4f} (positive favours the candidate); better on {c['wins']}, "
                    f"within margin on {c['ties']}, worse on {c['losses']} of {c['n_datasets']} datasets; "
-                   f"non-inferiority p = {_p(c['p_noninferior'])}, two-sided Wilcoxon p = {_p(c['p_two_sided'])}.")
+                   f"non-inferiority p = {_p(c['p_noninferior'])}, two-sided Wilcoxon p = {_p(c['p_two_sided'])}. "
+                   f"Severe (beyond {stats.SEVERE} margins): {c['severe_wins']} wins, {c['severe_losses']} losses, "
+                   f"p = {_p(c['p_severe'])}.")
     if r["candidate_failures"]:
         errs = r["errors"].get(r["candidate"], {})
         out.append("- The candidate failed on: " + "; ".join(
@@ -112,15 +116,47 @@ its suite and is *non-inferior* to each predecessor: a one-sided Wilcoxon
 signed-rank test over the per-dataset mean scores rejects, at α = 0.05, that
 the candidate is typically worse by more than the margin (0.01 for accuracy,
 R² and ROC AUC; 0.005 for the Brier score). Winning everywhere is not
-required. "Superior" additionally means significantly better (two-sided
-Wilcoxon, α = 0.05). "Inconclusive" fails the gate: the data do not show the
-candidate is competitive.
+required, but severe losses (more than five margins) must not significantly
+outnumber severe wins (one-sided sign test, α = 0.05), or the verdict is
+"severe losses" and the gate fails. "Superior" additionally means
+significantly better (two-sided Wilcoxon, α = 0.05). "Inconclusive" fails
+the gate: the data do not show the candidate is competitive. Verdicts are
+recomputed from the per-dataset scores every time the gate is checked.
 """
+
+SHIFTS = (-1.5, -1.0, -0.5, 0.0, 0.5)
+
+
+def operating_characteristics(results, n_sim=1000):
+    """How often the gate passes a candidate whose true typical difference is known."""
+    lines = [
+        "## How reliable the gate is",
+        "",
+        "Pass rate of the gate for a candidate whose true typical difference to",
+        "its predecessor is the given number of margins. Each row is simulated",
+        "from the committed comparisons on that suite: their per-dataset",
+        "differences are centred at zero, keeping the real spread and tails",
+        "between datasets, resampled to the suite's size and shifted. At −1 margin",
+        "and below, a pass is a false pass (the target is at most 5%); at 0 and",
+        "above, a failure is a miss. Most of the spread is genuine variation",
+        "between datasets, not fold noise, so only more datasets lower the miss",
+        "rate without loosening the margin.",
+        "",
+        "| Suite | Datasets | Comparisons | " + " | ".join(f"{k:+.1f} m" for k in SHIFTS) + " |",
+        "|---|---|---" + "|---" * len(SHIFTS) + "|",
+    ]
+    for (suite, margin), pools in sorted(comparison_diffs(results).items()):
+        n = len(SUITES[suite].datasets)
+        oc = stats.operating_characteristic(pools, margin, n, [k * margin for k in SHIFTS], n_sim=n_sim)
+        lines.append(f"| `{suite}` (margin {margin}) | {n} | {len(pools)} | "
+                     + " | ".join(f"{oc[k * margin]:.0%}" for k in SHIFTS) + " |")
+    return "\n".join(lines + [""])
 
 
 def render(results):
     results = sorted(results, key=lambda r: r["name"])
-    parts = [HEADER, "## Summary", "", summary_table(results), "", "## Details", ""]
+    parts = [HEADER, "## Summary", "", summary_table(results), "",
+             operating_characteristics(results), "## Details", ""]
     parts += [section(r) for r in results]
     env = results[0]["environment"] if results else {}
     if env:

@@ -129,7 +129,45 @@ def save(summary):
 
 
 def load_results():
-    return {p.stem: json.loads(p.read_text()) for p in sorted(RESULTS_DIR.glob("*.json"))}
+    """Committed results, with every verdict recomputed by ``assess``."""
+    return {p.stem: assess(json.loads(p.read_text())) for p in sorted(RESULTS_DIR.glob("*.json"))}
+
+
+def _scores(result, label):
+    return np.array([np.nan if v is None else v for v in (result["scores"][label][d] for d in result["datasets"])])
+
+
+def assess(result):
+    """Recompute the comparisons and the gate decision from a result's per-dataset scores.
+
+    The committed verdicts are never trusted: the gate is always the current
+    statistics applied to the committed scores, so a change to the
+    statistics applies to every result without rerunning a model, and a
+    hand-edited verdict has no effect.
+    """
+    cand = result["candidate"]
+    comparisons = [
+        stats.compare(_scores(result, cand), _scores(result, base), base, result["margin"], ALPHA, MIN_DATASETS)
+        for base in result["predecessors"]
+    ]
+    failures = [d for d, v in zip(result["datasets"], _scores(result, cand)) if np.isnan(v)]
+    return result | {
+        "alpha": ALPHA,
+        "comparisons": [dataclasses.asdict(c) | {"passed": c.passed} for c in comparisons],
+        "candidate_failures": failures,
+        "passed": not failures and all(c.passed for c in comparisons),
+    }
+
+
+def comparison_diffs(results):
+    """Per-dataset differences (candidate - predecessor) of every comparison, grouped by (suite, margin)."""
+    pools = {}
+    for r in results:
+        cand = _scores(r, r["candidate"])
+        for base in r["predecessors"]:
+            d = cand - _scores(r, base)
+            pools.setdefault((r["suite"], r["margin"]), []).append(d[~np.isnan(d)])
+    return pools
 
 
 def check(benchmarks):

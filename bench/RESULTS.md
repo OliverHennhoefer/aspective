@@ -9,56 +9,78 @@ its suite and is *non-inferior* to each predecessor: a one-sided Wilcoxon
 signed-rank test over the per-dataset mean scores rejects, at α = 0.05, that
 the candidate is typically worse by more than the margin (0.01 for accuracy,
 R² and ROC AUC; 0.005 for the Brier score). Winning everywhere is not
-required. "Superior" additionally means significantly better (two-sided
-Wilcoxon, α = 0.05). "Inconclusive" fails the gate: the data do not show the
-candidate is competitive.
+required, but severe losses (more than five margins) must not significantly
+outnumber severe wins (one-sided sign test, α = 0.05), or the verdict is
+"severe losses" and the gate fails. "Superior" additionally means
+significantly better (two-sided Wilcoxon, α = 0.05). "Inconclusive" fails
+the gate: the data do not show the candidate is competitive. Verdicts are
+recomputed from the per-dataset scores every time the gate is checked.
 
 ## Summary
 
-| Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | Median Δ | p (non-inferior) | Verdict | Gate |
-|---|---|---|---|---|---|---|---|---|
-| [a2de](#a2de) | A2DE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 12 / 6 | +0.016 | <0.001 | superior | PASS |
-| [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [aode](#aode) | AODE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 16 / 2 | +0.016 | <0.001 | superior | PASS |
-| [bolasso](#bolasso) | Bolasso | LassoCV | 25 | 0 / 20 / 5 | -0.002 | 0.029 | non-inferior | PASS |
-| [cauchy-logistic](#cauchy-logistic) | Cauchy prior | ML logistic | 23 | 7 / 16 / 0 | +0.000 | <0.001 | superior | PASS |
-| [dann](#dann) | DANN (k=5) | k-NN (k=5) | 43 | 18 / 16 / 9 | +0.006 | <0.001 | non-inferior | PASS |
-| [extended-iforest](#extended-iforest) | Extended IF | Isolation Forest | 37 | 10 / 17 / 10 | -0.001 | 0.020 | non-inferior | PASS |
-| [firth](#firth) | Firth | ML logistic | 23 | 2 / 19 / 2 | +0.000 | <0.001 | non-inferior | PASS |
-| [flexible-nb](#flexible-nb) | Flexible NB | Gaussian NB | 43 | 23 / 11 / 9 | +0.021 | <0.001 | superior | PASS |
-| [hnb](#hnb) | Hidden NB (5 bins) | Naive Bayes (5 bins) | 43 | 24 / 14 / 5 | +0.014 | <0.001 | superior | PASS |
-| [kdb](#kdb) | KDB k=2 (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 9 / 12 | +0.012 | <0.001 | superior | PASS |
-| [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 25 | 0 / 25 / 0 | -0.000 | <0.001 | non-inferior | PASS |
-| [lesinn](#lesinn) | LeSiNN | Isolation Forest | 37 | 13 / 14 / 10 | +0.005 | 0.013 | non-inferior | PASS |
-| [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 25 | 9 / 11 / 5 | +0.006 | 0.002 | non-inferior | PASS |
-| [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 25 | 19 / 1 / 5 | +0.037 | <0.001 | superior | PASS |
-| [logitboost](#logitboost) | LogitBoost (depth 3) | AdaBoost (depth 3) | 43 | 13 / 21 / 9 | +0.001 | <0.001 | non-inferior | PASS |
-| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 25 | 19 / 5 / 1 | +0.051 | <0.001 | superior | PASS |
-| [mars](#mars) | MARS (additive) | LassoCV | 25 | 16 / 5 / 4 | +0.039 | <0.001 | superior | PASS |
-| [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 25 | 16 / 5 / 4 | +0.036 | 0.001 | superior | PASS |
-| [mcp](#mcp) | MCP (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [mda](#mda) | MDA (tuned) | LDA | 43 | 14 / 24 / 5 | +0.001 | <0.001 | non-inferior | PASS |
-| [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 43 | 13 / 21 / 9 | +0.003 | <0.001 | non-inferior | PASS |
-| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 25 | 13 / 6 / 6 | +0.019 | 0.031 | non-inferior | PASS |
-| [rda](#rda) | RDA (tuned) | LDA | 43 | 18 / 20 / 5 | +0.005 | <0.001 | superior | PASS |
-| [rda](#rda) | RDA (tuned) | QDA | 23 | 6 / 14 / 3 | +0.003 | 0.002 | non-inferior | PASS |
-| [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 43 | 11 / 28 / 4 | +0.000 | <0.001 | non-inferior | PASS |
-| [rshash](#rshash) | RS-Hash | Isolation Forest | 37 | 12 / 15 / 10 | +0.001 | 0.019 | non-inferior | PASS |
-| [scad](#scad) | SCAD (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 12 / 9 | +0.012 | <0.001 | superior | PASS |
+| Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | Median Δ | p (non-inferior) | Severe wins / losses | Verdict | Gate |
+|---|---|---|---|---|---|---|---|---|---|
+| [a2de](#a2de) | A2DE (5 bins) | Naive Bayes (5 bins) | 68 | 42 / 18 / 8 | +0.022 | <0.001 | 22 / 0 | superior | PASS |
+| [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [aode](#aode) | AODE (5 bins) | Naive Bayes (5 bins) | 68 | 42 / 22 / 4 | +0.021 | <0.001 | 20 / 0 | superior | PASS |
+| [bolasso](#bolasso) | Bolasso | LassoCV | 31 | 1 / 24 / 6 | -0.001 | 0.004 | 0 / 3 | non-inferior | PASS |
+| [cauchy-logistic](#cauchy-logistic) | Cauchy prior | ML logistic | 31 | 11 / 20 / 0 | +0.000 | <0.001 | 4 / 0 | superior | PASS |
+| [dann](#dann) | DANN (k=5) | k-NN (k=5) | 68 | 28 / 25 / 15 | +0.006 | <0.001 | 7 / 5 | non-inferior | PASS |
+| [extended-iforest](#extended-iforest) | Extended IF | Isolation Forest | 46 | 16 / 20 / 10 | +0.002 | <0.001 | 5 / 5 | non-inferior | PASS |
+| [firth](#firth) | Firth | ML logistic | 31 | 3 / 26 / 2 | +0.000 | <0.001 | 1 / 1 | non-inferior | PASS |
+| [flexible-nb](#flexible-nb) | Flexible NB | Gaussian NB | 68 | 39 / 13 / 16 | +0.023 | <0.001 | 26 / 6 | superior | PASS |
+| [hnb](#hnb) | Hidden NB (5 bins) | Naive Bayes (5 bins) | 68 | 40 / 21 / 7 | +0.020 | <0.001 | 20 / 0 | superior | PASS |
+| [kdb](#kdb) | KDB k=2 (5 bins) | Naive Bayes (5 bins) | 68 | 37 / 12 / 19 | +0.022 | <0.001 | 23 / 2 | superior | PASS |
+| [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 31 | 0 / 31 / 0 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [lesinn](#lesinn) | LeSiNN | Isolation Forest | 46 | 20 / 16 / 10 | +0.006 | <0.001 | 11 / 6 | non-inferior | PASS |
+| [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 31 | 11 / 15 / 5 | +0.006 | <0.001 | 1 / 2 | superior | PASS |
+| [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 31 | 23 / 1 / 7 | +0.028 | <0.001 | 12 / 3 | superior | PASS |
+| [logitboost](#logitboost) | LogitBoost (depth 3) | AdaBoost (depth 3) | 68 | 24 / 31 / 13 | +0.002 | <0.001 | 8 / 1 | superior | PASS |
+| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 31 | 23 / 6 / 2 | +0.044 | <0.001 | 14 / 1 | superior | PASS |
+| [mars](#mars) | MARS (additive) | LassoCV | 31 | 17 / 9 / 5 | +0.025 | <0.001 | 12 / 3 | superior | PASS |
+| [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 31 | 19 / 6 / 6 | +0.023 | 0.002 | 9 / 3 | superior | PASS |
+| [mcp](#mcp) | MCP (CV) | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [mda](#mda) | MDA (tuned) | LDA | 68 | 24 / 36 / 8 | +0.002 | <0.001 | 9 / 1 | superior | PASS |
+| [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 68 | 20 / 34 / 14 | +0.003 | <0.001 | 3 / 2 | non-inferior | PASS |
+| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 31 | 14 / 11 / 6 | +0.003 | 0.007 | 11 / 4 | non-inferior | PASS |
+| [rda](#rda) | RDA (tuned) | LDA | 68 | 33 / 28 / 7 | +0.009 | <0.001 | 17 / 0 | superior | PASS |
+| [rda](#rda) | RDA (tuned) | QDA | 33 | 9 / 21 / 3 | +0.003 | <0.001 | 1 / 1 | non-inferior | PASS |
+| [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 68 | 16 / 42 / 10 | +0.000 | <0.001 | 3 / 1 | non-inferior | PASS |
+| [rshash](#rshash) | RS-Hash | Isolation Forest | 46 | 18 / 18 / 10 | +0.006 | <0.001 | 5 / 3 | non-inferior | PASS |
+| [scad](#scad) | SCAD (CV) | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 68 | 36 / 19 / 13 | +0.013 | <0.001 | 19 / 1 | superior | PASS |
+
+## How reliable the gate is
+
+Pass rate of the gate for a candidate whose true typical difference to
+its predecessor is the given number of margins. Each row is simulated
+from the committed comparisons on that suite: their per-dataset
+differences are centred at zero, keeping the real spread and tails
+between datasets, resampled to the suite's size and shifted. At −1 margin
+and below, a pass is a false pass (the target is at most 5%); at 0 and
+above, a failure is a miss. Most of the spread is genuine variation
+between datasets, not fold noise, so only more datasets lower the miss
+rate without loosening the margin.
+
+| Suite | Datasets | Comparisons | -1.5 m | -1.0 m | -0.5 m | +0.0 m | +0.5 m |
+|---|---|---|---|---|---|---|---|
+| `adbench-classical` (margin 0.01) | 46 | 3 | 1% | 6% | 28% | 59% | 83% |
+| `pmlb-binary` (margin 0.005) | 31 | 2 | 0% | 6% | 71% | 100% | 100% |
+| `pmlb-classification` (margin 0.01) | 68 | 13 | 1% | 6% | 43% | 67% | 85% |
+| `pmlb-regression` (margin 0.01) | 31 | 12 | 2% | 6% | 56% | 66% | 70% |
 
 ## Details
 
 ### a2de
 
-**A2DE (5 bins)** vs Naive Bayes (5 bins) (references: AODE (5 bins)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**A2DE (5 bins)** vs Naive Bayes (5 bins) (references: AODE (5 bins)). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0160, mean +0.0336 (positive favours the candidate); better on 25, within margin on 12, worse on 6 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
-- Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.77, A2DE (5 bins) 1.79, Naive Bayes (5 bins) 2.44. Nemenyi critical difference 0.51, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.018x.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0222, mean +0.0426 (positive favours the candidate); better on 42, within margin on 18, worse on 8 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 22 wins, 0 losses, p = 1.000.
+- Average ranks over 68 datasets where every model ran: A2DE (5 bins) 1.64, AODE (5 bins) 1.83, Naive Bayes (5 bins) 2.53. Nemenyi critical difference 0.40, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.0086x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -77,7 +99,6 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | hepatitis | 0.839 | **0.842** | **0.842** |
 | hypothyroid | **0.965** | 0.962 | 0.964 |
 | ionosphere | **0.920** | 0.873 | 0.910 |
-| irish | **0.913** | 0.882 | 0.906 |
 | kr_vs_kp | **0.543** | **0.543** | **0.543** |
 | profb | 0.641 | 0.656 | **0.663** |
 | saheart | 0.659 | **0.675** | 0.662 |
@@ -87,6 +108,15 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | spectf | **0.910** | 0.775 | 0.881 |
 | tic_tac_toe | **0.653** | **0.653** | **0.653** |
 | tokyo1 | **0.932** | 0.890 | 0.926 |
+| adult | **0.823** | 0.799 | 0.815 |
+| analcatdata_boxing2 | **0.689** | 0.685 | **0.689** |
+| analcatdata_creditscore | **0.800** | 0.780 | 0.790 |
+| appendicitis | **0.877** | 0.853 | 0.872 |
+| backache | 0.858 | **0.861** | 0.856 |
+| coil2000 | **0.931** | 0.814 | 0.905 |
+| molecular_biology_promoters | **0.811** | **0.811** | 0.797 |
+| phoneme | **0.838** | 0.767 | 0.821 |
+| prnn_crabs | **0.825** | 0.623 | 0.820 |
 | balance_scale | 0.833 | **0.867** | 0.857 |
 | car_evaluation | 0.855 | 0.828 | **0.859** |
 | cars | **0.800** | 0.708 | 0.791 |
@@ -107,18 +137,35 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | wine_quality_red | **0.650** | 0.570 | 0.611 |
 | wine_recognition | **0.986** | 0.978 | 0.983 |
 | yeast | 0.575 | 0.578 | **0.579** |
+| analcatdata_authorship | 0.997 | 0.993 | **0.998** |
+| analcatdata_dmft | 0.183 | **0.198** | 0.196 |
+| analcatdata_germangss | 0.314 | **0.340** | 0.325 |
+| calendarDOW | **0.573** | 0.497 | 0.569 |
+| cloud | **0.329** | 0.287 | 0.310 |
+| collins | 0.747 | 0.748 | **0.758** |
+| flags | **0.374** | 0.340 | **0.374** |
+| letter | **0.786** | 0.649 | 0.753 |
+| movement_libras | **0.783** | 0.592 | 0.778 |
+| nursery | **0.807** | 0.799 | 0.801 |
+| optdigits | **0.969** | 0.912 | 0.965 |
+| page_blocks | **0.962** | 0.851 | 0.954 |
+| pendigits | **0.972** | 0.856 | 0.966 |
+| satimage | **0.889** | 0.802 | 0.875 |
+| schizo | 0.557 | 0.544 | **0.572** |
+| splice | **0.900** | 0.884 | 0.894 |
+| texture | **0.934** | 0.756 | 0.924 |
 
 </details>
 
 ### adaptive-lasso
 
-**Adaptive LassoCV** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Adaptive LassoCV** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0005 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.210.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.28, Adaptive LassoCV 1.72. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: LassoCV 0.21x.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0005 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.213. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: LassoCV 1.29, Adaptive LassoCV 1.71. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: LassoCV 0.35x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -149,18 +196,24 @@ gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | **0.863** | 0.858 |
 | solar_flare | **0.132** | 0.128 |
+| 519_vinnie | **0.742** | **0.743** |
+| 523_analcatdata_neavote | **0.928** | 0.927 |
+| 556_analcatdata_apnea2 | -0.032 | **-0.028** |
+| 663_rabe_266 | **0.969** | **0.969** |
+| 678_visualizing_environmental | **0.345** | 0.341 |
+| 712_chscase_geyser1 | 0.756 | **0.759** |
 
 </details>
 
 ### aode
 
-**AODE (5 bins)** vs Naive Bayes (5 bins) (references: Gaussian NB). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**AODE (5 bins)** vs Naive Bayes (5 bins) (references: Gaussian NB). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0164, mean +0.0320 (positive favours the candidate); better on 25, within margin on 16, worse on 2 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
-- Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.56, Gaussian NB 2.19, Naive Bayes (5 bins) 2.26. Nemenyi critical difference 0.51, Friedman p = 0.001.
-- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.22x.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0211, mean +0.0396 (positive favours the candidate); better on 42, within margin on 22, worse on 4 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 20 wins, 0 losses, p = 1.000.
+- Average ranks over 68 datasets where every model ran: AODE (5 bins) 1.51, Gaussian NB 2.19, Naive Bayes (5 bins) 2.29. Nemenyi critical difference 0.40, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.11x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -179,7 +232,6 @@ Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 | hepatitis | **0.842** | **0.842** | 0.713 |
 | hypothyroid | **0.964** | 0.962 | 0.248 |
 | ionosphere | **0.910** | 0.873 | 0.892 |
-| irish | **0.906** | 0.882 | 0.854 |
 | kr_vs_kp | 0.543 | 0.543 | **0.621** |
 | profb | **0.663** | 0.656 | 0.646 |
 | saheart | 0.662 | 0.675 | **0.718** |
@@ -189,6 +241,15 @@ Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 | spectf | **0.881** | 0.775 | 0.731 |
 | tic_tac_toe | 0.653 | 0.653 | **0.710** |
 | tokyo1 | **0.926** | 0.890 | 0.880 |
+| adult | **0.815** | 0.799 | 0.791 |
+| analcatdata_boxing2 | **0.689** | 0.685 | 0.662 |
+| analcatdata_creditscore | 0.790 | 0.780 | **0.990** |
+| appendicitis | **0.872** | 0.853 | 0.853 |
+| backache | 0.856 | **0.861** | 0.233 |
+| coil2000 | **0.905** | 0.814 | 0.124 |
+| molecular_biology_promoters | 0.797 | 0.811 | **0.873** |
+| phoneme | **0.821** | 0.767 | 0.755 |
+| prnn_crabs | **0.820** | 0.623 | 0.618 |
 | balance_scale | 0.857 | 0.867 | **0.903** |
 | car_evaluation | **0.859** | 0.828 | 0.698 |
 | cars | **0.791** | 0.708 | 0.677 |
@@ -209,18 +270,35 @@ Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 | wine_quality_red | **0.611** | 0.570 | 0.542 |
 | wine_recognition | **0.983** | 0.978 | 0.972 |
 | yeast | **0.579** | 0.578 | 0.153 |
+| analcatdata_authorship | **0.998** | 0.993 | 0.983 |
+| analcatdata_dmft | 0.196 | 0.198 | **0.216** |
+| analcatdata_germangss | 0.325 | 0.340 | **0.384** |
+| calendarDOW | **0.569** | 0.497 | 0.446 |
+| cloud | 0.310 | 0.287 | **0.319** |
+| collins | 0.758 | 0.748 | **1.000** |
+| flags | **0.374** | 0.340 | 0.343 |
+| letter | **0.753** | 0.649 | 0.638 |
+| movement_libras | **0.778** | 0.592 | 0.610 |
+| nursery | **0.801** | 0.799 | 0.632 |
+| optdigits | **0.965** | 0.912 | 0.796 |
+| page_blocks | **0.954** | 0.851 | 0.897 |
+| pendigits | **0.966** | 0.856 | 0.860 |
+| satimage | **0.875** | 0.802 | 0.801 |
+| schizo | **0.572** | 0.544 | 0.546 |
+| splice | 0.894 | 0.884 | **0.915** |
+| texture | **0.924** | 0.756 | 0.771 |
 
 </details>
 
 ### bolasso
 
-**Bolasso** vs LassoCV (references: Bolasso-S (0.9)). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Bolasso** vs LassoCV (references: Bolasso-S (0.9)). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Bolasso is mainly a variable-selection method; this checks that its predictions keep up with the lasso.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0016, mean -0.0126 (positive favours the candidate); better on 0, within margin on 20, worse on 5 of 25 datasets; non-inferiority p = 0.029, two-sided Wilcoxon p = <0.001.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.56, Bolasso-S (0.9) 1.96, Bolasso 2.48. Nemenyi critical difference 0.66, Friedman p = 0.004.
-- Total fit and score time relative to the candidate: LassoCV 0.13x.
+- vs LassoCV: **non-inferior**. Median difference -0.0014, mean -0.0102 (positive favours the candidate); better on 1, within margin on 24, worse on 6 of 31 datasets; non-inferiority p = 0.004, two-sided Wilcoxon p = 0.003. Severe (beyond 5 margins): 0 wins, 3 losses, p = 0.125.
+- Average ranks over 31 datasets where every model ran: LassoCV 1.61, Bolasso-S (0.9) 2.00, Bolasso 2.39. Nemenyi critical difference 0.60, Friedman p = 0.008.
+- Total fit and score time relative to the candidate: LassoCV 0.14x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -251,18 +329,24 @@ Bolasso is mainly a variable-selection method; this checks that its predictions 
 | 690_visualizing_galaxy | 0.892 | **0.894** | **0.894** |
 | 695_chatfield_4 | 0.848 | 0.858 | **0.860** |
 | solar_flare | 0.125 | 0.128 | **0.128** |
+| 519_vinnie | **0.743** | **0.743** | **0.743** |
+| 523_analcatdata_neavote | **0.928** | 0.927 | **0.928** |
+| 556_analcatdata_apnea2 | -0.041 | **-0.028** | -0.032 |
+| 663_rabe_266 | **0.969** | **0.969** | **0.969** |
+| 678_visualizing_environmental | **0.355** | 0.341 | 0.332 |
+| 712_chscase_geyser1 | 0.754 | **0.759** | 0.756 |
 
 </details>
 
 ### cauchy-logistic
 
-**Cauchy prior** vs ML logistic (references: Ridge logistic (C=1), Firth). Suite `pmlb-binary` (the 23 binary datasets of pmlb-classification), 2x repeated 5-fold CV. Metric: Brier score, lower is better; margin 0.005.
+**Cauchy prior** vs ML logistic (references: Ridge logistic (C=1), Firth). Suite `pmlb-binary` (the 31 binary datasets of pmlb-classification), 2x repeated 5-fold CV. Metric: Brier score, lower is better; margin 0.005.
 
 The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs centred); the other models get standardized inputs.
 
-- vs ML logistic: **superior**. Median difference +0.0003, mean +0.0070 (positive favours the candidate); better on 7, within margin on 16, worse on 0 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
-- Average ranks over 23 datasets where every model ran: Cauchy prior 1.74, Ridge logistic (C=1) 2.09, Firth 3.00, ML logistic 3.17. Nemenyi critical difference 0.98, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: ML logistic 1.4x.
+- vs ML logistic: **superior**. Median difference +0.0005, mean +0.0091 (positive favours the candidate); better on 11, within margin on 20, worse on 0 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 4 wins, 0 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: Cauchy prior 1.65, Ridge logistic (C=1) 2.26, Firth 2.97, ML logistic 3.13. Nemenyi critical difference 0.84, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: ML logistic 0.75x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -281,7 +365,6 @@ The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs ce
 | hepatitis | 0.136 | 0.155 | **0.133** | 0.143 |
 | hypothyroid | **0.033** | **0.033** | **0.033** | 0.033 |
 | ionosphere | **0.095** | 0.117 | **0.095** | 0.122 |
-| irish | **0.163** | **0.163** | **0.163** | **0.163** |
 | kr_vs_kp | **0.023** | **0.023** | 0.027 | 0.023 |
 | profb | **0.209** | **0.209** | **0.209** | **0.209** |
 | saheart | **0.179** | **0.179** | **0.179** | **0.179** |
@@ -291,18 +374,27 @@ The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs ce
 | spectf | 0.125 | 0.139 | **0.123** | 0.138 |
 | tic_tac_toe | **0.217** | **0.217** | **0.217** | **0.217** |
 | tokyo1 | **0.058** | 0.063 | **0.057** | 0.242 |
+| adult | **0.121** | **0.121** | **0.121** | **0.121** |
+| analcatdata_boxing2 | **0.227** | **0.228** | **0.227** | **0.227** |
+| analcatdata_creditscore | **0.029** | 0.037 | 0.100 | 0.035 |
+| appendicitis | **0.102** | 0.108 | **0.102** | 0.110 |
+| backache | **0.150** | 0.205 | 0.157 | 0.163 |
+| coil2000 | **0.054** | 0.055 | **0.055** | 0.055 |
+| molecular_biology_promoters | **0.156** | 0.207 | 0.162 | 0.210 |
+| phoneme | **0.158** | **0.158** | **0.158** | **0.158** |
+| prnn_crabs | 0.005 | **0.003** | 0.031 | 0.005 |
 
 </details>
 
 ### dann
 
-**DANN (k=5)** vs k-NN (k=5). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**DANN (k=5)** vs k-NN (k=5). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both vote with 5 neighbours on standardized inputs; DANN estimates its metric from max(n/5, 50) neighbours with epsilon = 1, as in the paper.
 
-- vs k-NN (k=5): **non-inferior**. Median difference +0.0057, mean +0.0045 (positive favours the candidate); better on 18, within margin on 16, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.131.
-- Average ranks over 43 datasets where every model ran: DANN (k=5) 1.37, k-NN (k=5) 1.63. Nemenyi critical difference 0.30.
-- Total fit and score time relative to the candidate: k-NN (k=5) 0.0052x.
+- vs k-NN (k=5): **non-inferior**. Median difference +0.0056, mean +0.0073 (positive favours the candidate); better on 28, within margin on 25, worse on 15 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.073. Severe (beyond 5 margins): 7 wins, 5 losses, p = 0.806.
+- Average ranks over 68 datasets where every model ran: DANN (k=5) 1.37, k-NN (k=5) 1.63. Nemenyi critical difference 0.24.
+- Total fit and score time relative to the candidate: k-NN (k=5) 0.0039x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -321,7 +413,6 @@ Both vote with 5 neighbours on standardized inputs; DANN estimates its metric fr
 | hepatitis | 0.806 | **0.842** |
 | hypothyroid | **0.963** | **0.963** |
 | ionosphere | 0.833 | **0.848** |
-| irish | **0.970** | 0.958 |
 | kr_vs_kp | **0.984** | 0.941 |
 | profb | 0.635 | **0.639** |
 | saheart | **0.676** | 0.638 |
@@ -331,6 +422,15 @@ Both vote with 5 neighbours on standardized inputs; DANN estimates its metric fr
 | spectf | **0.815** | 0.747 |
 | tic_tac_toe | 0.830 | **0.849** |
 | tokyo1 | 0.916 | **0.924** |
+| adult | **0.832** | 0.826 |
+| analcatdata_boxing2 | **0.663** | 0.659 |
+| analcatdata_creditscore | **0.790** | 0.775 |
+| appendicitis | **0.872** | **0.872** |
+| backache | 0.803 | **0.856** |
+| coil2000 | **0.936** | 0.935 |
+| molecular_biology_promoters | 0.542 | **0.787** |
+| phoneme | **0.880** | 0.874 |
+| prnn_crabs | **1.000** | 0.920 |
 | balance_scale | **0.941** | 0.829 |
 | car_evaluation | **0.963** | 0.959 |
 | cars | **0.819** | 0.801 |
@@ -351,18 +451,35 @@ Both vote with 5 neighbours on standardized inputs; DANN estimates its metric fr
 | wine_quality_red | **0.585** | 0.574 |
 | wine_recognition | **0.983** | 0.964 |
 | yeast | **0.564** | 0.554 |
+| analcatdata_authorship | 0.955 | **0.995** |
+| analcatdata_dmft | 0.205 | **0.211** |
+| analcatdata_germangss | **0.263** | 0.221 |
+| calendarDOW | **0.627** | 0.595 |
+| cloud | **0.235** | 0.208 |
+| collins | **1.000** | 0.582 |
+| flags | 0.368 | **0.480** |
+| letter | **0.919** | 0.864 |
+| movement_libras | 0.592 | **0.715** |
+| nursery | **0.900** | 0.865 |
+| optdigits | **0.987** | 0.976 |
+| page_blocks | **0.967** | 0.963 |
+| pendigits | **0.992** | 0.989 |
+| satimage | 0.886 | **0.901** |
+| schizo | 0.493 | **0.497** |
+| splice | **0.794** | 0.639 |
+| texture | **0.999** | 0.981 |
 
 </details>
 
 ### extended-iforest
 
-**Extended IF** vs Isolation Forest. Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
+**Extended IF** vs Isolation Forest. Suite `adbench-classical` (46 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
 
 Fully extended cuts, 200 trees of 256 points like the Isolation Forest.
 
-- vs Isolation Forest: **non-inferior**. Median difference -0.0005, mean -0.0086 (positive favours the candidate); better on 10, within margin on 17, worse on 10 of 37 datasets; non-inferiority p = 0.020, two-sided Wilcoxon p = 0.833.
-- Average ranks over 37 datasets where every model ran: Isolation Forest 1.47, Extended IF 1.53. Nemenyi critical difference 0.32.
-- Total fit and score time relative to the candidate: Isolation Forest 0.29x.
+- vs Isolation Forest: **non-inferior**. Median difference +0.0016, mean +0.0005 (positive favours the candidate); better on 16, within margin on 20, worse on 10 of 46 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.376. Severe (beyond 5 margins): 5 wins, 5 losses, p = 0.623.
+- Average ranks over 46 datasets where every model ran: Extended IF 1.47, Isolation Forest 1.53. Nemenyi critical difference 0.29.
+- Total fit and score time relative to the candidate: Isolation Forest 0.37x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -405,18 +522,27 @@ Fully extended cuts, 200 trees of 256 points like the Isolation Forest.
 | 45_wine | **0.839** | 0.773 |
 | 46_WPBC | **0.537** | 0.499 |
 | 47_yeast | 0.387 | **0.396** |
+| 3_backdoor | **0.759** | 0.756 |
+| 5_campaign | **0.746** | 0.716 |
+| 8_celeba | **0.770** | 0.666 |
+| 9_census | **0.662** | 0.582 |
+| 10_cover | **0.900** | 0.868 |
+| 11_donors | **0.824** | 0.771 |
+| 13_fraud | 0.965 | **0.972** |
+| 16_http | 0.998 | **1.000** |
+| 33_skin | **0.718** | 0.667 |
 
 </details>
 
 ### firth
 
-**Firth** vs ML logistic. Suite `pmlb-binary` (the 23 binary datasets of pmlb-classification), 2x repeated 5-fold CV. Metric: Brier score, lower is better; margin 0.005.
+**Firth** vs ML logistic. Suite `pmlb-binary` (the 31 binary datasets of pmlb-classification), 2x repeated 5-fold CV. Metric: Brier score, lower is better; margin 0.005.
 
 Full-size training folds; features standardized for every model.
 
-- vs ML logistic: **non-inferior**. Median difference +0.0000, mean -0.0075 (positive favours the candidate); better on 2, within margin on 19, worse on 2 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.964.
-- Average ranks over 23 datasets where every model ran: Firth 1.48, ML logistic 1.52. Nemenyi critical difference 0.41.
-- Total fit and score time relative to the candidate: ML logistic 0.058x.
+- vs ML logistic: **non-inferior**. Median difference +0.0000, mean -0.0043 (positive favours the candidate); better on 3, within margin on 26, worse on 2 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.900. Severe (beyond 5 margins): 1 wins, 1 losses, p = 0.750.
+- Average ranks over 31 datasets where every model ran: Firth 1.48, ML logistic 1.52. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: ML logistic 0.04x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -435,7 +561,6 @@ Full-size training folds; features standardized for every model.
 | hepatitis | **0.143** | 0.155 |
 | hypothyroid | **0.033** | **0.033** |
 | ionosphere | 0.122 | **0.117** |
-| irish | **0.163** | **0.163** |
 | kr_vs_kp | 0.023 | **0.023** |
 | profb | **0.209** | **0.209** |
 | saheart | **0.179** | **0.179** |
@@ -445,18 +570,27 @@ Full-size training folds; features standardized for every model.
 | spectf | **0.138** | 0.139 |
 | tic_tac_toe | **0.217** | **0.217** |
 | tokyo1 | 0.242 | **0.063** |
+| adult | **0.121** | **0.121** |
+| analcatdata_boxing2 | **0.227** | **0.228** |
+| analcatdata_creditscore | **0.035** | 0.037 |
+| appendicitis | 0.110 | **0.108** |
+| backache | **0.163** | 0.205 |
+| coil2000 | **0.055** | **0.055** |
+| molecular_biology_promoters | 0.210 | **0.207** |
+| phoneme | **0.158** | **0.158** |
+| prnn_crabs | 0.005 | **0.003** |
 
 </details>
 
 ### flexible-nb
 
-**Flexible NB** vs Gaussian NB. Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**Flexible NB** vs Gaussian NB. Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.
 
-- vs Gaussian NB: **superior**. Median difference +0.0208, mean +0.0664 (positive favours the candidate); better on 23, within margin on 11, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
-- Average ranks over 43 datasets where every model ran: Flexible NB 1.33, Gaussian NB 1.67. Nemenyi critical difference 0.30.
-- Total fit and score time relative to the candidate: Gaussian NB 0.0054x.
+- vs Gaussian NB: **superior**. Median difference +0.0233, mean +0.0634 (positive favours the candidate); better on 39, within margin on 13, worse on 16 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 26 wins, 6 losses, p = 1.000.
+- Average ranks over 68 datasets where every model ran: Flexible NB 1.33, Gaussian NB 1.67. Nemenyi critical difference 0.24.
+- Total fit and score time relative to the candidate: Gaussian NB 0.0024x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -475,7 +609,6 @@ Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.
 | hepatitis | **0.832** | 0.713 |
 | hypothyroid | **0.952** | 0.248 |
 | ionosphere | **0.920** | 0.892 |
-| irish | **1.000** | 0.854 |
 | kr_vs_kp | **0.765** | 0.621 |
 | profb | **0.667** | 0.646 |
 | saheart | 0.660 | **0.718** |
@@ -485,6 +618,15 @@ Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.
 | spectf | **0.835** | 0.731 |
 | tic_tac_toe | 0.653 | **0.710** |
 | tokyo1 | **0.911** | 0.880 |
+| adult | **0.806** | 0.791 |
+| analcatdata_boxing2 | **0.806** | 0.662 |
+| analcatdata_creditscore | 0.770 | **0.990** |
+| appendicitis | 0.839 | **0.853** |
+| backache | **0.839** | 0.233 |
+| coil2000 | **0.932** | 0.124 |
+| molecular_biology_promoters | 0.858 | **0.873** |
+| phoneme | **0.778** | 0.755 |
+| prnn_crabs | **0.655** | 0.618 |
 | balance_scale | **0.912** | 0.903 |
 | car_evaluation | **0.700** | 0.698 |
 | cars | **0.861** | 0.677 |
@@ -505,18 +647,35 @@ Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.
 | wine_quality_red | **0.573** | 0.542 |
 | wine_recognition | **0.978** | 0.972 |
 | yeast | **0.538** | 0.153 |
+| analcatdata_authorship | 0.948 | **0.983** |
+| analcatdata_dmft | 0.215 | **0.216** |
+| analcatdata_germangss | 0.289 | **0.384** |
+| calendarDOW | **0.639** | 0.446 |
+| cloud | **0.342** | 0.319 |
+| collins | 0.762 | **1.000** |
+| flags | **0.404** | 0.343 |
+| letter | **0.727** | 0.638 |
+| movement_libras | **0.713** | 0.610 |
+| nursery | **0.891** | 0.632 |
+| optdigits | **0.904** | 0.796 |
+| page_blocks | **0.948** | 0.897 |
+| pendigits | **0.891** | 0.860 |
+| satimage | **0.836** | 0.801 |
+| schizo | **0.546** | **0.546** |
+| splice | 0.520 | **0.915** |
+| texture | **0.805** | 0.771 |
 
 </details>
 
 ### hnb
 
-**Hidden NB (5 bins)** vs Naive Bayes (5 bins) (references: AODE (5 bins)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**Hidden NB (5 bins)** vs Naive Bayes (5 bins) (references: AODE (5 bins)). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0145, mean +0.0297 (positive favours the candidate); better on 24, within margin on 14, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
-- Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.69, Hidden NB (5 bins) 1.87, Naive Bayes (5 bins) 2.44. Nemenyi critical difference 0.51, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.2x.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0200, mean +0.0379 (positive favours the candidate); better on 40, within margin on 21, worse on 7 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 20 wins, 0 losses, p = 1.000.
+- Average ranks over 68 datasets where every model ran: AODE (5 bins) 1.70, Hidden NB (5 bins) 1.79, Naive Bayes (5 bins) 2.51. Nemenyi critical difference 0.40, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.16x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -535,7 +694,6 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | hepatitis | 0.835 | **0.842** | **0.842** |
 | hypothyroid | 0.962 | 0.962 | **0.964** |
 | ionosphere | 0.902 | 0.873 | **0.910** |
-| irish | **0.911** | 0.882 | 0.906 |
 | kr_vs_kp | **0.543** | **0.543** | **0.543** |
 | profb | 0.650 | 0.656 | **0.663** |
 | saheart | 0.671 | **0.675** | 0.662 |
@@ -545,6 +703,15 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | spectf | 0.871 | 0.775 | **0.881** |
 | tic_tac_toe | **0.653** | **0.653** | **0.653** |
 | tokyo1 | 0.918 | 0.890 | **0.926** |
+| adult | 0.790 | 0.799 | **0.815** |
+| analcatdata_boxing2 | 0.652 | 0.685 | **0.689** |
+| analcatdata_creditscore | 0.780 | 0.780 | **0.790** |
+| appendicitis | **0.882** | 0.853 | 0.872 |
+| backache | **0.861** | **0.861** | 0.856 |
+| coil2000 | **0.923** | 0.814 | 0.905 |
+| molecular_biology_promoters | 0.802 | **0.811** | 0.797 |
+| phoneme | **0.821** | 0.767 | 0.821 |
+| prnn_crabs | **0.840** | 0.623 | 0.820 |
 | balance_scale | 0.853 | **0.867** | 0.857 |
 | car_evaluation | **0.861** | 0.828 | 0.859 |
 | cars | **0.807** | 0.708 | 0.791 |
@@ -565,18 +732,35 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | wine_quality_red | **0.616** | 0.570 | 0.611 |
 | wine_recognition | **0.983** | 0.978 | **0.983** |
 | yeast | 0.567 | 0.578 | **0.579** |
+| analcatdata_authorship | 0.994 | 0.993 | **0.998** |
+| analcatdata_dmft | **0.209** | 0.198 | 0.196 |
+| analcatdata_germangss | **0.341** | 0.340 | 0.325 |
+| calendarDOW | 0.561 | 0.497 | **0.569** |
+| cloud | **0.319** | 0.287 | 0.310 |
+| collins | 0.737 | 0.748 | **0.758** |
+| flags | **0.396** | 0.340 | 0.374 |
+| letter | **0.761** | 0.649 | 0.753 |
+| movement_libras | **0.783** | 0.592 | 0.778 |
+| nursery | **0.808** | 0.799 | 0.801 |
+| optdigits | 0.954 | 0.912 | **0.965** |
+| page_blocks | **0.956** | 0.851 | 0.954 |
+| pendigits | 0.956 | 0.856 | **0.966** |
+| satimage | 0.866 | 0.802 | **0.875** |
+| schizo | 0.565 | 0.544 | **0.572** |
+| splice | **0.896** | 0.884 | 0.894 |
+| texture | 0.917 | 0.756 | **0.924** |
 
 </details>
 
 ### kdb
 
-**KDB k=2 (5 bins)** vs Naive Bayes (5 bins) (references: TAN (5 bins)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**KDB k=2 (5 bins)** vs Naive Bayes (5 bins) (references: TAN (5 bins)). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0121, mean +0.0195 (positive favours the candidate); better on 22, within margin on 9, worse on 12 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.042.
-- Average ranks over 43 datasets where every model ran: TAN (5 bins) 1.69, KDB k=2 (5 bins) 2.00, Naive Bayes (5 bins) 2.31. Nemenyi critical difference 0.51, Friedman p = 0.010.
-- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.43x.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0222, mean +0.0326 (positive favours the candidate); better on 37, within margin on 12, worse on 19 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 23 wins, 2 losses, p = 1.000.
+- Average ranks over 68 datasets where every model ran: TAN (5 bins) 1.79, KDB k=2 (5 bins) 1.85, Naive Bayes (5 bins) 2.36. Nemenyi critical difference 0.40, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.38x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -595,7 +779,6 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | hepatitis | 0.794 | **0.842** | 0.823 |
 | hypothyroid | **0.964** | 0.962 | 0.963 |
 | ionosphere | **0.929** | 0.873 | 0.919 |
-| irish | 0.905 | 0.882 | **0.908** |
 | kr_vs_kp | **0.543** | **0.543** | **0.543** |
 | profb | 0.619 | **0.656** | 0.621 |
 | saheart | 0.622 | **0.675** | 0.660 |
@@ -605,6 +788,15 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | spectf | 0.897 | 0.775 | **0.905** |
 | tic_tac_toe | 0.630 | **0.653** | **0.653** |
 | tokyo1 | **0.915** | 0.890 | 0.912 |
+| adult | **0.828** | 0.799 | 0.825 |
+| analcatdata_boxing2 | **0.689** | 0.685 | 0.666 |
+| analcatdata_creditscore | **0.840** | 0.780 | 0.765 |
+| appendicitis | **0.877** | 0.853 | **0.877** |
+| backache | 0.847 | **0.861** | 0.858 |
+| coil2000 | **0.932** | 0.814 | 0.928 |
+| molecular_biology_promoters | 0.792 | **0.811** | 0.764 |
+| phoneme | **0.831** | 0.767 | 0.807 |
+| prnn_crabs | **0.823** | 0.623 | 0.807 |
 | balance_scale | 0.817 | **0.867** | 0.838 |
 | car_evaluation | 0.856 | 0.828 | **0.863** |
 | cars | 0.802 | 0.708 | **0.806** |
@@ -625,18 +817,35 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | wine_quality_red | **0.629** | 0.570 | 0.596 |
 | wine_recognition | 0.933 | **0.978** | 0.963 |
 | yeast | 0.529 | **0.578** | 0.556 |
+| analcatdata_authorship | 0.989 | 0.993 | **0.995** |
+| analcatdata_dmft | 0.183 | **0.198** | 0.190 |
+| analcatdata_germangss | 0.315 | 0.340 | **0.349** |
+| calendarDOW | **0.590** | 0.497 | 0.581 |
+| cloud | **0.384** | 0.287 | 0.297 |
+| collins | 0.716 | **0.748** | 0.671 |
+| flags | **0.430** | 0.340 | 0.415 |
+| letter | **0.776** | 0.649 | 0.739 |
+| movement_libras | **0.722** | 0.592 | 0.669 |
+| nursery | 0.802 | 0.799 | **0.806** |
+| optdigits | **0.959** | 0.912 | 0.955 |
+| page_blocks | **0.955** | 0.851 | 0.947 |
+| pendigits | **0.962** | 0.856 | 0.939 |
+| satimage | **0.876** | 0.802 | 0.866 |
+| schizo | 0.522 | 0.544 | **0.557** |
+| splice | 0.863 | 0.884 | **0.884** |
+| texture | **0.939** | 0.756 | 0.923 |
 
 </details>
 
 ### l2boost
 
-**L2Boost (CV)** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**L2Boost (CV)** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Componentwise linear least squares, learning rate 0.1, number of steps (up to 2000) by 5-fold CV, as in mboost.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0001 (positive favours the candidate); better on 0, within margin on 25, worse on 0 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.007.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.20, L2Boost (CV) 1.80. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: LassoCV 0.58x.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean +0.0000 (positive favours the candidate); better on 0, within margin on 31, worse on 0 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.032. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: LassoCV 1.26, L2Boost (CV) 1.74. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: LassoCV 0.6x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -667,17 +876,23 @@ Componentwise linear least squares, learning rate 0.1, number of steps (up to 20
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | 0.858 | **0.858** |
 | solar_flare | **0.128** | **0.128** |
+| 519_vinnie | **0.743** | **0.743** |
+| 523_analcatdata_neavote | **0.927** | **0.927** |
+| 556_analcatdata_apnea2 | **-0.028** | **-0.028** |
+| 663_rabe_266 | **0.969** | **0.969** |
+| 678_visualizing_environmental | **0.346** | 0.341 |
+| 712_chscase_geyser1 | **0.758** | **0.759** |
 
 </details>
 
 ### lesinn
 
-**LeSiNN** vs Isolation Forest (references: LOF). Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
+**LeSiNN** vs Isolation Forest (references: LOF). Suite `adbench-classical` (46 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
 
 The paper's defaults: 50 subsamples of 8 points.
 
-- vs Isolation Forest: **non-inferior**. Median difference +0.0049, mean +0.0034 (positive favours the candidate); better on 13, within margin on 14, worse on 10 of 37 datasets; non-inferiority p = 0.013, two-sided Wilcoxon p = 0.577.
-- Average ranks over 37 datasets where every model ran: LeSiNN 1.80, Isolation Forest 1.88, LOF 2.32. Nemenyi critical difference 0.54, Friedman p = 0.050.
+- vs Isolation Forest: **non-inferior**. Median difference +0.0063, mean +0.0140 (positive favours the candidate); better on 20, within margin on 16, worse on 10 of 46 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.086. Severe (beyond 5 margins): 11 wins, 6 losses, p = 0.928.
+- Average ranks over 46 datasets where every model ran: LeSiNN 1.73, Isolation Forest 1.90, LOF 2.37. Nemenyi critical difference 0.49, Friedman p = 0.006.
 - Total fit and score time relative to the candidate: Isolation Forest 3x.
 
 <details><summary>Per-dataset scores</summary>
@@ -721,18 +936,27 @@ The paper's defaults: 50 subsamples of 8 points.
 | 45_wine | 0.793 | 0.773 | **0.906** |
 | 46_WPBC | 0.524 | 0.499 | **0.530** |
 | 47_yeast | 0.385 | 0.396 | **0.451** |
+| 3_backdoor | **0.808** | 0.756 | 0.735 |
+| 5_campaign | **0.754** | 0.716 | 0.658 |
+| 8_celeba | **0.806** | 0.666 | 0.482 |
+| 9_census | **0.673** | 0.582 | 0.540 |
+| 10_cover | 0.905 | 0.868 | **0.984** |
+| 11_donors | **0.854** | 0.771 | 0.649 |
+| 13_fraud | 0.967 | 0.972 | **0.989** |
+| 16_http | 0.995 | **1.000** | 0.994 |
+| 33_skin | **0.755** | 0.667 | 0.397 |
 
 </details>
 
 ### local-linear-forest
 
-**Local linear forest** vs Random forest (leaf 5). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Local linear forest** vs Random forest (leaf 5). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 The same forest (200 trees, leaves of at least 5) supplies the weights; ridge penalty 0.1 on the local slopes, grf's default.
 
-- vs Random forest (leaf 5): **non-inferior**. Median difference +0.0063, mean +0.0044 (positive favours the candidate); better on 9, within margin on 11, worse on 5 of 25 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.096.
-- Average ranks over 25 datasets where every model ran: Local linear forest 1.28, Random forest (leaf 5) 1.72. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: Random forest (leaf 5) 0.86x.
+- vs Random forest (leaf 5): **superior**. Median difference +0.0058, mean +0.0054 (positive favours the candidate); better on 11, within margin on 15, worse on 5 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.036. Severe (beyond 5 margins): 1 wins, 2 losses, p = 0.500.
+- Average ranks over 31 datasets where every model ran: Local linear forest 1.32, Random forest (leaf 5) 1.68. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: Random forest (leaf 5) 0.85x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -763,18 +987,24 @@ The same forest (200 trees, leaves of at least 5) supplies the weights; ridge pe
 | 690_visualizing_galaxy | **0.971** | 0.964 |
 | 695_chatfield_4 | **0.820** | 0.817 |
 | solar_flare | 0.003 | **0.077** |
+| 519_vinnie | 0.707 | **0.711** |
+| 523_analcatdata_neavote | 0.884 | **0.886** |
+| 556_analcatdata_apnea2 | 0.896 | **0.897** |
+| 663_rabe_266 | **0.980** | 0.938 |
+| 678_visualizing_environmental | **0.303** | 0.286 |
+| 712_chscase_geyser1 | **0.753** | 0.748 |
 
 </details>
 
 ### loess
 
-**LOESS (tuned span)** vs k-NN (tuned k). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**LOESS (tuned span)** vs k-NN (tuned k). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Local linear fits with tricube weights. Both tune their neighbourhood size over five values by inner 3-fold CV on standardized inputs.
 
-- vs k-NN (tuned k): **superior**. Median difference +0.0368, mean +0.0454 (positive favours the candidate); better on 19, within margin on 1, worse on 5 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.003.
-- Average ranks over 25 datasets where every model ran: LOESS (tuned span) 1.24, k-NN (tuned k) 1.76. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: k-NN (tuned k) 0.043x.
+- vs k-NN (tuned k): **superior**. Median difference +0.0284, mean +0.0137 (positive favours the candidate); better on 23, within margin on 1, worse on 7 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.010. Severe (beyond 5 margins): 12 wins, 3 losses, p = 0.996.
+- Average ranks over 31 datasets where every model ran: LOESS (tuned span) 1.26, k-NN (tuned k) 1.74. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: k-NN (tuned k) 0.045x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -805,18 +1035,24 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 | 690_visualizing_galaxy | 0.951 | **0.970** |
 | 695_chatfield_4 | **0.807** | 0.791 |
 | solar_flare | 0.063 | **0.104** |
+| 519_vinnie | **0.738** | 0.695 |
+| 523_analcatdata_neavote | 0.860 | **0.929** |
+| 556_analcatdata_apnea2 | 0.093 | **0.849** |
+| 663_rabe_266 | **0.998** | 0.986 |
+| 678_visualizing_environmental | **0.291** | 0.266 |
+| 712_chscase_geyser1 | **0.766** | 0.731 |
 
 </details>
 
 ### logitboost
 
-**LogitBoost (depth 3)** vs AdaBoost (depth 3) (references: Gradient boosting (depth 3)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**LogitBoost (depth 3)** vs AdaBoost (depth 3) (references: Gradient boosting (depth 3)). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 200 rounds of depth-3 trees for every model, no shrinkage for LogitBoost and AdaBoost (SAMME), as in the paper.
 
-- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0010, mean +0.0100 (positive favours the candidate); better on 13, within margin on 21, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.176.
-- Average ranks over 43 datasets where every model ran: LogitBoost (depth 3) 1.78, Gradient boosting (depth 3) 2.02, AdaBoost (depth 3) 2.20. Nemenyi critical difference 0.51, Friedman p = 0.135.
-- Total fit and score time relative to the candidate: AdaBoost (depth 3) 0.33x.
+- vs AdaBoost (depth 3): **superior**. Median difference +0.0021, mean +0.0133 (positive favours the candidate); better on 24, within margin on 31, worse on 13 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.046. Severe (beyond 5 margins): 8 wins, 1 losses, p = 0.998.
+- Average ranks over 68 datasets where every model ran: LogitBoost (depth 3) 1.83, Gradient boosting (depth 3) 1.95, AdaBoost (depth 3) 2.22. Nemenyi critical difference 0.40, Friedman p = 0.060.
+- Total fit and score time relative to the candidate: AdaBoost (depth 3) 0.19x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -835,7 +1071,6 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 | hepatitis | 0.816 | **0.829** | 0.777 |
 | hypothyroid | **0.982** | **0.982** | 0.982 |
 | ionosphere | **0.940** | 0.919 | 0.932 |
-| irish | **1.000** | **1.000** | **1.000** |
 | kr_vs_kp | **0.995** | 0.994 | 0.989 |
 | profb | 0.651 | 0.662 | **0.668** |
 | saheart | 0.628 | 0.642 | **0.670** |
@@ -845,6 +1080,15 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 | spectf | 0.907 | **0.911** | 0.898 |
 | tic_tac_toe | **1.000** | **1.000** | 0.990 |
 | tokyo1 | 0.926 | **0.929** | 0.928 |
+| adult | 0.853 | 0.862 | **0.873** |
+| analcatdata_boxing2 | 0.693 | 0.716 | **0.738** |
+| analcatdata_creditscore | **0.980** | **0.980** | **0.980** |
+| appendicitis | 0.848 | 0.848 | **0.858** |
+| backache | **0.833** | 0.825 | 0.825 |
+| coil2000 | 0.929 | 0.933 | **0.934** |
+| molecular_biology_promoters | 0.882 | **0.906** | 0.887 |
+| phoneme | **0.875** | 0.865 | 0.870 |
+| prnn_crabs | **0.927** | 0.922 | 0.920 |
 | balance_scale | **0.894** | 0.862 | 0.869 |
 | car_evaluation | **0.997** | 0.962 | 0.994 |
 | cars | **0.982** | 0.980 | 0.977 |
@@ -865,18 +1109,35 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 | wine_quality_red | **0.666** | 0.556 | 0.664 |
 | wine_recognition | **0.969** | 0.947 | 0.955 |
 | yeast | 0.554 | 0.505 | **0.581** |
+| analcatdata_authorship | 0.992 | **0.994** | 0.985 |
+| analcatdata_dmft | 0.202 | **0.219** | 0.218 |
+| analcatdata_germangss | 0.335 | **0.386** | 0.378 |
+| calendarDOW | 0.618 | 0.612 | **0.630** |
+| cloud | **0.829** | 0.746 | **0.830** |
+| collins | 0.975 | **0.977** | 0.973 |
+| flags | 0.466 | **0.469** | 0.463 |
+| letter | **0.919** | 0.682 | 0.896 |
+| movement_libras | **0.756** | 0.697 | 0.704 |
+| nursery | **0.999** | 0.948 | 0.995 |
+| optdigits | **0.985** | 0.959 | 0.981 |
+| page_blocks | 0.970 | 0.964 | **0.971** |
+| pendigits | **0.991** | 0.968 | 0.985 |
+| satimage | **0.916** | 0.855 | 0.905 |
+| schizo | 0.479 | 0.488 | **0.518** |
+| splice | 0.962 | 0.948 | **0.965** |
+| texture | **0.989** | 0.962 | 0.985 |
 
 </details>
 
 ### m5
 
-**M5 model tree** vs CART (tuned leaf size) (references: LassoCV). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**M5 model tree** vs CART (tuned leaf size) (references: LassoCV). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its minimum leaf size from five values by inner 3-fold CV.
 
-- vs CART (tuned leaf size): **superior**. Median difference +0.0513, mean +0.0651 (positive favours the candidate); better on 19, within margin on 5, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
-- Average ranks over 25 datasets where every model ran: M5 model tree 1.44, LassoCV 1.96, CART (tuned leaf size) 2.60. Nemenyi critical difference 0.66, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: CART (tuned leaf size) 0.89x.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0441, mean +0.0542 (positive favours the candidate); better on 23, within margin on 6, worse on 2 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 14 wins, 1 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: M5 model tree 1.42, LassoCV 2.00, CART (tuned leaf size) 2.58. Nemenyi critical difference 0.60, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: CART (tuned leaf size) 1.1x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -907,19 +1168,25 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 | 690_visualizing_galaxy | **0.964** | 0.955 | 0.894 |
 | 695_chatfield_4 | 0.851 | 0.770 | **0.858** |
 | solar_flare | 0.107 | 0.118 | **0.128** |
+| 519_vinnie | **0.743** | 0.710 | **0.743** |
+| 523_analcatdata_neavote | **0.928** | 0.884 | 0.927 |
+| 556_analcatdata_apnea2 | 0.784 | **0.896** | -0.028 |
+| 663_rabe_266 | **0.980** | 0.977 | 0.969 |
+| 678_visualizing_environmental | **0.342** | 0.276 | 0.341 |
+| 712_chscase_geyser1 | 0.749 | 0.730 | **0.759** |
 
 </details>
 
 ### mars
 
-**MARS (additive)** vs LassoCV, CART (tuned leaf size). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**MARS (additive)** vs LassoCV, CART (tuned leaf size). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes both stepwise linear regression and recursive partitioning, so it must keep up with both.
 
-- vs LassoCV: **superior**. Median difference +0.0387, mean +0.0500 (positive favours the candidate); better on 16, within margin on 5, worse on 4 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.016.
-- vs CART (tuned leaf size): **superior**. Median difference +0.0364, mean +0.0392 (positive favours the candidate); better on 16, within margin on 5, worse on 4 of 25 datasets; non-inferiority p = 0.001, two-sided Wilcoxon p = 0.008.
-- Average ranks over 25 datasets where every model ran: MARS (additive) 1.56, LassoCV 2.00, CART (tuned leaf size) 2.44. Nemenyi critical difference 0.66, Friedman p = 0.008.
-- Total fit and score time relative to the candidate: LassoCV 0.35x, CART (tuned leaf size) 0.73x.
+- vs LassoCV: **superior**. Median difference +0.0246, mean +0.0453 (positive favours the candidate); better on 17, within margin on 9, worse on 5 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.023. Severe (beyond 5 margins): 12 wins, 3 losses, p = 0.996.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0233, mean +0.0119 (positive favours the candidate); better on 19, within margin on 6, worse on 6 of 31 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.014. Severe (beyond 5 margins): 9 wins, 3 losses, p = 0.981.
+- Average ranks over 31 datasets where every model ran: MARS (additive) 1.61, LassoCV 1.97, CART (tuned leaf size) 2.42. Nemenyi critical difference 0.60, Friedman p = 0.006.
+- Total fit and score time relative to the candidate: LassoCV 0.41x, CART (tuned leaf size) 0.96x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -950,18 +1217,24 @@ Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes
 | 690_visualizing_galaxy | **0.958** | 0.894 | 0.955 |
 | 695_chatfield_4 | 0.781 | **0.858** | 0.770 |
 | solar_flare | **0.139** | 0.128 | 0.118 |
+| 519_vinnie | 0.734 | **0.743** | 0.710 |
+| 523_analcatdata_neavote | **0.928** | 0.927 | 0.884 |
+| 556_analcatdata_apnea2 | 0.218 | -0.028 | **0.896** |
+| 663_rabe_266 | **0.979** | 0.969 | 0.977 |
+| 678_visualizing_environmental | 0.248 | **0.341** | 0.276 |
+| 712_chscase_geyser1 | 0.756 | **0.759** | 0.730 |
 
 </details>
 
 ### mcp
 
-**MCP (CV)** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**MCP (CV)** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0002, mean -0.0010 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.080.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.28, MCP (CV) 1.72. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: LassoCV 0.069x.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0008 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.125. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: LassoCV 1.32, MCP (CV) 1.68. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: LassoCV 0.08x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -992,18 +1265,24 @@ gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | **0.858** | **0.858** |
 | solar_flare | 0.122 | **0.128** |
+| 519_vinnie | **0.743** | **0.743** |
+| 523_analcatdata_neavote | **0.928** | 0.927 |
+| 556_analcatdata_apnea2 | -0.032 | **-0.028** |
+| 663_rabe_266 | **0.969** | **0.969** |
+| 678_visualizing_environmental | **0.345** | 0.341 |
+| 712_chscase_geyser1 | 0.756 | **0.759** |
 
 </details>
 
 ### mda
 
-**MDA (tuned)** vs LDA (references: QDA). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**MDA (tuned)** vs LDA (references: QDA). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as Hastie & Tibshirani (1996) did; one subclass is LDA.
 
-- vs LDA: **non-inferior**. Median difference +0.0011, mean +0.0147 (positive favours the candidate); better on 14, within margin on 24, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.053.
-- Average ranks over 23 datasets where every model ran: MDA (tuned) 1.85, QDA 2.07, LDA 2.09. Nemenyi critical difference 0.69, Friedman p = 0.654.
-- Total fit and score time relative to the candidate: LDA 0.0068x.
+- vs LDA: **superior**. Median difference +0.0023, mean +0.0154 (positive favours the candidate); better on 24, within margin on 36, worse on 8 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.006. Severe (beyond 5 margins): 9 wins, 1 losses, p = 0.999.
+- Average ranks over 33 datasets where every model ran: MDA (tuned) 1.82, QDA 2.08, LDA 2.11. Nemenyi critical difference 0.58, Friedman p = 0.409.
+- Total fit and score time relative to the candidate: LDA 0.0038x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1022,7 +1301,6 @@ MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as 
 | hepatitis | 0.826 | **0.839** | n/a |
 | hypothyroid | **0.943** | **0.943** | n/a |
 | ionosphere | **0.883** | 0.856 | n/a |
-| irish | **0.960** | 0.754 | 0.864 |
 | kr_vs_kp | 0.937 | **0.942** | n/a |
 | profb | **0.677** | **0.677** | 0.652 |
 | saheart | 0.716 | **0.726** | 0.711 |
@@ -1032,6 +1310,15 @@ MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as 
 | spectf | 0.774 | 0.758 | **0.933** |
 | tic_tac_toe | 0.764 | 0.675 | **0.770** |
 | tokyo1 | **0.926** | **0.926** | n/a |
+| adult | **0.830** | 0.820 | 0.801 |
+| analcatdata_boxing2 | **0.700** | 0.643 | 0.674 |
+| analcatdata_creditscore | **0.815** | 0.800 | n/a |
+| appendicitis | 0.868 | **0.872** | n/a |
+| backache | 0.789 | **0.792** | n/a |
+| coil2000 | **0.937** | 0.935 | n/a |
+| molecular_biology_promoters | 0.689 | **0.732** | n/a |
+| phoneme | **0.787** | 0.757 | **0.787** |
+| prnn_crabs | **1.000** | **1.000** | **1.000** |
 | balance_scale | 0.871 | 0.871 | **0.917** |
 | car_evaluation | **0.836** | 0.815 | n/a |
 | cars | 0.764 | 0.751 | **0.790** |
@@ -1052,18 +1339,35 @@ MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as 
 | wine_quality_red | **0.585** | **0.585** | n/a |
 | wine_recognition | 0.989 | **0.994** | 0.989 |
 | yeast | 0.585 | **0.586** | n/a |
+| analcatdata_authorship | 0.996 | **0.998** | n/a |
+| analcatdata_dmft | 0.225 | 0.225 | **0.225** |
+| analcatdata_germangss | 0.300 | 0.338 | **0.379** |
+| calendarDOW | **0.584** | 0.568 | n/a |
+| cloud | 0.329 | **0.333** | 0.269 |
+| collins | **1.000** | 0.882 | n/a |
+| flags | 0.421 | **0.455** | n/a |
+| letter | 0.849 | 0.698 | **0.868** |
+| movement_libras | **0.747** | 0.643 | n/a |
+| nursery | **0.817** | 0.769 | n/a |
+| optdigits | **0.960** | 0.952 | n/a |
+| page_blocks | **0.950** | 0.947 | 0.946 |
+| pendigits | **0.972** | 0.881 | n/a |
+| satimage | **0.871** | 0.835 | 0.856 |
+| schizo | **0.568** | **0.568** | 0.465 |
+| splice | **0.866** | 0.810 | n/a |
+| texture | **0.998** | 0.995 | n/a |
 
 </details>
 
 ### multiboost
 
-**MultiBoost (depth 3)** vs AdaBoost (depth 3). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**MultiBoost (depth 3)** vs AdaBoost (depth 3). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights about every sqrt(200) = 14 members.
 
-- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0029, mean +0.0053 (positive favours the candidate); better on 13, within margin on 21, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.230.
-- Average ranks over 43 datasets where every model ran: MultiBoost (depth 3) 1.43, AdaBoost (depth 3) 1.57. Nemenyi critical difference 0.30.
-- Total fit and score time relative to the candidate: AdaBoost (depth 3) 1x.
+- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0026, mean +0.0047 (positive favours the candidate); better on 20, within margin on 34, worse on 14 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.143. Severe (beyond 5 margins): 3 wins, 2 losses, p = 0.812.
+- Average ranks over 68 datasets where every model ran: MultiBoost (depth 3) 1.43, AdaBoost (depth 3) 1.57. Nemenyi critical difference 0.24.
+- Total fit and score time relative to the candidate: AdaBoost (depth 3) 0.97x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1082,7 +1386,6 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 | hepatitis | 0.813 | **0.829** |
 | hypothyroid | 0.982 | **0.982** |
 | ionosphere | **0.925** | 0.919 |
-| irish | **1.000** | **1.000** |
 | kr_vs_kp | 0.978 | **0.994** |
 | profb | 0.659 | **0.662** |
 | saheart | **0.686** | 0.642 |
@@ -1092,6 +1395,15 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 | spectf | **0.914** | 0.911 |
 | tic_tac_toe | 0.915 | **1.000** |
 | tokyo1 | **0.936** | 0.929 |
+| adult | **0.862** | **0.862** |
+| analcatdata_boxing2 | **0.742** | 0.716 |
+| analcatdata_creditscore | **0.980** | **0.980** |
+| appendicitis | **0.849** | **0.848** |
+| backache | **0.833** | 0.825 |
+| coil2000 | **0.940** | 0.933 |
+| molecular_biology_promoters | 0.896 | **0.906** |
+| phoneme | 0.860 | **0.865** |
+| prnn_crabs | **0.943** | 0.922 |
 | balance_scale | **0.874** | 0.862 |
 | car_evaluation | 0.948 | **0.962** |
 | cars | 0.954 | **0.980** |
@@ -1112,17 +1424,34 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 | wine_quality_red | **0.602** | 0.556 |
 | wine_recognition | **0.969** | 0.947 |
 | yeast | **0.588** | 0.505 |
+| analcatdata_authorship | 0.988 | **0.994** |
+| analcatdata_dmft | 0.216 | **0.219** |
+| analcatdata_germangss | **0.419** | 0.386 |
+| calendarDOW | 0.607 | **0.612** |
+| cloud | 0.718 | **0.746** |
+| collins | **0.980** | 0.977 |
+| flags | **0.511** | 0.469 |
+| letter | **0.698** | 0.682 |
+| movement_libras | 0.694 | **0.697** |
+| nursery | 0.937 | **0.948** |
+| optdigits | 0.945 | **0.959** |
+| page_blocks | **0.970** | 0.964 |
+| pendigits | 0.957 | **0.968** |
+| satimage | **0.870** | 0.855 |
+| schizo | **0.513** | 0.488 |
+| splice | **0.953** | 0.948 |
+| texture | 0.942 | **0.962** |
 
 </details>
 
 ### pspline-gam
 
-**P-spline GAM** vs LassoCV (references: MARS (additive)). Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**P-spline GAM** vs LassoCV (references: MARS (additive)). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter chosen by GCV; the strongest smoothing is linear regression.
 
-- vs LassoCV: **non-inferior**. Median difference +0.0190, mean -0.0401 (positive favours the candidate); better on 13, within margin on 6, worse on 6 of 25 datasets; non-inferiority p = 0.031, two-sided Wilcoxon p = 0.275.
-- Average ranks over 25 datasets where every model ran: MARS (additive) 1.84, P-spline GAM 1.96, LassoCV 2.20. Nemenyi critical difference 0.66, Friedman p = 0.432.
+- vs LassoCV: **non-inferior**. Median difference +0.0034, mean -0.0320 (positive favours the candidate); better on 14, within margin on 11, worse on 6 of 31 datasets; non-inferiority p = 0.007, two-sided Wilcoxon p = 0.247. Severe (beyond 5 margins): 11 wins, 4 losses, p = 0.982.
+- Average ranks over 31 datasets where every model ran: MARS (additive) 1.90, P-spline GAM 1.94, LassoCV 2.16. Nemenyi critical difference 0.60, Friedman p = 0.542.
 - Total fit and score time relative to the candidate: LassoCV 0.31x.
 
 <details><summary>Per-dataset scores</summary>
@@ -1154,19 +1483,25 @@ Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter 
 | 690_visualizing_galaxy | **0.961** | 0.894 | 0.958 |
 | 695_chatfield_4 | 0.761 | **0.858** | 0.781 |
 | solar_flare | **0.147** | 0.128 | 0.139 |
+| 519_vinnie | 0.740 | **0.743** | 0.734 |
+| 523_analcatdata_neavote | 0.927 | 0.927 | **0.928** |
+| 556_analcatdata_apnea2 | -0.034 | -0.028 | **0.218** |
+| 663_rabe_266 | **0.980** | 0.969 | 0.979 |
+| 678_visualizing_environmental | **0.344** | 0.341 | 0.248 |
+| 712_chscase_geyser1 | **0.764** | 0.759 | 0.756 |
 
 </details>
 
 ### rda
 
-**RDA (tuned)** vs LDA, QDA (references: LDA (Ledoit-Wolf)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**RDA (tuned)** vs LDA, QDA (references: LDA (Ledoit-Wolf)). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, gamma=0 is LDA and lambda=0, gamma=0 is QDA.
 
-- vs LDA: **superior**. Median difference +0.0055, mean +0.0244 (positive favours the candidate); better on 18, within margin on 20, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.001.
-- vs QDA: **non-inferior**. Median difference +0.0033, mean +0.0017 (positive favours the candidate); better on 6, within margin on 14, worse on 3 of 23 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.144.
-- Average ranks over 23 datasets where every model ran: RDA (tuned) 1.83, QDA 2.54, LDA 2.72, LDA (Ledoit-Wolf) 2.91. Nemenyi critical difference 0.98, Friedman p = 0.023.
-- Total fit and score time relative to the candidate: LDA 0.02x, QDA 0.011x.
+- vs LDA: **superior**. Median difference +0.0093, mean +0.0330 (positive favours the candidate); better on 33, within margin on 28, worse on 7 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 17 wins, 0 losses, p = 1.000.
+- vs QDA: **non-inferior**. Median difference +0.0028, mean +0.0061 (positive favours the candidate); better on 9, within margin on 21, worse on 3 of 33 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.070. Severe (beyond 5 margins): 1 wins, 1 losses, p = 0.750.
+- Average ranks over 33 datasets where every model ran: RDA (tuned) 1.89, QDA 2.50, LDA 2.67, LDA (Ledoit-Wolf) 2.94. Nemenyi critical difference 0.82, Friedman p = 0.007.
+- Total fit and score time relative to the candidate: LDA 0.018x, QDA 0.012x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1185,7 +1520,6 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 | hepatitis | 0.823 | 0.839 | n/a | **0.858** |
 | hypothyroid | **0.952** | 0.943 | n/a | 0.946 |
 | ionosphere | **0.929** | 0.856 | n/a | 0.870 |
-| irish | **0.872** | 0.754 | 0.864 | 0.759 |
 | kr_vs_kp | **0.943** | 0.942 | n/a | 0.926 |
 | profb | **0.679** | 0.677 | 0.652 | 0.669 |
 | saheart | **0.727** | 0.726 | 0.711 | **0.727** |
@@ -1195,6 +1529,15 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 | spectf | **0.933** | 0.758 | **0.933** | 0.785 |
 | tic_tac_toe | 0.767 | 0.675 | **0.770** | 0.675 |
 | tokyo1 | 0.911 | **0.926** | n/a | 0.918 |
+| adult | 0.816 | **0.820** | 0.801 | **0.820** |
+| analcatdata_boxing2 | **0.677** | 0.643 | 0.674 | 0.650 |
+| analcatdata_creditscore | **0.990** | 0.800 | n/a | 0.790 |
+| appendicitis | **0.882** | 0.872 | n/a | **0.882** |
+| backache | **0.861** | 0.792 | n/a | 0.783 |
+| coil2000 | **0.939** | 0.935 | n/a | 0.935 |
+| molecular_biology_promoters | 0.803 | 0.732 | n/a | **0.826** |
+| phoneme | 0.784 | 0.757 | **0.787** | 0.758 |
+| prnn_crabs | **1.000** | **1.000** | **1.000** | 0.995 |
 | balance_scale | 0.880 | 0.871 | **0.917** | 0.871 |
 | car_evaluation | **0.902** | 0.815 | n/a | 0.814 |
 | cars | 0.787 | 0.751 | **0.790** | 0.755 |
@@ -1215,16 +1558,33 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 | wine_quality_red | 0.587 | 0.585 | n/a | **0.590** |
 | wine_recognition | 0.991 | **0.994** | 0.989 | 0.983 |
 | yeast | 0.585 | **0.586** | n/a | 0.580 |
+| analcatdata_authorship | 0.997 | **0.998** | n/a | **0.998** |
+| analcatdata_dmft | 0.221 | 0.225 | 0.225 | **0.227** |
+| analcatdata_germangss | 0.378 | 0.338 | **0.379** | 0.330 |
+| calendarDOW | 0.554 | **0.568** | n/a | 0.544 |
+| cloud | 0.310 | **0.333** | 0.269 | 0.300 |
+| collins | **1.000** | 0.882 | n/a | 0.943 |
+| flags | **0.494** | 0.455 | n/a | 0.455 |
+| letter | 0.868 | 0.698 | **0.868** | 0.697 |
+| movement_libras | **0.875** | 0.643 | n/a | 0.722 |
+| nursery | **0.861** | 0.769 | n/a | 0.771 |
+| optdigits | **0.989** | 0.952 | n/a | 0.953 |
+| page_blocks | **0.947** | **0.947** | 0.946 | 0.945 |
+| pendigits | **0.981** | 0.881 | n/a | 0.879 |
+| satimage | **0.861** | 0.835 | 0.856 | 0.836 |
+| schizo | **0.581** | 0.568 | 0.465 | 0.575 |
+| splice | **0.898** | 0.810 | n/a | 0.811 |
+| texture | **0.998** | 0.995 | n/a | 0.993 |
 
 </details>
 
 ### relaxed-lasso
 
-**Relaxed LassoCV** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Relaxed LassoCV** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0000, mean -0.0006 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.560.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.36, Relaxed LassoCV 1.64. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: LassoCV 0.017x.
+- vs LassoCV: **non-inferior**. Median difference -0.0000, mean -0.0006 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.480. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: LassoCV 1.35, Relaxed LassoCV 1.65. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: LassoCV 0.019x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1255,18 +1615,24 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | **0.861** | 0.858 |
 | solar_flare | **0.130** | 0.128 |
+| 519_vinnie | **0.742** | **0.743** |
+| 523_analcatdata_neavote | **0.928** | 0.927 |
+| 556_analcatdata_apnea2 | -0.033 | **-0.028** |
+| 663_rabe_266 | **0.969** | **0.969** |
+| 678_visualizing_environmental | **0.344** | 0.341 |
+| 712_chscase_geyser1 | 0.757 | **0.759** |
 
 </details>
 
 ### rotation-forest
 
-**Rotation Forest** vs Random forest. Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**Rotation Forest** vs Random forest. Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 
-- vs Random forest: **non-inferior**. Median difference +0.0001, mean +0.0032 (positive favours the candidate); better on 11, within margin on 28, worse on 4 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.254.
-- Average ranks over 43 datasets where every model ran: Rotation Forest 1.47, Random forest 1.53. Nemenyi critical difference 0.30.
-- Total fit and score time relative to the candidate: Random forest 0.15x.
+- vs Random forest: **non-inferior**. Median difference +0.0000, mean +0.0011 (positive favours the candidate); better on 16, within margin on 42, worse on 10 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.612. Severe (beyond 5 margins): 3 wins, 1 losses, p = 0.938.
+- Average ranks over 68 datasets where every model ran: Rotation Forest 1.49, Random forest 1.51. Nemenyi critical difference 0.24.
+- Total fit and score time relative to the candidate: Random forest 0.1x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1285,7 +1651,6 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 | hepatitis | 0.826 | **0.835** |
 | hypothyroid | **0.981** | **0.981** |
 | ionosphere | **0.949** | 0.936 |
-| irish | **1.000** | 0.999 |
 | kr_vs_kp | **0.995** | 0.990 |
 | profb | 0.673 | **0.686** |
 | saheart | **0.692** | 0.680 |
@@ -1295,6 +1660,15 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 | spectf | 0.910 | **0.918** |
 | tic_tac_toe | 0.946 | **0.951** |
 | tokyo1 | 0.932 | **0.935** |
+| adult | 0.861 | **0.866** |
+| analcatdata_boxing2 | 0.644 | **0.682** |
+| analcatdata_creditscore | **0.990** | **0.990** |
+| appendicitis | 0.858 | **0.881** |
+| backache | 0.847 | **0.858** |
+| coil2000 | 0.924 | **0.930** |
+| molecular_biology_promoters | **0.886** | 0.882 |
+| phoneme | **0.908** | 0.905 |
+| prnn_crabs | **1.000** | 0.945 |
 | balance_scale | **0.890** | 0.834 |
 | car_evaluation | **0.991** | 0.979 |
 | cars | 0.902 | **0.911** |
@@ -1315,16 +1689,33 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 | wine_quality_red | 0.691 | **0.692** |
 | wine_recognition | **0.986** | 0.980 |
 | yeast | 0.602 | **0.607** |
+| analcatdata_authorship | 0.991 | **0.992** |
+| analcatdata_dmft | 0.190 | **0.198** |
+| analcatdata_germangss | **0.282** | 0.274 |
+| calendarDOW | 0.623 | **0.633** |
+| cloud | 0.370 | **0.459** |
+| collins | 0.942 | **0.990** |
+| flags | 0.463 | **0.486** |
+| letter | **0.929** | 0.914 |
+| movement_libras | **0.899** | 0.822 |
+| nursery | **0.982** | 0.963 |
+| optdigits | **0.985** | 0.982 |
+| page_blocks | **0.973** | **0.973** |
+| pendigits | **0.992** | 0.989 |
+| satimage | **0.918** | 0.914 |
+| schizo | **0.575** | 0.574 |
+| splice | 0.951 | **0.957** |
+| texture | **0.994** | 0.976 |
 
 </details>
 
 ### rshash
 
-**RS-Hash** vs Isolation Forest (references: LOF). Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
+**RS-Hash** vs Isolation Forest (references: LOF). Suite `adbench-classical` (46 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
 
-- vs Isolation Forest: **non-inferior**. Median difference +0.0012, mean -0.0018 (positive favours the candidate); better on 12, within margin on 15, worse on 10 of 37 datasets; non-inferiority p = 0.019, two-sided Wilcoxon p = 0.754.
-- Average ranks over 37 datasets where every model ran: RS-Hash 1.78, Isolation Forest 1.92, LOF 2.30. Nemenyi critical difference 0.54, Friedman p = 0.073.
-- Total fit and score time relative to the candidate: Isolation Forest 0.96x.
+- vs Isolation Forest: **non-inferior**. Median difference +0.0062, mean +0.0062 (positive favours the candidate); better on 18, within margin on 18, worse on 10 of 46 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.133. Severe (beyond 5 margins): 5 wins, 3 losses, p = 0.855.
+- Average ranks over 46 datasets where every model ran: RS-Hash 1.70, Isolation Forest 1.96, LOF 2.35. Nemenyi critical difference 0.49, Friedman p = 0.007.
+- Total fit and score time relative to the candidate: Isolation Forest 0.98x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1367,18 +1758,27 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 | 45_wine | 0.808 | 0.773 | **0.906** |
 | 46_WPBC | 0.517 | 0.499 | **0.530** |
 | 47_yeast | 0.387 | 0.396 | **0.451** |
+| 3_backdoor | **0.824** | 0.756 | 0.735 |
+| 5_campaign | **0.764** | 0.716 | 0.658 |
+| 8_celeba | **0.750** | 0.666 | 0.482 |
+| 9_census | **0.646** | 0.582 | 0.540 |
+| 10_cover | 0.876 | 0.868 | **0.984** |
+| 11_donors | **0.784** | 0.771 | 0.649 |
+| 13_fraud | 0.979 | 0.972 | **0.989** |
+| 16_http | 0.995 | **1.000** | 0.994 |
+| 33_skin | **0.732** | 0.667 | 0.397 |
 
 </details>
 
 ### scad
 
-**SCAD (CV)** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**SCAD (CV)** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0007 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.096.
-- Average ranks over 25 datasets where every model ran: LassoCV 1.32, SCAD (CV) 1.68. Nemenyi critical difference 0.39.
-- Total fit and score time relative to the candidate: LassoCV 0.063x.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0006 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.146. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 31 datasets where every model ran: LassoCV 1.35, SCAD (CV) 1.65. Nemenyi critical difference 0.35.
+- Total fit and score time relative to the candidate: LassoCV 0.072x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1409,18 +1809,24 @@ gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 | 690_visualizing_galaxy | **0.894** | **0.894** |
 | 695_chatfield_4 | 0.856 | **0.858** |
 | solar_flare | **0.128** | **0.128** |
+| 519_vinnie | **0.743** | **0.743** |
+| 523_analcatdata_neavote | **0.928** | 0.927 |
+| 556_analcatdata_apnea2 | -0.033 | **-0.028** |
+| 663_rabe_266 | **0.969** | **0.969** |
+| 678_visualizing_environmental | **0.345** | 0.341 |
+| 712_chscase_geyser1 | 0.756 | **0.759** |
 
 </details>
 
 ### tan
 
-**TAN (5 bins)** vs Naive Bayes (5 bins) (references: AODE (5 bins)). Suite `pmlb-classification` (43 real-world PMLB classification datasets (23 binary, 20 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
+**TAN (5 bins)** vs Naive Bayes (5 bins) (references: AODE (5 bins)). Suite `pmlb-classification` (68 real-world PMLB classification datasets (31 binary, 37 multiclass)), 2x repeated 5-fold CV. Metric: accuracy, higher is better; margin 0.01.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0123, mean +0.0234 (positive favours the candidate); better on 22, within margin on 12, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.005.
-- Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.67, TAN (5 bins) 1.88, Naive Bayes (5 bins) 2.44. Nemenyi critical difference 0.51, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.49x.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0130, mean +0.0297 (positive favours the candidate); better on 36, within margin on 19, worse on 13 of 68 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 19 wins, 1 losses, p = 1.000.
+- Average ranks over 68 datasets where every model ran: AODE (5 bins) 1.59, TAN (5 bins) 1.91, Naive Bayes (5 bins) 2.50. Nemenyi critical difference 0.40, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.39x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1439,7 +1845,6 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | hepatitis | 0.823 | **0.842** | **0.842** |
 | hypothyroid | 0.963 | 0.962 | **0.964** |
 | ionosphere | **0.919** | 0.873 | 0.910 |
-| irish | **0.908** | 0.882 | 0.906 |
 | kr_vs_kp | **0.543** | **0.543** | **0.543** |
 | profb | 0.621 | 0.656 | **0.663** |
 | saheart | 0.660 | **0.675** | 0.662 |
@@ -1449,6 +1854,15 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | spectf | **0.905** | 0.775 | 0.881 |
 | tic_tac_toe | **0.653** | **0.653** | **0.653** |
 | tokyo1 | 0.912 | 0.890 | **0.926** |
+| adult | **0.825** | 0.799 | 0.815 |
+| analcatdata_boxing2 | 0.666 | 0.685 | **0.689** |
+| analcatdata_creditscore | 0.765 | 0.780 | **0.790** |
+| appendicitis | **0.877** | 0.853 | 0.872 |
+| backache | 0.858 | **0.861** | 0.856 |
+| coil2000 | **0.928** | 0.814 | 0.905 |
+| molecular_biology_promoters | 0.764 | **0.811** | 0.797 |
+| phoneme | 0.807 | 0.767 | **0.821** |
+| prnn_crabs | 0.807 | 0.623 | **0.820** |
 | balance_scale | 0.838 | **0.867** | 0.857 |
 | car_evaluation | **0.863** | 0.828 | 0.859 |
 | cars | **0.806** | 0.708 | 0.791 |
@@ -1469,6 +1883,23 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 | wine_quality_red | 0.596 | 0.570 | **0.611** |
 | wine_recognition | 0.963 | 0.978 | **0.983** |
 | yeast | 0.556 | 0.578 | **0.579** |
+| analcatdata_authorship | 0.995 | 0.993 | **0.998** |
+| analcatdata_dmft | 0.190 | **0.198** | 0.196 |
+| analcatdata_germangss | **0.349** | 0.340 | 0.325 |
+| calendarDOW | **0.581** | 0.497 | 0.569 |
+| cloud | 0.297 | 0.287 | **0.310** |
+| collins | 0.671 | 0.748 | **0.758** |
+| flags | **0.415** | 0.340 | 0.374 |
+| letter | 0.739 | 0.649 | **0.753** |
+| movement_libras | 0.669 | 0.592 | **0.778** |
+| nursery | **0.806** | 0.799 | 0.801 |
+| optdigits | 0.955 | 0.912 | **0.965** |
+| page_blocks | 0.947 | 0.851 | **0.954** |
+| pendigits | 0.939 | 0.856 | **0.966** |
+| satimage | 0.866 | 0.802 | **0.875** |
+| schizo | 0.557 | 0.544 | **0.572** |
+| splice | 0.884 | 0.884 | **0.894** |
+| texture | 0.923 | 0.756 | **0.924** |
 
 </details>
 
