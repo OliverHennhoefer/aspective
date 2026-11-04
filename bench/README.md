@@ -159,6 +159,22 @@ which passes; at 100 training rows they were not shown better than maximum
 likelihood, which the docstring states. The code is in the git history
 (commit `aa38a9b` and earlier for the first wave, commit `2aa9e33` for the second, commit `b2bf66c` for the third) if a better configuration turns up.
 
+### Re-test on the larger suites
+
+The smaller suites missed a truly equivalent model a third of the time or
+more, so the seven that had come out inconclusive were re-tested once on
+the larger suites: restored from git history exactly as last tested, with
+no retuning, and the result declared final in advance. All seven fail
+again. `DARTClassifier` and `RandomRotationClassifier` are now inferior;
+`DARTRegressor`, `SCiForestDetector`, `RobustKDEDetector`, `IDKDetector`
+and `LoOPDetector` stay inconclusive. The six that were clearly inferior
+were not re-tested.
+
+Every model ever considered, including those dropped before benchmarking
+and those left out, is listed with its paper and outcome in
+[`docs/models.md`](../docs/models.md), generated from
+[`catalog.py`](src/aspective_bench/catalog.py).
+
 ## Commands
 
 ```bash

@@ -43,3 +43,16 @@ def test_every_estimator_has_a_benchmark(cls):
 def test_benchmark_passes_gate(bench):
     problems = runner.check([bench])
     assert not problems, problems[0]
+
+
+def test_catalog_lists_every_benchmark_and_is_rendered():
+    from pathlib import Path
+
+    from aspective_bench import report
+    from aspective_bench.catalog import ENTRIES
+
+    included = {e.benchmark for e in ENTRIES if e.status == "included"}
+    assert included == {b.name for b in BENCHMARKS}, "update bench/src/aspective_bench/catalog.py"
+    page = Path(runner.BENCH_DIR).parent / "docs" / "models.md"
+    expected = report.render_catalog(list(runner.load_results().values()))
+    assert page.read_text() == expected, "docs/models.md is stale; run `uv run aspective-bench report`"

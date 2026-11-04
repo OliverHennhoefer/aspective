@@ -44,9 +44,9 @@ because "not shown to be worse" is not evidence of being competitive.
 The gate is not a formality. Published methods that were implemented,
 benchmarked at the settings their paper recommends and then failed are
 removed, among them the square-root lasso, supervised principal components,
-INFLO and LDOF. The
-[benchmark README](https://github.com/OliverHennhoefer/aspective/blob/main/bench/README.md#models-removed-by-the-gate)
-lists each one with its result.
+INFLO and LDOF. [All models](models.md) lists every model aspective has
+considered, with its paper and what became of it: included, removed by the
+gate, dropped before benchmarking, not built yet, or left out.
 
 ## Running it yourself
 

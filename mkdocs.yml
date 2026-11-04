@@ -48,6 +48,7 @@ nav:
   - Quickstart: quickstart.md
   - Choosing an estimator: user_guide/choosing.md
   - Benchmarks: benchmarks.md
+  - All models: models.md
   - API reference:
       - api/index.md
       - Discriminant analysis: api/discriminant_analysis.md
