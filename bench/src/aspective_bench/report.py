@@ -153,7 +153,7 @@ def operating_characteristics(results, n_sim=1000):
     return "\n".join(lines + [""])
 
 
-def leaderboards(results):
+def leaderboards(results, standards=()):
     """One table per suite and protocol with every model run on it, side by side.
 
     Benchmarks on the same suite share their datasets and splits, so their
@@ -161,15 +161,16 @@ def leaderboards(results):
     several benchmarks under the same label and configuration is listed once.
     """
     groups = {}
-    for r in results:
+    for r in [*results, *standards]:
         key = (r["suite"], r["metric"], tuple(sorted(r["protocol"].items())))
         groups.setdefault(key, []).append(r)
     out = [
         "## Leaderboards",
         "",
         "Every model run on a suite, ranked together over the datasets where all of",
-        "them ran: the candidates, the vanilla predecessors they must keep up with and",
-        "the references shown for context. Lower average rank is better. These tables are for",
+        "them ran: the candidates, the vanilla predecessors they must keep up with,",
+        "the references shown for context, and standard methods with default",
+        "settings (`uv run aspective-bench standards`). Lower average rank is better. These tables are for",
         "orientation; the gate only compares each candidate with its own",
         "predecessors, configured like the candidate's building blocks.",
         "",
@@ -182,9 +183,12 @@ def leaderboards(results):
                 name = label if all(k[0] != label or k == ident for k in models) else f"{label} ({r['name']})"
                 if ident not in models:
                     models[ident] = (name, [r["scores"][label][d] for d in r["datasets"]])
-                role = "candidate" if label == r["candidate"] else \
-                    "predecessor" if label in r["predecessors"] else "reference"
-                order = ("candidate", "predecessor", "reference")
+                if r["name"].startswith("standards-"):
+                    role = "standard"
+                else:
+                    role = "candidate" if label == r["candidate"] else \
+                        "predecessor" if label in r["predecessors"] else "reference"
+                order = ("candidate", "predecessor", "reference", "standard")
                 roles[ident] = min(role, roles.get(ident, role), key=order.index)
         if len(models) < 3:
             continue
@@ -212,10 +216,10 @@ def leaderboards(results):
     return "\n".join(out)
 
 
-def render(results):
+def render(results, standards=()):
     results = sorted(results, key=lambda r: r["name"])
     parts = [HEADER, "## Summary", "", summary_table(results), "",
-             leaderboards(results), operating_characteristics(results), "## Details", ""]
+             leaderboards(results, standards), operating_characteristics(results), "## Details", ""]
     parts += [section(r) for r in results]
     env = results[0]["environment"] if results else {}
     if env:

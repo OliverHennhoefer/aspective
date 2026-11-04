@@ -75,6 +75,14 @@ Verdicts are never read from the committed files: `check`, the tests and the
 report recompute them from the committed per-dataset scores, so a change to
 the statistics applies to every result without rerunning a model.
 
+**Leaderboards.** `RESULTS.md` also ranks every model run on a suite
+together: the candidates, their predecessors and references, and a fixed
+set of standard methods with default settings (linear and ridge models,
+CART, k-NN, SVMs, random forest, extra trees, gradient boosting and
+histogram gradient boosting; Isolation Forest, LOF, one-class SVM, elliptic
+envelope and KDE for anomaly detection). The standards are defined in
+`specs.py`, saved under `results/standards/` and never affect the gate.
+
 **How reliable the gate is.** `RESULTS.md` has a table of the gate's pass
 rate for a candidate whose true typical difference is known, simulated per
 suite from the committed comparisons (their per-dataset differences,
@@ -188,6 +196,7 @@ uv run aspective-bench list            # benchmarks and suites
 uv run aspective-bench fetch           # download all datasets
 uv run aspective-bench run [names]     # run (all by default), save, report
 uv run aspective-bench run name --quick
+uv run aspective-bench standards [suites]  # run the standard methods for the leaderboards
 uv run aspective-bench report          # rebuild RESULTS.md
 uv run aspective-bench check           # exit 1 unless the gate passes
 ```

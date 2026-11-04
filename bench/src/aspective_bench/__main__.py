@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from . import datasets, report, runner
-from .specs import BENCHMARKS, BY_NAME
+from .specs import BENCHMARKS, BY_NAME, STANDARDS
 from .suites import SUITES
 
 
@@ -26,6 +26,9 @@ def main(argv=None):
     p.add_argument("-j", "--n-jobs", type=int, default=-1)
     p.add_argument("--quick", action="store_true",
                    help="4 datasets, 3 folds, print only: checks that a new spec works")
+    p = sub.add_parser("standards", help="run the standard methods shown in the leaderboards")
+    p.add_argument("suites", nargs="*", help="suites to run them on (default: all)")
+    p.add_argument("-j", "--n-jobs", type=int, default=-1)
     sub.add_parser("report", help="write bench/RESULTS.md from the saved results")
     sub.add_parser("check", help="exit 1 unless every benchmark is fresh and passes the gate")
     args = parser.parse_args(argv)
@@ -50,10 +53,15 @@ def main(argv=None):
                 print(f"saved {runner.save(s)}")
         if not args.quick:
             main(["report"])
+    elif args.command == "standards":
+        chosen = [b for b in STANDARDS if not args.suites or b.suite in args.suites]
+        for s in runner.run(chosen, n_jobs=args.n_jobs):
+            print(f"saved {runner.save(s, standards=True)}")
+        main(["report"])
     elif args.command == "report":
         path = runner.BENCH_DIR / "RESULTS.md"
         results = list(runner.load_results().values())
-        path.write_text(report.render(results))
+        path.write_text(report.render(results, runner.load_standards()))
         print(f"wrote {path}")
         docs = runner.BENCH_DIR.parent / "docs" / "models.md"
         docs.write_text(report.render_catalog(results))

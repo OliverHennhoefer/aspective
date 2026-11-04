@@ -15,20 +15,28 @@ number of trees, same discretization, same bandwidth rule), so a comparison
 measures the paper's idea and not a tuning difference.
 """
 
+from sklearn.compose import TransformedTargetRegressor
+from sklearn.covariance import EllipticEnvelope
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.ensemble import (
     AdaBoostClassifier,
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
     GradientBoostingClassifier,
+    GradientBoostingRegressor,
+    HistGradientBoostingClassifier,
+    HistGradientBoostingRegressor,
     IsolationForest,
     RandomForestClassifier,
     RandomForestRegressor,
 )
-from sklearn.linear_model import LassoCV, LogisticRegression
+from sklearn.linear_model import LassoCV, LinearRegression, LogisticRegression, RidgeCV
 from sklearn.model_selection import GridSearchCV
 from sklearn.naive_bayes import CategoricalNB, GaussianNB
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, LocalOutlierFactor
+from sklearn.neighbors import KernelDensity, KNeighborsClassifier, KNeighborsRegressor, LocalOutlierFactor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
+from sklearn.svm import SVC, SVR, OneClassSVM
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 from aspective.anomaly import ExtendedIsolationForestDetector, LeSiNNDetector, RSHashDetector
@@ -388,3 +396,65 @@ COVERED_BY = {
     "AdaptiveLasso": "adaptive-lasso: AdaptiveLassoCV is AdaptiveLasso with (alpha, gamma) chosen by CV",
     "NonconvexPenaltyRegression": "mcp, scad: NonconvexPenaltyRegressionCV is it with alpha chosen by CV",
 }
+
+
+# Standard methods, for the leaderboards only. They are what a practitioner
+# would reach for first, with scikit-learn's defaults (200 trees for the
+# forests, like the benchmarks above); none of them affects the gate. Labels
+# and settings shared with a benchmark's baseline are reused, so those
+# scores come from the cache and the model appears once in a leaderboard.
+def svr():
+    return TransformedTargetRegressor(scaled(SVR()), transformer=StandardScaler())
+
+
+def standards(suite, metric, models):
+    (first, *rest) = models.items()
+    return Benchmark(name=f"standards-{suite}", candidate=first, predecessors={}, references=dict(rest),
+                     suite=suite, metric=metric,
+                     notes="Standard methods with default settings, shown in the leaderboards only.")
+
+
+STANDARDS = [
+    standards("pmlb-ctr23-regression", "r2", {
+        "Linear regression": lambda: scaled(LinearRegression()),
+        "RidgeCV": lambda: scaled(RidgeCV()),
+        "CART": lambda: DecisionTreeRegressor(random_state=0),
+        "k-NN (k=5)": lambda: scaled(KNeighborsRegressor()),
+        "SVR (RBF)": svr,
+        "Random forest": lambda: RandomForestRegressor(n_estimators=N_TREES, random_state=0),
+        "Extra trees": lambda: ExtraTreesRegressor(n_estimators=N_TREES, random_state=0),
+        "Gradient boosting": lambda: GradientBoostingRegressor(random_state=0),
+        "Histogram gradient boosting": lambda: HistGradientBoostingRegressor(random_state=0),
+    }),
+    standards("pmlb-classification", "accuracy", {
+        "Ridge logistic (C=1)": lambda: scaled(LogisticRegression(max_iter=10_000)),
+        "LDA": LinearDiscriminantAnalysis,
+        "Gaussian NB": GaussianNB,
+        "CART": lambda: DecisionTreeClassifier(random_state=0),
+        "k-NN (k=5)": lambda: scaled(KNeighborsClassifier(n_neighbors=5)),
+        "SVM (RBF)": lambda: scaled(SVC()),
+        "Random forest": lambda: RandomForestClassifier(n_estimators=N_TREES, random_state=0),
+        "Extra trees": lambda: ExtraTreesClassifier(n_estimators=N_TREES, random_state=0),
+        "Gradient boosting (depth 3)": lambda: GradientBoostingClassifier(
+            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0),
+        "Histogram gradient boosting": lambda: HistGradientBoostingClassifier(random_state=0),
+    }),
+    standards("pmlb-binary", "brier", {
+        "Ridge logistic (C=1)": lambda: scaled(LogisticRegression(max_iter=10_000)),
+        "Gaussian NB": GaussianNB,
+        "CART": lambda: DecisionTreeClassifier(random_state=0),
+        "k-NN (k=5)": lambda: scaled(KNeighborsClassifier(n_neighbors=5)),
+        "Random forest": lambda: RandomForestClassifier(n_estimators=N_TREES, random_state=0),
+        "Extra trees": lambda: ExtraTreesClassifier(n_estimators=N_TREES, random_state=0),
+        "Gradient boosting (depth 3)": lambda: GradientBoostingClassifier(
+            n_estimators=N_ROUNDS, max_depth=DEPTH, random_state=0),
+        "Histogram gradient boosting": lambda: HistGradientBoostingClassifier(random_state=0),
+    }),
+    standards("adbench-classical", "roc_auc", {
+        "Isolation Forest": ISOLATION_FOREST[1],
+        "LOF": LOF[1],
+        "One-class SVM": lambda: scaled(OneClassSVM()),
+        "Elliptic envelope": lambda: scaled(EllipticEnvelope(random_state=0)),
+        "KDE (Scott)": lambda: scaled(KernelDensity(bandwidth="scott")),
+    }),
+]
