@@ -23,3 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `aspective.__version__`.
 - Contributor guide, citation file, security policy, and issue and pull
   request templates.
+- The regression benchmarks now run on 52 datasets: the 31 from PMLB plus
+  the 21 OpenML-CTR23 datasets that meet the suite rule. `RESULTS.md` has
+  per-suite leaderboards that rank every model, including standard methods
+  with default settings (`uv run aspective-bench standards`).
