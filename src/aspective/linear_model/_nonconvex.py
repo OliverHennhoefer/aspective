@@ -133,8 +133,11 @@ _REFS = """
 
 
 class NonconvexPenaltyRegression(_NonconvexMixin, RegressorMixin, BaseEstimator):
-    __doc__ = """Least squares with the MCP or SCAD penalty at a fixed strength.
-""" + _DOC + """
+    __doc__ = (
+        """Least squares with the MCP or SCAD penalty at a fixed strength.
+"""
+        + _DOC
+        + """
     Parameters
     ----------
     alpha : float, default=0.1
@@ -152,7 +155,9 @@ class NonconvexPenaltyRegression(_NonconvexMixin, RegressorMixin, BaseEstimator)
     support_ : ndarray of int
     n_iter_ : int
         Coordinate-descent sweeps at the final penalty.
-""" + _REFS
+"""
+        + _REFS
+    )
 
     _parameter_constraints = {
         "alpha": [Interval(Real, 0, None, closed="left")],
@@ -176,18 +181,25 @@ class NonconvexPenaltyRegression(_NonconvexMixin, RegressorMixin, BaseEstimator)
         # Approach the requested penalty along a short path, for a better local optimum.
         Z, yc, *_ = _standardize(X, y)
         alpha_max = np.abs(Z.T @ yc).max() / len(Z)
-        alphas = np.geomspace(max(alpha_max, self.alpha), max(self.alpha, 1e-12), 10) \
-            if alpha_max > self.alpha > 0 else np.array([self.alpha])
-        coefs, intercepts, self.n_iter_ = _fit_path(X, y, alphas, self.penalty, gamma,
-                                                    self.max_iter, self.tol)
+        alphas = (
+            np.geomspace(max(alpha_max, self.alpha), max(self.alpha, 1e-12), 10)
+            if alpha_max > self.alpha > 0
+            else np.array([self.alpha])
+        )
+        coefs, intercepts, self.n_iter_ = _fit_path(
+            X, y, alphas, self.penalty, gamma, self.max_iter, self.tol
+        )
         self.coef_, self.intercept_ = coefs[-1], float(intercepts[-1])
         self.support_ = np.flatnonzero(self.coef_)
         return self
 
 
 class NonconvexPenaltyRegressionCV(_NonconvexMixin, RegressorMixin, BaseEstimator):
-    __doc__ = """MCP or SCAD penalized least squares with the penalty chosen by CV.
-""" + _DOC + """
+    __doc__ = (
+        """MCP or SCAD penalized least squares with the penalty chosen by CV.
+"""
+        + _DOC
+        + """
     The penalty is chosen from a path of ``n_alphas`` values, log-spaced
     from the smallest that sets every coefficient to zero down to
     ``eps`` times it (``eps`` defaults to 0.001, or 0.05 when there are
@@ -215,7 +227,9 @@ class NonconvexPenaltyRegressionCV(_NonconvexMixin, RegressorMixin, BaseEstimato
     support_ : ndarray of int
     n_iter_ : int
         Coordinate-descent sweeps at the final penalty.
-""" + _REFS
+"""
+        + _REFS
+    )
 
     _parameter_constraints = {
         "penalty": [StrOptions({"mcp", "scad"})],
@@ -227,8 +241,9 @@ class NonconvexPenaltyRegressionCV(_NonconvexMixin, RegressorMixin, BaseEstimato
         "tol": [Interval(Real, 0, None, closed="neither")],
     }
 
-    def __init__(self, penalty="mcp", gamma=None, n_alphas=50, eps=None, cv=5, max_iter=1000,
-                 tol=1e-6):
+    def __init__(
+        self, penalty="mcp", gamma=None, n_alphas=50, eps=None, cv=5, max_iter=1000, tol=1e-6
+    ):
         self.penalty = penalty
         self.gamma = gamma
         self.n_alphas = n_alphas
@@ -249,15 +264,17 @@ class NonconvexPenaltyRegressionCV(_NonconvexMixin, RegressorMixin, BaseEstimato
         folds = list(check_cv(self.cv).split(X, y))
         mse = np.empty((self.n_alphas, len(folds)))
         for f, (train, test) in enumerate(folds):
-            coefs, intercepts, _ = _fit_path(X[train], y[train], self.alphas_, self.penalty, gamma,
-                                          self.max_iter, self.tol)
+            coefs, intercepts, _ = _fit_path(
+                X[train], y[train], self.alphas_, self.penalty, gamma, self.max_iter, self.tol
+            )
             pred = X[test] @ coefs.T + intercepts
             mse[:, f] = np.mean((pred - y[test, None]) ** 2, axis=0)
         self.mse_path_ = mse
         best = int(np.argmin(mse.mean(axis=1)))
         self.alpha_ = float(self.alphas_[best])
-        coefs, intercepts, self.n_iter_ = _fit_path(X, y, self.alphas_[: best + 1], self.penalty, gamma,
-                                      self.max_iter, self.tol)
+        coefs, intercepts, self.n_iter_ = _fit_path(
+            X, y, self.alphas_[: best + 1], self.penalty, gamma, self.max_iter, self.tol
+        )
         self.coef_, self.intercept_ = coefs[-1], float(intercepts[-1])
         self.support_ = np.flatnonzero(self.coef_)
         return self

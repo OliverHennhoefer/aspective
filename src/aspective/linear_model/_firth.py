@@ -170,8 +170,13 @@ class FirthLogisticRegression(ClassifierMixin, BaseEstimator):
     }
 
     def __init__(
-        self, correction="none", fit_intercept=True, max_iter=100, tol=1e-8,
-        max_step=5.0, max_halfstep=25,
+        self,
+        correction="none",
+        fit_intercept=True,
+        max_iter=100,
+        tol=1e-8,
+        max_step=5.0,
+        max_halfstep=25,
     ):
         self.correction = correction
         self.fit_intercept = fit_intercept

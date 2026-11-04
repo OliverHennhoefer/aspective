@@ -60,15 +60,24 @@ class LocalLinearForestRegressor(RegressorMixin, BaseEstimator):
     _parameter_constraints = {
         "n_estimators": [Interval(Integral, 1, None, closed="left")],
         "min_samples_leaf": [Interval(Integral, 1, None, closed="left")],
-        "max_features": [Interval(Integral, 1, None, closed="left"),
-                         Interval(Real, 0, 1, closed="right"),
-                         StrOptions({"sqrt", "log2"}), None],
+        "max_features": [
+            Interval(Integral, 1, None, closed="left"),
+            Interval(Real, 0, 1, closed="right"),
+            StrOptions({"sqrt", "log2"}),
+            None,
+        ],
         "ll_lambda": [Interval(Real, 0, None, closed="left")],
         "random_state": ["random_state"],
     }
 
-    def __init__(self, n_estimators=200, min_samples_leaf=5, max_features=1.0, ll_lambda=0.1,
-                 random_state=None):
+    def __init__(
+        self,
+        n_estimators=200,
+        min_samples_leaf=5,
+        max_features=1.0,
+        ll_lambda=0.1,
+        random_state=None,
+    ):
         self.n_estimators = n_estimators
         self.min_samples_leaf = min_samples_leaf
         self.max_features = max_features
@@ -79,8 +88,10 @@ class LocalLinearForestRegressor(RegressorMixin, BaseEstimator):
         self._validate_params()
         X, y = validate_data(self, X, y, y_numeric=True, dtype=np.float64)
         self.forest_ = RandomForestRegressor(
-            n_estimators=self.n_estimators, min_samples_leaf=self.min_samples_leaf,
-            max_features=self.max_features, random_state=self.random_state,
+            n_estimators=self.n_estimators,
+            min_samples_leaf=self.min_samples_leaf,
+            max_features=self.max_features,
+            random_state=self.random_state,
         ).fit(X, y)
         self._mean = X.mean(axis=0)
         sd = X.std(axis=0)
@@ -93,8 +104,9 @@ class LocalLinearForestRegressor(RegressorMixin, BaseEstimator):
         self._members = []
         for b in range(leaves.shape[1]):
             ids, inverse, counts = np.unique(leaves[:, b], return_inverse=True, return_counts=True)
-            member = sparse.csr_matrix((1.0 / counts[inverse], (inverse, np.arange(n))),
-                                       shape=(len(ids), n))
+            member = sparse.csr_matrix(
+                (1.0 / counts[inverse], (inverse, np.arange(n))), shape=(len(ids), n)
+            )
             self._members.append((ids, member))
         return self
 

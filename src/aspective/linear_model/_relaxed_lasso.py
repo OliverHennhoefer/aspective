@@ -150,8 +150,14 @@ class RelaxedLassoCV(RegressorMixin, BaseEstimator):
     }
 
     def __init__(
-        self, n_alphas=50, eps=1e-3, phis=(0.0, 0.25, 0.5, 0.75, 1.0), cv=5,
-        fit_intercept=True, max_iter=1000, tol=1e-4,
+        self,
+        n_alphas=50,
+        eps=1e-3,
+        phis=(0.0, 0.25, 0.5, 0.75, 1.0),
+        cv=5,
+        fit_intercept=True,
+        max_iter=1000,
+        tol=1e-4,
     ):
         self.n_alphas = n_alphas
         self.eps = eps

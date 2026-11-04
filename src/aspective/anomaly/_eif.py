@@ -56,8 +56,14 @@ class ExtendedIsolationForestDetector(BaseDetector):
     of the 8th IEEE International Conference on Data Mining (ICDM), 2008.
     """
 
-    def __init__(self, n_estimators=100, max_samples=256, extension_level=None,
-                 contamination=0.1, random_state=None):
+    def __init__(
+        self,
+        n_estimators=100,
+        max_samples=256,
+        extension_level=None,
+        contamination=0.1,
+        random_state=None,
+    ):
         super().__init__(contamination=contamination)
         self.n_estimators = n_estimators
         self.max_samples = max_samples

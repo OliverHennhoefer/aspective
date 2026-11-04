@@ -52,8 +52,10 @@ class FlexibleNaiveBayes(ClassifierMixin, BaseEstimator):
     """
 
     _parameter_constraints = {
-        "bandwidth": [StrOptions({"john-langley", "silverman"}),
-                      Interval(Real, 0, None, closed="neither")],
+        "bandwidth": [
+            StrOptions({"john-langley", "silverman"}),
+            Interval(Real, 0, None, closed="neither"),
+        ],
         "min_bandwidth": [Interval(Real, 0, None, closed="neither")],
     }
 

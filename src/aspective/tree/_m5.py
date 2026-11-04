@@ -98,8 +98,9 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
     def fit(self, X, y):
         self._validate_params()
         X, y = validate_data(self, X, y, y_numeric=True, dtype=np.float64)
-        grower = DecisionTreeRegressor(min_samples_leaf=self.min_samples_leaf,
-                                       max_depth=self.max_depth, random_state=0).fit(X, y)
+        grower = DecisionTreeRegressor(
+            min_samples_leaf=self.min_samples_leaf, max_depth=self.max_depth, random_state=0
+        ).fit(X, y)
         tree = self.tree_ = grower.tree_
         left, right = tree.children_left, tree.children_right
         n_nodes = tree.node_count
@@ -136,7 +137,11 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
                 if t_err > error:
                     break
                 features, intercept, coef, resid, error = trial, t_int, t_coef, t_resid, t_err
-            self._intercepts[node], self._coefs[node], self._features[node] = intercept, coef, features
+            self._intercepts[node], self._coefs[node], self._features[node] = (
+                intercept,
+                coef,
+                features,
+            )
             if left[node] == -1:
                 n_params[node] = len(features) + 1
                 residuals[node] = resid
@@ -166,7 +171,9 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
         if self.is_leaf_[node]:
             return 1
         tree = self.tree_
-        return self._count_leaves(tree.children_left[node]) + self._count_leaves(tree.children_right[node])
+        return self._count_leaves(tree.children_left[node]) + self._count_leaves(
+            tree.children_right[node]
+        )
 
     def _model(self, X, node):
         f = self._features[node]
