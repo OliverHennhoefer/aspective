@@ -1,6 +1,6 @@
 {
  "name": "local-linear-forest",
- "fingerprint": "1f14128d84c94f4b",
+ "fingerprint": "62ac951796b3a4c1",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

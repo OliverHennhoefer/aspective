@@ -1,6 +1,6 @@
 {
  "name": "rotation-forest",
- "fingerprint": "ebd504f003a6538c",
+ "fingerprint": "b83b849cd0ce4d26",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

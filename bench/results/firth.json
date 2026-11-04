@@ -1,6 +1,6 @@
 {
  "name": "firth",
- "fingerprint": "2dc118b5c0335139",
+ "fingerprint": "9abc4d26a31b8294",
  "quick": false,
  "suite": "pmlb-binary",
  "metric": "brier",

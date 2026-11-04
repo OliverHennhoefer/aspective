@@ -111,3 +111,12 @@ def test_check_recomputes_verdicts():
     worse = dict(result, scores={**result["scores"], result["candidate"]: {
         d: None if v is None else v - 0.5 for d, v in result["scores"][result["candidate"]].items()}})
     assert not runner.assess(worse)["passed"]
+
+
+def test_code_fingerprint_ignores_formatting_comments_and_docstrings():
+    from aspective_bench.protocol import code_fingerprint
+
+    a = 'def f(x):\n    """Doc."""\n    return x + 1\n'
+    b = "def f(x):  # comment\n    return (x +\n            1)\n"
+    assert code_fingerprint(a) == code_fingerprint(b)
+    assert code_fingerprint(a) != code_fingerprint("def f(x):\n    return x + 2\n")

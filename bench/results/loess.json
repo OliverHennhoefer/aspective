@@ -1,6 +1,6 @@
 {
  "name": "loess",
- "fingerprint": "7d7413af742acb1c",
+ "fingerprint": "266054101d7e7b23",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

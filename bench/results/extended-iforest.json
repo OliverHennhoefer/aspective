@@ -1,6 +1,6 @@
 {
  "name": "extended-iforest",
- "fingerprint": "7b605d6f06df5e76",
+ "fingerprint": "031f47ab56d96f58",
  "quick": false,
  "suite": "adbench-classical",
  "metric": "roc_auc",

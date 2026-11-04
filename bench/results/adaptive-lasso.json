@@ -1,6 +1,6 @@
 {
  "name": "adaptive-lasso",
- "fingerprint": "2e1687046633ff9b",
+ "fingerprint": "ec07d61419b7480e",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",

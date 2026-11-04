@@ -1,6 +1,6 @@
 {
  "name": "rda",
- "fingerprint": "87e7394a890bf839",
+ "fingerprint": "145377b928b3004f",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

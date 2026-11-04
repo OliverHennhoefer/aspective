@@ -1,6 +1,6 @@
 {
  "name": "cauchy-logistic",
- "fingerprint": "258c1587deca6797",
+ "fingerprint": "4734c415a35967b9",
  "quick": false,
  "suite": "pmlb-binary",
  "metric": "brier",

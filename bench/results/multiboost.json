@@ -1,6 +1,6 @@
 {
  "name": "multiboost",
- "fingerprint": "0c6a3d9e84ca641c",
+ "fingerprint": "57ecfd9f7f2aab8f",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

@@ -1,6 +1,6 @@
 {
  "name": "tan",
- "fingerprint": "1b9cf261cc40e3b1",
+ "fingerprint": "01c24845385bde8b",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

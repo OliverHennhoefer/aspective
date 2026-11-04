@@ -1,6 +1,6 @@
 {
  "name": "kdb",
- "fingerprint": "1504475dbad339bc",
+ "fingerprint": "4dd9a7f7cf040a35",
  "quick": false,
  "suite": "pmlb-classification",
  "metric": "accuracy",

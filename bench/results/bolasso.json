@@ -1,6 +1,6 @@
 {
  "name": "bolasso",
- "fingerprint": "db8ce2bcc6552a19",
+ "fingerprint": "2deb1c87fbd1d351",
  "quick": false,
  "suite": "pmlb-regression",
  "metric": "r2",
