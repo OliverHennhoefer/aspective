@@ -35,21 +35,43 @@ all tests run on the per-dataset scores:
 
 - **Non-inferiority (the gate):** a one-sided Wilcoxon signed-rank test of
   H0 "the candidate is typically worse than the predecessor by more than the
-  margin". The margin is 0.01 for accuracy, R² and ROC AUC and 0.005 for the
-  Brier score.
+  margin". "Typically" is the pseudo-median of the per-dataset differences
+  (their Hodges-Lehmann location), which is what the signed-rank test
+  measures. The margin is 0.01 for accuracy, R² and ROC AUC and 0.005 for
+  the Brier score.
+- **Severe losses (tail guard):** a rank test barely notices a few very
+  large losses. Among the datasets where the two models differ by more than
+  five margins, a one-sided exact sign test asks whether the candidate loses
+  significantly more often than it wins. Severe losses balanced by severe
+  wins are a trade-off the docstring can state; severe losses with nothing
+  in return fail the gate.
 - **Two-sided Wilcoxon** for superiority or inferiority.
 - **Friedman test with Nemenyi critical difference** over all models of a
   benchmark, including references, for the average-rank summary.
 
 **Verdicts.** `superior` (non-inferior and significantly better),
-`non-inferior`, `inconclusive` (neither shown non-inferior nor significantly
-worse), `inferior` (significantly worse by more than the margin), and
-`too few datasets` (fewer than 10 usable).
+`non-inferior`, `severe losses` (non-inferior in the typical case, but
+severe losses significantly outnumber severe wins), `inconclusive` (neither
+shown non-inferior nor significantly worse), `inferior` (significantly worse
+by more than the margin), and `too few datasets` (fewer than 10 usable).
 
 **Gate.** A benchmark passes when the candidate runs without error on every
 dataset of its suite and is `superior` or `non-inferior` against every
 predecessor. References are shown for context only. `inconclusive` fails,
 because "not shown to be worse" is not evidence of being competitive.
+Verdicts are never read from the committed files: `check`, the tests and the
+report recompute them from the committed per-dataset scores, so a change to
+the statistics applies to every result without rerunning a model.
+
+**How reliable the gate is.** `RESULTS.md` has a table of the gate's pass
+rate for a candidate whose true typical difference is known, simulated per
+suite from the committed comparisons (their per-dataset differences,
+centred at zero and resampled, so the real spread and tails between
+datasets are kept). At one margin worse the gate passes about 5% of
+candidates, as designed. An exactly equivalent candidate, though, is missed
+roughly 30 to 45% of the time on the smaller suites: most of the spread is
+genuine variation between datasets (fold noise is only 15 to 50% of it), so
+more CV repeats do not help and only more datasets do.
 
 ## Adding a model
 

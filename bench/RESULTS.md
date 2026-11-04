@@ -9,44 +9,66 @@ its suite and is *non-inferior* to each predecessor: a one-sided Wilcoxon
 signed-rank test over the per-dataset mean scores rejects, at α = 0.05, that
 the candidate is typically worse by more than the margin (0.01 for accuracy,
 R² and ROC AUC; 0.005 for the Brier score). Winning everywhere is not
-required. "Superior" additionally means significantly better (two-sided
-Wilcoxon, α = 0.05). "Inconclusive" fails the gate: the data do not show the
-candidate is competitive.
+required, but severe losses (more than five margins) must not significantly
+outnumber severe wins (one-sided sign test, α = 0.05), or the verdict is
+"severe losses" and the gate fails. "Superior" additionally means
+significantly better (two-sided Wilcoxon, α = 0.05). "Inconclusive" fails
+the gate: the data do not show the candidate is competitive. Verdicts are
+recomputed from the per-dataset scores every time the gate is checked.
 
 ## Summary
 
-| Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | Median Δ | p (non-inferior) | Verdict | Gate |
-|---|---|---|---|---|---|---|---|---|
-| [a2de](#a2de) | A2DE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 12 / 6 | +0.016 | <0.001 | superior | PASS |
-| [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [aode](#aode) | AODE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 16 / 2 | +0.016 | <0.001 | superior | PASS |
-| [bolasso](#bolasso) | Bolasso | LassoCV | 25 | 0 / 20 / 5 | -0.002 | 0.029 | non-inferior | PASS |
-| [cauchy-logistic](#cauchy-logistic) | Cauchy prior | ML logistic | 23 | 7 / 16 / 0 | +0.000 | <0.001 | superior | PASS |
-| [dann](#dann) | DANN (k=5) | k-NN (k=5) | 43 | 18 / 16 / 9 | +0.006 | <0.001 | non-inferior | PASS |
-| [extended-iforest](#extended-iforest) | Extended IF | Isolation Forest | 37 | 10 / 17 / 10 | -0.001 | 0.020 | non-inferior | PASS |
-| [firth](#firth) | Firth | ML logistic | 23 | 2 / 19 / 2 | +0.000 | <0.001 | non-inferior | PASS |
-| [flexible-nb](#flexible-nb) | Flexible NB | Gaussian NB | 43 | 23 / 11 / 9 | +0.021 | <0.001 | superior | PASS |
-| [hnb](#hnb) | Hidden NB (5 bins) | Naive Bayes (5 bins) | 43 | 24 / 14 / 5 | +0.014 | <0.001 | superior | PASS |
-| [kdb](#kdb) | KDB k=2 (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 9 / 12 | +0.012 | <0.001 | superior | PASS |
-| [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 25 | 0 / 25 / 0 | -0.000 | <0.001 | non-inferior | PASS |
-| [lesinn](#lesinn) | LeSiNN | Isolation Forest | 37 | 13 / 14 / 10 | +0.005 | 0.013 | non-inferior | PASS |
-| [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 25 | 9 / 11 / 5 | +0.006 | 0.002 | non-inferior | PASS |
-| [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 25 | 19 / 1 / 5 | +0.037 | <0.001 | superior | PASS |
-| [logitboost](#logitboost) | LogitBoost (depth 3) | AdaBoost (depth 3) | 43 | 13 / 21 / 9 | +0.001 | <0.001 | non-inferior | PASS |
-| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 25 | 19 / 5 / 1 | +0.051 | <0.001 | superior | PASS |
-| [mars](#mars) | MARS (additive) | LassoCV | 25 | 16 / 5 / 4 | +0.039 | <0.001 | superior | PASS |
-| [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 25 | 16 / 5 / 4 | +0.036 | 0.001 | superior | PASS |
-| [mcp](#mcp) | MCP (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [mda](#mda) | MDA (tuned) | LDA | 43 | 14 / 24 / 5 | +0.001 | <0.001 | non-inferior | PASS |
-| [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 43 | 13 / 21 / 9 | +0.003 | <0.001 | non-inferior | PASS |
-| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 25 | 13 / 6 / 6 | +0.019 | 0.031 | non-inferior | PASS |
-| [rda](#rda) | RDA (tuned) | LDA | 43 | 18 / 20 / 5 | +0.005 | <0.001 | superior | PASS |
-| [rda](#rda) | RDA (tuned) | QDA | 23 | 6 / 14 / 3 | +0.003 | 0.002 | non-inferior | PASS |
-| [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 43 | 11 / 28 / 4 | +0.000 | <0.001 | non-inferior | PASS |
-| [rshash](#rshash) | RS-Hash | Isolation Forest | 37 | 12 / 15 / 10 | +0.001 | 0.019 | non-inferior | PASS |
-| [scad](#scad) | SCAD (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | non-inferior | PASS |
-| [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 12 / 9 | +0.012 | <0.001 | superior | PASS |
+| Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | Median Δ | p (non-inferior) | Severe wins / losses | Verdict | Gate |
+|---|---|---|---|---|---|---|---|---|---|
+| [a2de](#a2de) | A2DE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 12 / 6 | +0.016 | <0.001 | 11 / 0 | superior | PASS |
+| [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [aode](#aode) | AODE (5 bins) | Naive Bayes (5 bins) | 43 | 25 / 16 / 2 | +0.016 | <0.001 | 9 / 0 | superior | PASS |
+| [bolasso](#bolasso) | Bolasso | LassoCV | 25 | 0 / 20 / 5 | -0.002 | 0.029 | 0 / 3 | non-inferior | PASS |
+| [cauchy-logistic](#cauchy-logistic) | Cauchy prior | ML logistic | 23 | 7 / 16 / 0 | +0.000 | <0.001 | 2 / 0 | superior | PASS |
+| [dann](#dann) | DANN (k=5) | k-NN (k=5) | 43 | 18 / 16 / 9 | +0.006 | <0.001 | 3 / 1 | non-inferior | PASS |
+| [extended-iforest](#extended-iforest) | Extended IF | Isolation Forest | 37 | 10 / 17 / 10 | -0.001 | 0.020 | 1 / 5 | non-inferior | PASS |
+| [firth](#firth) | Firth | ML logistic | 23 | 2 / 19 / 2 | +0.000 | <0.001 | 0 / 1 | non-inferior | PASS |
+| [flexible-nb](#flexible-nb) | Flexible NB | Gaussian NB | 43 | 23 / 11 / 9 | +0.021 | <0.001 | 17 / 2 | superior | PASS |
+| [hnb](#hnb) | Hidden NB (5 bins) | Naive Bayes (5 bins) | 43 | 24 / 14 / 5 | +0.014 | <0.001 | 9 / 0 | superior | PASS |
+| [kdb](#kdb) | KDB k=2 (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 9 / 12 | +0.012 | <0.001 | 10 / 2 | superior | PASS |
+| [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 25 | 0 / 25 / 0 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [lesinn](#lesinn) | LeSiNN | Isolation Forest | 37 | 13 / 14 / 10 | +0.005 | 0.013 | 6 / 6 | non-inferior | PASS |
+| [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 25 | 9 / 11 / 5 | +0.006 | 0.002 | 1 / 2 | non-inferior | PASS |
+| [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 25 | 19 / 1 / 5 | +0.037 | <0.001 | 12 / 1 | superior | PASS |
+| [logitboost](#logitboost) | LogitBoost (depth 3) | AdaBoost (depth 3) | 43 | 14 / 20 / 9 | +0.001 | <0.001 | 3 / 0 | non-inferior | PASS |
+| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 25 | 19 / 5 / 1 | +0.051 | <0.001 | 13 / 0 | superior | PASS |
+| [mars](#mars) | MARS (additive) | LassoCV | 25 | 16 / 5 / 4 | +0.039 | <0.001 | 11 / 2 | superior | PASS |
+| [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 25 | 16 / 5 / 4 | +0.036 | 0.001 | 9 / 2 | superior | PASS |
+| [mcp](#mcp) | MCP (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [mda](#mda) | MDA (tuned) | LDA | 43 | 14 / 24 / 5 | +0.001 | <0.001 | 4 / 1 | non-inferior | PASS |
+| [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 43 | 13 / 21 / 9 | +0.003 | <0.001 | 3 / 2 | non-inferior | PASS |
+| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 25 | 13 / 6 / 6 | +0.019 | 0.031 | 11 / 4 | non-inferior | PASS |
+| [rda](#rda) | RDA (tuned) | LDA | 43 | 18 / 20 / 5 | +0.006 | <0.001 | 9 / 0 | superior | PASS |
+| [rda](#rda) | RDA (tuned) | QDA | 23 | 6 / 14 / 3 | +0.003 | 0.002 | 0 / 1 | non-inferior | PASS |
+| [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 43 | 11 / 28 / 4 | +0.000 | <0.001 | 1 / 0 | non-inferior | PASS |
+| [rshash](#rshash) | RS-Hash | Isolation Forest | 37 | 12 / 15 / 10 | +0.001 | 0.019 | 1 / 3 | non-inferior | PASS |
+| [scad](#scad) | SCAD (CV) | LassoCV | 25 | 0 / 24 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 43 | 22 / 12 / 9 | +0.012 | <0.001 | 9 / 0 | superior | PASS |
+
+## How reliable the gate is
+
+Pass rate of the gate for a candidate whose true typical difference to
+its predecessor is the given number of margins. Each row is simulated
+from the committed comparisons on that suite: their per-dataset
+differences are centred at zero, keeping the real spread and tails
+between datasets, resampled to the suite's size and shifted. At −1 margin
+and below, a pass is a false pass (the target is at most 5%); at 0 and
+above, a failure is a miss. Most of the spread is genuine variation
+between datasets, not fold noise, so only more datasets lower the miss
+rate without loosening the margin.
+
+| Suite | Datasets | Comparisons | -1.5 m | -1.0 m | -0.5 m | +0.0 m | +0.5 m |
+|---|---|---|---|---|---|---|---|
+| `adbench-classical` (margin 0.01) | 37 | 3 | 0% | 4% | 30% | 56% | 76% |
+| `pmlb-binary` (margin 0.005) | 23 | 2 | 0% | 5% | 92% | 100% | 99% |
+| `pmlb-classification` (margin 0.01) | 43 | 13 | 0% | 6% | 40% | 71% | 87% |
+| `pmlb-regression` (margin 0.01) | 25 | 12 | 1% | 6% | 57% | 58% | 62% |
 
 ## Details
 
@@ -56,7 +78,7 @@ candidate is competitive.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0160, mean +0.0336 (positive favours the candidate); better on 25, within margin on 12, worse on 6 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0160, mean +0.0336 (positive favours the candidate); better on 25, within margin on 12, worse on 6 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 11 wins, 0 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.77, A2DE (5 bins) 1.79, Naive Bayes (5 bins) 2.44. Nemenyi critical difference 0.51, Friedman p = <0.001.
 - Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.018x.
 
@@ -116,7 +138,7 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 
 gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0005 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.210.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0005 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.206. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: LassoCV 1.28, Adaptive LassoCV 1.72. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: LassoCV 0.21x.
 
@@ -158,7 +180,7 @@ gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 
 Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0164, mean +0.0320 (positive favours the candidate); better on 25, within margin on 16, worse on 2 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0164, mean +0.0320 (positive favours the candidate); better on 25, within margin on 16, worse on 2 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 9 wins, 0 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.56, Gaussian NB 2.19, Naive Bayes (5 bins) 2.26. Nemenyi critical difference 0.51, Friedman p = 0.001.
 - Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.22x.
 
@@ -218,7 +240,7 @@ Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 
 Bolasso is mainly a variable-selection method; this checks that its predictions keep up with the lasso.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0016, mean -0.0126 (positive favours the candidate); better on 0, within margin on 20, worse on 5 of 25 datasets; non-inferiority p = 0.029, two-sided Wilcoxon p = <0.001.
+- vs LassoCV: **non-inferior**. Median difference -0.0016, mean -0.0126 (positive favours the candidate); better on 0, within margin on 20, worse on 5 of 25 datasets; non-inferiority p = 0.029, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 0 wins, 3 losses, p = 0.125.
 - Average ranks over 25 datasets where every model ran: LassoCV 1.56, Bolasso-S (0.9) 1.96, Bolasso 2.48. Nemenyi critical difference 0.66, Friedman p = 0.004.
 - Total fit and score time relative to the candidate: LassoCV 0.13x.
 
@@ -260,7 +282,7 @@ Bolasso is mainly a variable-selection method; this checks that its predictions 
 
 The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs centred); the other models get standardized inputs.
 
-- vs ML logistic: **superior**. Median difference +0.0003, mean +0.0070 (positive favours the candidate); better on 7, within margin on 16, worse on 0 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
+- vs ML logistic: **superior**. Median difference +0.0003, mean +0.0070 (positive favours the candidate); better on 7, within margin on 16, worse on 0 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 2 wins, 0 losses, p = 1.000.
 - Average ranks over 23 datasets where every model ran: Cauchy prior 1.74, Ridge logistic (C=1) 2.09, Firth 3.00, ML logistic 3.17. Nemenyi critical difference 0.98, Friedman p = <0.001.
 - Total fit and score time relative to the candidate: ML logistic 1.4x.
 
@@ -300,7 +322,7 @@ The Cauchy model applies the paper's own input scaling (sd 0.5, binary inputs ce
 
 Both vote with 5 neighbours on standardized inputs; DANN estimates its metric from max(n/5, 50) neighbours with epsilon = 1, as in the paper.
 
-- vs k-NN (k=5): **non-inferior**. Median difference +0.0057, mean +0.0045 (positive favours the candidate); better on 18, within margin on 16, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.131.
+- vs k-NN (k=5): **non-inferior**. Median difference +0.0057, mean +0.0045 (positive favours the candidate); better on 18, within margin on 16, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.131. Severe (beyond 5 margins): 3 wins, 1 losses, p = 0.938.
 - Average ranks over 43 datasets where every model ran: DANN (k=5) 1.37, k-NN (k=5) 1.63. Nemenyi critical difference 0.30.
 - Total fit and score time relative to the candidate: k-NN (k=5) 0.0052x.
 
@@ -360,7 +382,7 @@ Both vote with 5 neighbours on standardized inputs; DANN estimates its metric fr
 
 Fully extended cuts, 200 trees of 256 points like the Isolation Forest.
 
-- vs Isolation Forest: **non-inferior**. Median difference -0.0005, mean -0.0086 (positive favours the candidate); better on 10, within margin on 17, worse on 10 of 37 datasets; non-inferiority p = 0.020, two-sided Wilcoxon p = 0.833.
+- vs Isolation Forest: **non-inferior**. Median difference -0.0005, mean -0.0086 (positive favours the candidate); better on 10, within margin on 17, worse on 10 of 37 datasets; non-inferiority p = 0.020, two-sided Wilcoxon p = 0.833. Severe (beyond 5 margins): 1 wins, 5 losses, p = 0.109.
 - Average ranks over 37 datasets where every model ran: Isolation Forest 1.47, Extended IF 1.53. Nemenyi critical difference 0.32.
 - Total fit and score time relative to the candidate: Isolation Forest 0.29x.
 
@@ -414,7 +436,7 @@ Fully extended cuts, 200 trees of 256 points like the Isolation Forest.
 
 Full-size training folds; features standardized for every model.
 
-- vs ML logistic: **non-inferior**. Median difference +0.0000, mean -0.0075 (positive favours the candidate); better on 2, within margin on 19, worse on 2 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.964.
+- vs ML logistic: **non-inferior**. Median difference +0.0000, mean -0.0075 (positive favours the candidate); better on 2, within margin on 19, worse on 2 of 23 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.964. Severe (beyond 5 margins): 0 wins, 1 losses, p = 0.500.
 - Average ranks over 23 datasets where every model ran: Firth 1.48, ML logistic 1.52. Nemenyi critical difference 0.41.
 - Total fit and score time relative to the candidate: ML logistic 0.058x.
 
@@ -454,7 +476,7 @@ Full-size training folds; features standardized for every model.
 
 Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.
 
-- vs Gaussian NB: **superior**. Median difference +0.0208, mean +0.0664 (positive favours the candidate); better on 23, within margin on 11, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
+- vs Gaussian NB: **superior**. Median difference +0.0208, mean +0.0664 (positive favours the candidate); better on 23, within margin on 11, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 17 wins, 2 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: Flexible NB 1.33, Gaussian NB 1.67. Nemenyi critical difference 0.30.
 - Total fit and score time relative to the candidate: Gaussian NB 0.0054x.
 
@@ -514,7 +536,7 @@ Kernel width 1/sqrt(n_c) on standardized features, the paper's rule.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0145, mean +0.0297 (positive favours the candidate); better on 24, within margin on 14, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0145, mean +0.0297 (positive favours the candidate); better on 24, within margin on 14, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 9 wins, 0 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.69, Hidden NB (5 bins) 1.87, Naive Bayes (5 bins) 2.44. Nemenyi critical difference 0.51, Friedman p = <0.001.
 - Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.2x.
 
@@ -574,7 +596,7 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0121, mean +0.0195 (positive favours the candidate); better on 22, within margin on 9, worse on 12 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.042.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0121, mean +0.0195 (positive favours the candidate); better on 22, within margin on 9, worse on 12 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.042. Severe (beyond 5 margins): 10 wins, 2 losses, p = 0.997.
 - Average ranks over 43 datasets where every model ran: TAN (5 bins) 1.69, KDB k=2 (5 bins) 2.00, Naive Bayes (5 bins) 2.31. Nemenyi critical difference 0.51, Friedman p = 0.010.
 - Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.43x.
 
@@ -634,7 +656,7 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 
 Componentwise linear least squares, learning rate 0.1, number of steps (up to 2000) by 5-fold CV, as in mboost.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0001 (positive favours the candidate); better on 0, within margin on 25, worse on 0 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.007.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0001 (positive favours the candidate); better on 0, within margin on 25, worse on 0 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.008. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: LassoCV 1.20, L2Boost (CV) 1.80. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: LassoCV 0.58x.
 
@@ -676,7 +698,7 @@ Componentwise linear least squares, learning rate 0.1, number of steps (up to 20
 
 The paper's defaults: 50 subsamples of 8 points.
 
-- vs Isolation Forest: **non-inferior**. Median difference +0.0049, mean +0.0034 (positive favours the candidate); better on 13, within margin on 14, worse on 10 of 37 datasets; non-inferiority p = 0.013, two-sided Wilcoxon p = 0.577.
+- vs Isolation Forest: **non-inferior**. Median difference +0.0049, mean +0.0034 (positive favours the candidate); better on 13, within margin on 14, worse on 10 of 37 datasets; non-inferiority p = 0.013, two-sided Wilcoxon p = 0.577. Severe (beyond 5 margins): 6 wins, 6 losses, p = 0.613.
 - Average ranks over 37 datasets where every model ran: LeSiNN 1.80, Isolation Forest 1.88, LOF 2.32. Nemenyi critical difference 0.54, Friedman p = 0.050.
 - Total fit and score time relative to the candidate: Isolation Forest 3x.
 
@@ -730,7 +752,7 @@ The paper's defaults: 50 subsamples of 8 points.
 
 The same forest (200 trees, leaves of at least 5) supplies the weights; ridge penalty 0.1 on the local slopes, grf's default.
 
-- vs Random forest (leaf 5): **non-inferior**. Median difference +0.0063, mean +0.0044 (positive favours the candidate); better on 9, within margin on 11, worse on 5 of 25 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.096.
+- vs Random forest (leaf 5): **non-inferior**. Median difference +0.0063, mean +0.0044 (positive favours the candidate); better on 9, within margin on 11, worse on 5 of 25 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.096. Severe (beyond 5 margins): 1 wins, 2 losses, p = 0.500.
 - Average ranks over 25 datasets where every model ran: Local linear forest 1.28, Random forest (leaf 5) 1.72. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: Random forest (leaf 5) 0.86x.
 
@@ -772,7 +794,7 @@ The same forest (200 trees, leaves of at least 5) supplies the weights; ridge pe
 
 Local linear fits with tricube weights. Both tune their neighbourhood size over five values by inner 3-fold CV on standardized inputs.
 
-- vs k-NN (tuned k): **superior**. Median difference +0.0368, mean +0.0454 (positive favours the candidate); better on 19, within margin on 1, worse on 5 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.003.
+- vs k-NN (tuned k): **superior**. Median difference +0.0368, mean +0.0454 (positive favours the candidate); better on 19, within margin on 1, worse on 5 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.003. Severe (beyond 5 margins): 12 wins, 1 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: LOESS (tuned span) 1.24, k-NN (tuned k) 1.76. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: k-NN (tuned k) 0.043x.
 
@@ -814,7 +836,7 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 
 200 rounds of depth-3 trees for every model, no shrinkage for LogitBoost and AdaBoost (SAMME), as in the paper.
 
-- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0010, mean +0.0100 (positive favours the candidate); better on 13, within margin on 21, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.176.
+- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0010, mean +0.0100 (positive favours the candidate); better on 14, within margin on 20, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.176. Severe (beyond 5 margins): 3 wins, 0 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: LogitBoost (depth 3) 1.78, Gradient boosting (depth 3) 2.02, AdaBoost (depth 3) 2.20. Nemenyi critical difference 0.51, Friedman p = 0.135.
 - Total fit and score time relative to the candidate: AdaBoost (depth 3) 0.33x.
 
@@ -874,7 +896,7 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 
 M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its minimum leaf size from five values by inner 3-fold CV.
 
-- vs CART (tuned leaf size): **superior**. Median difference +0.0513, mean +0.0651 (positive favours the candidate); better on 19, within margin on 5, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0513, mean +0.0651 (positive favours the candidate); better on 19, within margin on 5, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 13 wins, 0 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: M5 model tree 1.44, LassoCV 1.96, CART (tuned leaf size) 2.60. Nemenyi critical difference 0.66, Friedman p = <0.001.
 - Total fit and score time relative to the candidate: CART (tuned leaf size) 0.89x.
 
@@ -916,8 +938,8 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 
 Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes both stepwise linear regression and recursive partitioning, so it must keep up with both.
 
-- vs LassoCV: **superior**. Median difference +0.0387, mean +0.0500 (positive favours the candidate); better on 16, within margin on 5, worse on 4 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.016.
-- vs CART (tuned leaf size): **superior**. Median difference +0.0364, mean +0.0392 (positive favours the candidate); better on 16, within margin on 5, worse on 4 of 25 datasets; non-inferiority p = 0.001, two-sided Wilcoxon p = 0.008.
+- vs LassoCV: **superior**. Median difference +0.0387, mean +0.0500 (positive favours the candidate); better on 16, within margin on 5, worse on 4 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.016. Severe (beyond 5 margins): 11 wins, 2 losses, p = 0.998.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0364, mean +0.0392 (positive favours the candidate); better on 16, within margin on 5, worse on 4 of 25 datasets; non-inferiority p = 0.001, two-sided Wilcoxon p = 0.008. Severe (beyond 5 margins): 9 wins, 2 losses, p = 0.994.
 - Average ranks over 25 datasets where every model ran: MARS (additive) 1.56, LassoCV 2.00, CART (tuned leaf size) 2.44. Nemenyi critical difference 0.66, Friedman p = 0.008.
 - Total fit and score time relative to the candidate: LassoCV 0.35x, CART (tuned leaf size) 0.73x.
 
@@ -959,7 +981,7 @@ Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes
 
 gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0002, mean -0.0010 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.080.
+- vs LassoCV: **non-inferior**. Median difference -0.0002, mean -0.0010 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.080. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: LassoCV 1.28, MCP (CV) 1.72. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: LassoCV 0.069x.
 
@@ -1001,7 +1023,7 @@ gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
 MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as Hastie & Tibshirani (1996) did; one subclass is LDA.
 
-- vs LDA: **non-inferior**. Median difference +0.0011, mean +0.0147 (positive favours the candidate); better on 14, within margin on 24, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.053.
+- vs LDA: **non-inferior**. Median difference +0.0011, mean +0.0147 (positive favours the candidate); better on 14, within margin on 24, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.054. Severe (beyond 5 margins): 4 wins, 1 losses, p = 0.969.
 - Average ranks over 23 datasets where every model ran: MDA (tuned) 1.85, QDA 2.07, LDA 2.09. Nemenyi critical difference 0.69, Friedman p = 0.654.
 - Total fit and score time relative to the candidate: LDA 0.0068x.
 
@@ -1061,7 +1083,7 @@ MDA picks the number of subclasses per class by inner 3-fold CV from 1 to 5, as 
 
 Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights about every sqrt(200) = 14 members.
 
-- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0029, mean +0.0053 (positive favours the candidate); better on 13, within margin on 21, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.230.
+- vs AdaBoost (depth 3): **non-inferior**. Median difference +0.0029, mean +0.0053 (positive favours the candidate); better on 13, within margin on 21, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.230. Severe (beyond 5 margins): 3 wins, 2 losses, p = 0.812.
 - Average ranks over 43 datasets where every model ran: MultiBoost (depth 3) 1.43, AdaBoost (depth 3) 1.57. Nemenyi critical difference 0.30.
 - Total fit and score time relative to the candidate: AdaBoost (depth 3) 1x.
 
@@ -1121,7 +1143,7 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 
 Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter chosen by GCV; the strongest smoothing is linear regression.
 
-- vs LassoCV: **non-inferior**. Median difference +0.0190, mean -0.0401 (positive favours the candidate); better on 13, within margin on 6, worse on 6 of 25 datasets; non-inferiority p = 0.031, two-sided Wilcoxon p = 0.275.
+- vs LassoCV: **non-inferior**. Median difference +0.0190, mean -0.0401 (positive favours the candidate); better on 13, within margin on 6, worse on 6 of 25 datasets; non-inferiority p = 0.031, two-sided Wilcoxon p = 0.275. Severe (beyond 5 margins): 11 wins, 4 losses, p = 0.982.
 - Average ranks over 25 datasets where every model ran: MARS (additive) 1.84, P-spline GAM 1.96, LassoCV 2.20. Nemenyi critical difference 0.66, Friedman p = 0.432.
 - Total fit and score time relative to the candidate: LassoCV 0.31x.
 
@@ -1163,8 +1185,8 @@ Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter 
 
 RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, gamma=0 is LDA and lambda=0, gamma=0 is QDA.
 
-- vs LDA: **superior**. Median difference +0.0055, mean +0.0244 (positive favours the candidate); better on 18, within margin on 20, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.001.
-- vs QDA: **non-inferior**. Median difference +0.0033, mean +0.0017 (positive favours the candidate); better on 6, within margin on 14, worse on 3 of 23 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.144.
+- vs LDA: **superior**. Median difference +0.0055, mean +0.0244 (positive favours the candidate); better on 18, within margin on 20, worse on 5 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.001. Severe (beyond 5 margins): 9 wins, 0 losses, p = 1.000.
+- vs QDA: **non-inferior**. Median difference +0.0033, mean +0.0017 (positive favours the candidate); better on 6, within margin on 14, worse on 3 of 23 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.144. Severe (beyond 5 margins): 0 wins, 1 losses, p = 0.500.
 - Average ranks over 23 datasets where every model ran: RDA (tuned) 1.83, QDA 2.54, LDA 2.72, LDA (Ledoit-Wolf) 2.91. Nemenyi critical difference 0.98, Friedman p = 0.023.
 - Total fit and score time relative to the candidate: LDA 0.02x, QDA 0.011x.
 
@@ -1222,7 +1244,7 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 
 **Relaxed LassoCV** vs LassoCV. Suite `pmlb-regression` (25 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0000, mean -0.0006 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.560.
+- vs LassoCV: **non-inferior**. Median difference -0.0000, mean -0.0006 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.560. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: LassoCV 1.36, Relaxed LassoCV 1.64. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: LassoCV 0.017x.
 
@@ -1264,7 +1286,7 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 
 Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 
-- vs Random forest: **non-inferior**. Median difference +0.0001, mean +0.0032 (positive favours the candidate); better on 11, within margin on 28, worse on 4 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.254.
+- vs Random forest: **non-inferior**. Median difference +0.0001, mean +0.0032 (positive favours the candidate); better on 11, within margin on 28, worse on 4 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.254. Severe (beyond 5 margins): 1 wins, 0 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: Rotation Forest 1.47, Random forest 1.53. Nemenyi critical difference 0.30.
 - Total fit and score time relative to the candidate: Random forest 0.15x.
 
@@ -1322,7 +1344,7 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 
 **RS-Hash** vs Isolation Forest (references: LOF). Suite `adbench-classical` (37 ADBench Classical anomaly detection datasets (ODDS and others)), 10 stratified 70/30 splits, fit without labels. Metric: ROC AUC, higher is better; margin 0.01.
 
-- vs Isolation Forest: **non-inferior**. Median difference +0.0012, mean -0.0018 (positive favours the candidate); better on 12, within margin on 15, worse on 10 of 37 datasets; non-inferiority p = 0.019, two-sided Wilcoxon p = 0.754.
+- vs Isolation Forest: **non-inferior**. Median difference +0.0012, mean -0.0018 (positive favours the candidate); better on 12, within margin on 15, worse on 10 of 37 datasets; non-inferiority p = 0.019, two-sided Wilcoxon p = 0.754. Severe (beyond 5 margins): 1 wins, 3 losses, p = 0.312.
 - Average ranks over 37 datasets where every model ran: RS-Hash 1.78, Isolation Forest 1.92, LOF 2.30. Nemenyi critical difference 0.54, Friedman p = 0.073.
 - Total fit and score time relative to the candidate: Isolation Forest 0.96x.
 
@@ -1376,7 +1398,7 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 
 gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0007 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.096.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0007 (positive favours the candidate); better on 0, within margin on 24, worse on 1 of 25 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.096. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
 - Average ranks over 25 datasets where every model ran: LassoCV 1.32, SCAD (CV) 1.68. Nemenyi critical difference 0.39.
 - Total fit and score time relative to the candidate: LassoCV 0.063x.
 
@@ -1418,7 +1440,7 @@ gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
 Both use the same 5-bin quantile discretization and Laplace smoothing.
 
-- vs Naive Bayes (5 bins): **superior**. Median difference +0.0123, mean +0.0234 (positive favours the candidate); better on 22, within margin on 12, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.005.
+- vs Naive Bayes (5 bins): **superior**. Median difference +0.0123, mean +0.0234 (positive favours the candidate); better on 22, within margin on 12, worse on 9 of 43 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.005. Severe (beyond 5 margins): 9 wins, 0 losses, p = 1.000.
 - Average ranks over 43 datasets where every model ran: AODE (5 bins) 1.67, TAN (5 bins) 1.88, Naive Bayes (5 bins) 2.44. Nemenyi critical difference 0.51, Friedman p = <0.001.
 - Total fit and score time relative to the candidate: Naive Bayes (5 bins) 0.49x.
 
