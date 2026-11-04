@@ -73,11 +73,16 @@ the statistics applies to every result without rerunning a model.
 rate for a candidate whose true typical difference is known, simulated per
 suite from the committed comparisons (their per-dataset differences,
 centred at zero and resampled, so the real spread and tails between
-datasets are kept). At one margin worse the gate passes about 5% of
-candidates, as designed. An exactly equivalent candidate, though, is missed
-roughly 30 to 45% of the time on the smaller suites: most of the spread is
-genuine variation between datasets (fold noise is only 15 to 50% of it), so
-more CV repeats do not help and only more datasets do.
+datasets are kept). At one margin worse the gate passes about 6% of
+candidates, close to the 5% it is designed for. An exactly equivalent
+candidate, though, is still missed about a third of the time (33% on
+classification, 34% on regression, 41% on anomaly detection; almost never
+on the binary Brier suite). Most of the spread is genuine variation between
+datasets, not fold noise (fold noise is 15 to 50% of it), so more CV
+repeats do not help; only more datasets do. Growing the suites from
+43/25/37 to 68/31/46 datasets lowered the miss rate less than hoped,
+because the added datasets also widened the spread. A candidate that is
+genuinely better by half a margin passes 70 to 85% of the time.
 
 ## Adding a model
 
