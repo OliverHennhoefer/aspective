@@ -11,13 +11,19 @@ are in [`RESULTS.md`](RESULTS.md).
 
 | Suite | Datasets | Source |
 |---|---|---|
-| `pmlb-classification` | 43 (23 binary, 20 multiclass) | [PMLB](https://github.com/EpistasisLab/pmlb) (Olson et al. 2017; Romano et al. 2022) |
-| `pmlb-binary` | the 23 binary ones | PMLB |
-| `pmlb-regression` | 25 | PMLB |
-| `adbench-classical` | 37 | [ADBench](https://github.com/Minqi824/ADBench) Classical, which includes ODDS (Han et al. 2022) |
+| `pmlb-classification` | 68 (31 binary, 37 multiclass) | [PMLB](https://github.com/EpistasisLab/pmlb) (Olson et al. 2017; Romano et al. 2022) |
+| `pmlb-binary` | the 31 binary ones | PMLB |
+| `pmlb-regression` | 31 | PMLB |
+| `adbench-classical` | 46 | [ADBench](https://github.com/Minqi824/ADBench) Classical, which includes ODDS (Han et al. 2022) |
 
 Only real-world datasets are used, without missing values, and duplicates
-of the same underlying data are removed. Datasets above 5000 rows are
+of the same underlying data are removed. Classification datasets need at
+least 10 rows in the smallest class and are dropped when a default decision
+tree already reaches 99.5% accuracy, since every model ties on them. The
+full rule is in `suites.py`; it was fixed before the added datasets were
+run, and the suites change only on purpose, never to rescue a model.
+PMLB has no more real regression datasets that meet the rule; growing that
+suite further would need a second source such as OpenML-CTR23. Datasets above 5000 rows are
 subsampled once with a fixed seed, stratified by class. Files are downloaded
 from GitHub on first use and cached in `$ASPECTIVE_BENCH_CACHE` (default
 `~/.cache/aspective-bench`) with a SHA-256 check.
