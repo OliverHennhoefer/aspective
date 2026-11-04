@@ -52,8 +52,12 @@ def main(argv=None):
             main(["report"])
     elif args.command == "report":
         path = runner.BENCH_DIR / "RESULTS.md"
-        path.write_text(report.render(list(runner.load_results().values())))
+        results = list(runner.load_results().values())
+        path.write_text(report.render(results))
         print(f"wrote {path}")
+        docs = runner.BENCH_DIR.parent / "docs" / "models.md"
+        docs.write_text(report.render_catalog(results))
+        print(f"wrote {docs}")
     elif args.command == "check":
         return runner.main_check(BENCHMARKS)
     return 0
