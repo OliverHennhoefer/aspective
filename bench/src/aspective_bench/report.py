@@ -153,10 +153,69 @@ def operating_characteristics(results, n_sim=1000):
     return "\n".join(lines + [""])
 
 
+def leaderboards(results):
+    """One table per suite and protocol with every model run on it, side by side.
+
+    Benchmarks on the same suite share their datasets and splits, so their
+    candidates and baselines can be ranked together. A model that appears in
+    several benchmarks under the same label and configuration is listed once.
+    """
+    groups = {}
+    for r in results:
+        key = (r["suite"], r["metric"], tuple(sorted(r["protocol"].items())))
+        groups.setdefault(key, []).append(r)
+    out = [
+        "## Leaderboards",
+        "",
+        "Every model run on a suite, ranked together over the datasets where all of",
+        "them ran: the candidates, the vanilla predecessors they must keep up with and",
+        "the references shown for context. Lower average rank is better. These tables are for",
+        "orientation; the gate only compares each candidate with its own",
+        "predecessors, configured like the candidate's building blocks.",
+        "",
+    ]
+    for (suite, metric, protocol), rs in sorted(groups.items()):
+        models, roles = {}, {}
+        for r in rs:
+            for label in [r["candidate"], *r["predecessors"], *r["references"]]:
+                ident = (label, r["models"][label])
+                name = label if all(k[0] != label or k == ident for k in models) else f"{label} ({r['name']})"
+                if ident not in models:
+                    models[ident] = (name, [r["scores"][label][d] for d in r["datasets"]])
+                role = "candidate" if label == r["candidate"] else \
+                    "predecessor" if label in r["predecessors"] else "reference"
+                order = ("candidate", "predecessor", "reference")
+                roles[ident] = min(role, roles.get(ident, role), key=order.index)
+        if len(models) < 3:
+            continue
+        idents = list(models)
+        matrix = np.array([[np.nan if v is None else v for v in models[i][1]] for i in idents], float).T
+        ranks, _, cd, n = stats.friedman_nemenyi(matrix)
+        first = rs[0]
+        proto = dict(protocol)
+        extra = f", {proto['train_size']} training rows" if proto.get("train_size") else ""
+        out += [f"### `{suite}`, {METRIC_NAMES[metric]}{extra}", "",
+                f"{len(idents)} models on {n} of {len(first['datasets'])} datasets "
+                f"(Nemenyi critical difference {cd:.2f}).", "",
+                f"| Rank | Model | Role | Average rank | Mean {METRIC_NAMES[metric]} | Median {METRIC_NAMES[metric]} |",
+                "|---|---|---|---|---|---|"]
+        order = np.argsort(ranks, kind="stable")
+        for place, j in enumerate(order, 1):
+            ident = idents[j]
+            col = matrix[:, j]
+            col = col[~np.isnan(col)]
+            mean = _display(first, float(np.mean(col))) if col.size else None
+            median = _display(first, float(np.median(col))) if col.size else None
+            out.append(f"| {place} | {models[ident][0]} | {roles[ident]} | {ranks[j]:.2f} | "
+                       f"{_fmt(mean)} | {_fmt(median)} |")
+        out.append("")
+    return "\n".join(out)
+
+
 def render(results):
     results = sorted(results, key=lambda r: r["name"])
     parts = [HEADER, "## Summary", "", summary_table(results), "",
-             operating_characteristics(results), "## Details", ""]
+             leaderboards(results), operating_characteristics(results), "## Details", ""]
     parts += [section(r) for r in results]
     env = results[0]["environment"] if results else {}
     if env:
