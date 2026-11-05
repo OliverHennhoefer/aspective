@@ -79,8 +79,9 @@ the statistics applies to every result without rerunning a model.
 together: the candidates, their predecessors and references, and a fixed
 set of standard methods with default settings (linear and ridge models,
 CART, k-NN, SVMs, random forest, extra trees, gradient boosting and
-histogram gradient boosting; Isolation Forest, LOF, one-class SVM, elliptic
-envelope and KDE for anomaly detection). The standards are defined in
+histogram gradient boosting; Isolation Forest, LOF, one-class SVM and KDE for
+anomaly detection; an elliptic envelope did not finish on InternetAds, whose
+1555 features make its robust covariance fit impractical). The standards are defined in
 `specs.py`, saved under `results/standards/` and never affect the gate.
 
 **How reliable the gate is.** `RESULTS.md` has a table of the gate's pass

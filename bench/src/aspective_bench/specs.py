@@ -16,7 +16,6 @@ measures the paper's idea and not a tuning difference.
 """
 
 from sklearn.compose import TransformedTargetRegressor
-from sklearn.covariance import EllipticEnvelope
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.ensemble import (
     AdaBoostClassifier,
@@ -454,7 +453,6 @@ STANDARDS = [
         "Isolation Forest": ISOLATION_FOREST[1],
         "LOF": LOF[1],
         "One-class SVM": lambda: scaled(OneClassSVM()),
-        "Elliptic envelope": lambda: scaled(EllipticEnvelope(random_state=0)),
         "KDE (Scott)": lambda: scaled(KernelDensity(bandwidth="scott")),
     }),
 ]

@@ -62,78 +62,101 @@ predecessors, configured like the candidate's building blocks.
 
 ### `adbench-classical`, ROC AUC
 
-5 models on 46 of 46 datasets (Nemenyi critical difference 0.90).
+7 models on 46 of 46 datasets (Nemenyi critical difference 1.33).
 
 | Rank | Model | Role | Average rank | Mean ROC AUC | Median ROC AUC |
 |---|---|---|---|---|---|
-| 1 | LeSiNN | candidate | 2.54 | 0.772 | 0.799 |
-| 2 | RS-Hash | candidate | 2.77 | 0.764 | 0.757 |
-| 3 | Extended IF | candidate | 2.88 | 0.758 | 0.774 |
-| 4 | Isolation Forest | predecessor | 3.07 | 0.758 | 0.756 |
-| 5 | LOF | reference | 3.74 | 0.668 | 0.651 |
+| 1 | LeSiNN | candidate | 3.17 | 0.772 | 0.799 |
+| 2 | RS-Hash | candidate | 3.55 | 0.764 | 0.757 |
+| 3 | Extended IF | candidate | 3.62 | 0.758 | 0.774 |
+| 4 | Isolation Forest | predecessor | 3.89 | 0.758 | 0.756 |
+| 5 | KDE (Scott) | standard | 4.05 | 0.728 | 0.745 |
+| 6 | One-class SVM | standard | 4.77 | 0.734 | 0.728 |
+| 7 | LOF | reference | 4.93 | 0.668 | 0.651 |
 
 ### `pmlb-binary`, Brier score
 
-4 models on 31 of 31 datasets (Nemenyi critical difference 0.84).
+11 models on 31 of 31 datasets (Nemenyi critical difference 2.71).
 
 | Rank | Model | Role | Average rank | Mean Brier score | Median Brier score |
 |---|---|---|---|---|---|
-| 1 | Cauchy prior | candidate | 1.65 | 0.118 | 0.125 |
-| 2 | Ridge logistic (C=1) | reference | 2.24 | 0.122 | 0.123 |
-| 3 | Firth | candidate | 2.98 | 0.131 | 0.139 |
-| 4 | ML logistic | predecessor | 3.13 | 0.127 | 0.135 |
+| 1 | Random forest | standard | 3.68 | 0.100 | 0.073 |
+| 2 | Histogram gradient boosting | standard | 4.29 | 0.100 | 0.081 |
+| 3 | Extra trees | standard | 4.32 | 0.103 | 0.067 |
+| 4 | Cauchy prior | candidate | 4.58 | 0.118 | 0.125 |
+| 5 | Ridge logistic (C=1) | reference | 5.24 | 0.122 | 0.123 |
+| 6 | Gradient boosting (depth 3) | standard | 5.50 | 0.109 | 0.091 |
+| 7 | Firth | candidate | 6.44 | 0.131 | 0.139 |
+| 8 | ML logistic | predecessor | 6.48 | 0.127 | 0.135 |
+| 9 | k-NN (k=5) | standard | 7.23 | 0.126 | 0.126 |
+| 10 | Gaussian NB | standard | 8.94 | 0.247 | 0.201 |
+| 11 | CART | standard | 9.31 | 0.189 | 0.141 |
 
 ### `pmlb-classification`, accuracy
 
-20 models on 68 of 68 datasets (Nemenyi critical difference 3.60).
+25 models on 68 of 68 datasets (Nemenyi critical difference 4.62).
 
 | Rank | Model | Role | Average rank | Mean accuracy | Median accuracy |
 |---|---|---|---|---|---|
-| 1 | Random forest | predecessor | 5.84 | 0.832 | 0.902 |
-| 2 | Rotation Forest | candidate | 5.88 | 0.833 | 0.904 |
-| 3 | MultiBoost (depth 3) | candidate | 7.29 | 0.823 | 0.873 |
-| 4 | Gradient boosting (depth 3) | reference | 7.29 | 0.832 | 0.891 |
-| 5 | RDA (tuned) | candidate | 7.35 | 0.811 | 0.862 |
-| 6 | LogitBoost (depth 3) | candidate | 7.81 | 0.831 | 0.901 |
-| 7 | AdaBoost (depth 3) | predecessor | 8.93 | 0.818 | 0.865 |
-| 8 | MDA (tuned) | candidate | 9.32 | 0.793 | 0.824 |
-| 9 | DANN (k=5) | candidate | 10.67 | 0.788 | 0.833 |
-| 10 | LDA | predecessor | 10.88 | 0.778 | 0.811 |
-| 11 | LDA (Ledoit-Wolf) | reference | 10.91 | 0.781 | 0.813 |
-| 12 | A2DE (5 bins) | candidate | 11.28 | 0.770 | 0.824 |
-| 13 | k-NN (k=5) | predecessor | 11.67 | 0.781 | 0.835 |
-| 14 | AODE (5 bins) | candidate | 12.02 | 0.766 | 0.815 |
-| 15 | Hidden NB (5 bins) | candidate | 12.34 | 0.765 | 0.807 |
-| 16 | Flexible NB | candidate | 13.16 | 0.763 | 0.804 |
-| 17 | KDB k=2 (5 bins) | candidate | 13.20 | 0.760 | 0.807 |
-| 18 | TAN (5 bins) | candidate | 13.32 | 0.757 | 0.806 |
-| 19 | Gaussian NB | predecessor | 15.15 | 0.699 | 0.730 |
-| 20 | Naive Bayes (5 bins) | predecessor | 15.69 | 0.727 | 0.772 |
+| 1 | Rotation Forest | candidate | 7.53 | 0.833 | 0.904 |
+| 2 | Random forest | predecessor | 7.68 | 0.832 | 0.902 |
+| 3 | Extra trees | standard | 8.15 | 0.829 | 0.910 |
+| 4 | SVM (RBF) | standard | 8.44 | 0.813 | 0.862 |
+| 5 | MultiBoost (depth 3) | candidate | 9.37 | 0.823 | 0.873 |
+| 6 | Histogram gradient boosting | standard | 9.40 | 0.829 | 0.896 |
+| 7 | Gradient boosting (depth 3) | reference | 9.46 | 0.832 | 0.891 |
+| 8 | RDA (tuned) | candidate | 9.57 | 0.811 | 0.862 |
+| 9 | LogitBoost (depth 3) | candidate | 9.98 | 0.831 | 0.901 |
+| 10 | AdaBoost (depth 3) | predecessor | 11.32 | 0.818 | 0.865 |
+| 11 | Ridge logistic (C=1) | standard | 12.11 | 0.788 | 0.816 |
+| 12 | MDA (tuned) | candidate | 12.20 | 0.793 | 0.824 |
+| 13 | DANN (k=5) | candidate | 13.73 | 0.788 | 0.833 |
+| 14 | LDA | predecessor | 14.12 | 0.778 | 0.811 |
+| 15 | LDA (Ledoit-Wolf) | reference | 14.15 | 0.781 | 0.813 |
+| 16 | A2DE (5 bins) | candidate | 14.54 | 0.770 | 0.824 |
+| 17 | k-NN (k=5) | predecessor | 15.14 | 0.781 | 0.835 |
+| 18 | AODE (5 bins) | candidate | 15.53 | 0.766 | 0.815 |
+| 19 | Hidden NB (5 bins) | candidate | 15.85 | 0.765 | 0.807 |
+| 20 | Flexible NB | candidate | 16.70 | 0.763 | 0.804 |
+| 21 | KDB k=2 (5 bins) | candidate | 16.90 | 0.760 | 0.807 |
+| 22 | TAN (5 bins) | candidate | 17.04 | 0.757 | 0.806 |
+| 23 | CART | standard | 17.31 | 0.783 | 0.808 |
+| 24 | Gaussian NB | predecessor | 19.01 | 0.699 | 0.730 |
+| 25 | Naive Bayes (5 bins) | predecessor | 19.76 | 0.727 | 0.772 |
 
 Not ranked, because they fail on more than a tenth of the datasets: QDA (35 of 68).
 
 ### `pmlb-ctr23-regression`, R²
 
-16 models on 52 of 52 datasets (Nemenyi critical difference 3.20).
+25 models on 52 of 52 datasets (Nemenyi critical difference 5.28).
 
 | Rank | Model | Role | Average rank | Mean R² | Median R² |
 |---|---|---|---|---|---|
-| 1 | M5 model tree | candidate | 5.79 | 0.202 | 0.718 |
-| 2 | LOESS (tuned span) | candidate | 5.94 | 0.610 | 0.673 |
-| 3 | Local linear forest | candidate | 6.25 | 0.648 | 0.738 |
-| 4 | Random forest (leaf 5) | predecessor | 6.92 | 0.654 | 0.723 |
-| 5 | MARS (additive) | candidate | 6.96 | 0.607 | 0.624 |
-| 6 | LassoCV | predecessor | 7.89 | 0.564 | 0.572 |
-| 7 | P-spline GAM | candidate | 8.34 | 0.458 | 0.564 |
-| 8 | Relaxed LassoCV | candidate | 8.76 | 0.564 | 0.569 |
-| 9 | Bolasso-S (0.9) | reference | 9.16 | 0.566 | 0.568 |
-| 10 | L2Boost (CV) | candidate | 9.31 | 0.562 | 0.559 |
-| 11 | k-NN (tuned k) | predecessor | 9.50 | 0.598 | 0.658 |
-| 12 | SCAD (CV) | candidate | 9.57 | 0.560 | 0.560 |
-| 13 | MCP (CV) | candidate | 9.88 | 0.558 | 0.561 |
-| 14 | Adaptive LassoCV | candidate | 10.13 | 0.562 | 0.565 |
-| 15 | CART (tuned leaf size) | predecessor | 10.75 | 0.599 | 0.653 |
-| 16 | Bolasso | candidate | 10.84 | 0.560 | 0.570 |
+| 1 | Local linear forest | candidate | 9.00 | 0.648 | 0.738 |
+| 2 | M5 model tree | candidate | 9.09 | 0.202 | 0.718 |
+| 3 | LOESS (tuned span) | candidate | 9.40 | 0.610 | 0.673 |
+| 4 | Extra trees | standard | 9.47 | 0.627 | 0.724 |
+| 5 | Gradient boosting | standard | 10.04 | 0.626 | 0.725 |
+| 6 | Random forest (leaf 5) | predecessor | 10.35 | 0.654 | 0.723 |
+| 7 | Random forest | standard | 10.42 | 0.641 | 0.718 |
+| 8 | Histogram gradient boosting | standard | 10.77 | 0.643 | 0.717 |
+| 9 | MARS (additive) | candidate | 10.96 | 0.607 | 0.624 |
+| 10 | SVR (RBF) | standard | 11.79 | 0.615 | 0.653 |
+| 11 | LassoCV | predecessor | 12.53 | 0.564 | 0.572 |
+| 12 | P-spline GAM | candidate | 12.88 | 0.458 | 0.564 |
+| 13 | Relaxed LassoCV | candidate | 13.43 | 0.564 | 0.569 |
+| 14 | RidgeCV | standard | 13.48 | 0.563 | 0.568 |
+| 15 | L2Boost (CV) | candidate | 14.08 | 0.562 | 0.559 |
+| 16 | Bolasso-S (0.9) | reference | 14.09 | 0.566 | 0.568 |
+| 17 | k-NN (tuned k) | predecessor | 14.53 | 0.598 | 0.658 |
+| 18 | SCAD (CV) | candidate | 14.54 | 0.560 | 0.560 |
+| 19 | Linear regression | standard | 14.62 | 0.563 | 0.567 |
+| 20 | MCP (CV) | candidate | 14.85 | 0.558 | 0.561 |
+| 21 | Adaptive LassoCV | candidate | 15.17 | 0.562 | 0.565 |
+| 22 | Bolasso | candidate | 16.25 | 0.560 | 0.570 |
+| 23 | CART (tuned leaf size) | predecessor | 16.33 | 0.599 | 0.653 |
+| 24 | k-NN (k=5) | standard | 16.43 | 0.570 | 0.662 |
+| 25 | CART | standard | 20.51 | 0.370 | 0.528 |
 
 ## How reliable the gate is
 
