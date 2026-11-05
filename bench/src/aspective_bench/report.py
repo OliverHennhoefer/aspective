@@ -156,10 +156,86 @@ def operating_characteristics(results, n_sim=1000):
     return "\n".join(lines + [""])
 
 
-def render(results):
+MAX_FAILED_SHARE = 0.1
+
+
+def leaderboards(results, standards=()):
+    """One table per suite and protocol with every model run on it, side by side.
+
+    Benchmarks on the same suite share their datasets and splits, so their
+    candidates and baselines can be ranked together. A model that appears in
+    several benchmarks under the same label and configuration is listed once.
+    """
+    groups = {}
+    for r in [*results, *standards]:
+        key = (r["suite"], r["metric"], tuple(sorted(r["protocol"].items())))
+        groups.setdefault(key, []).append(r)
+    out = [
+        "## Leaderboards",
+        "",
+        "Every model run on a suite, ranked together over the datasets where all of",
+        "them ran: the candidates, the vanilla predecessors they must keep up with,",
+        "the references shown for context, and standard methods with default",
+        "settings (`uv run aspective-bench standards`). Lower average rank is better. These tables are for",
+        "orientation; the gate only compares each candidate with its own",
+        "predecessors, configured like the candidate's building blocks.",
+        "",
+    ]
+    for (suite, metric, protocol), rs in sorted(groups.items()):
+        models, roles = {}, {}
+        for r in rs:
+            for label in [r["candidate"], *r["predecessors"], *r["references"]]:
+                ident = (label, r["models"][label])
+                name = label if all(k[0] != label or k == ident for k in models) else f"{label} ({r['name']})"
+                if ident not in models:
+                    models[ident] = (name, [r["scores"][label][d] for d in r["datasets"]])
+                if r["name"].startswith("standards-"):
+                    role = "standard"
+                else:
+                    role = "candidate" if label == r["candidate"] else \
+                        "predecessor" if label in r["predecessors"] else "reference"
+                order = ("candidate", "predecessor", "reference", "standard")
+                roles[ident] = min(role, roles.get(ident, role), key=order.index)
+        if len(models) < 3:
+            continue
+        # A model that fails on more than a tenth of the datasets would shrink
+        # the common set for everyone; it is named below the table instead.
+        n_data = len(rs[0]["datasets"])
+        failed = {i: sum(v is None for v in models[i][1]) for i in models}
+        left_out = [i for i in models if failed[i] > MAX_FAILED_SHARE * n_data]
+        idents = [i for i in models if i not in left_out]
+        matrix = np.array([[np.nan if v is None else v for v in models[i][1]] for i in idents], float).T
+        ranks, _, cd, n = stats.friedman_nemenyi(matrix)
+        first = rs[0]
+        proto = dict(protocol)
+        extra = f", {proto['train_size']} training rows" if proto.get("train_size") else ""
+        out += [f"### `{suite}`, {METRIC_NAMES[metric]}{extra}", "",
+                f"{len(idents)} models on {n} of {len(first['datasets'])} datasets "
+                f"(Nemenyi critical difference {cd:.2f}).", "",
+                f"| Rank | Model | Role | Average rank | Mean {METRIC_NAMES[metric]} | Median {METRIC_NAMES[metric]} |",
+                "|---|---|---|---|---|---|"]
+        # Means and medians over the same datasets as the ranks, so every row
+        # of the table describes one population.
+        complete = matrix[~np.isnan(matrix).any(axis=1)]
+        order = np.argsort(ranks, kind="stable")
+        for place, j in enumerate(order, 1):
+            ident = idents[j]
+            col = complete[:, j]
+            mean = _display(first, float(np.mean(col))) if col.size else None
+            median = _display(first, float(np.median(col))) if col.size else None
+            out.append(f"| {place} | {models[ident][0]} | {roles[ident]} | {ranks[j]:.2f} | "
+                       f"{_fmt(mean)} | {_fmt(median)} |")
+        if left_out:
+            out += ["", "Not ranked, because they fail on more than a tenth of the datasets: "
+                    + ", ".join(f"{models[i][0]} ({failed[i]} of {n_data})" for i in left_out) + "."]
+        out.append("")
+    return "\n".join(out)
+
+
+def render(results, standards=()):
     results = sorted(results, key=lambda r: r["name"])
     parts = [HEADER, "## Summary", "", summary_table(results), "",
-             operating_characteristics(results), "## Details", ""]
+             leaderboards(results, standards), operating_characteristics(results), "## Details", ""]
     parts += [section(r) for r in results]
     env = results[0]["environment"] if results else {}
     if env:

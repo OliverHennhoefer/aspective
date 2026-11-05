@@ -21,9 +21,9 @@ recomputed from the per-dataset scores every time the gate is checked.
 | Benchmark | Candidate | vs predecessor | Datasets | Better / within margin / worse | Median Δ | p (non-inferior) | Severe wins / losses | Verdict | Gate |
 |---|---|---|---|---|---|---|---|---|---|
 | [a2de](#a2de) | A2DE (5 bins) | Naive Bayes (5 bins) | 68 | 42 / 18 / 8 | +0.022 | <0.001 | 22 / 0 | superior | PASS |
-| [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [adaptive-lasso](#adaptive-lasso) | Adaptive LassoCV | LassoCV | 52 | 0 / 48 / 4 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
 | [aode](#aode) | AODE (5 bins) | Naive Bayes (5 bins) | 68 | 42 / 22 / 4 | +0.021 | <0.001 | 20 / 0 | superior | PASS |
-| [bolasso](#bolasso) | Bolasso | LassoCV | 31 | 1 / 24 / 6 | -0.001 | 0.004 | 0 / 3 | non-inferior | PASS |
+| [bolasso](#bolasso) | Bolasso | LassoCV | 52 | 2 / 41 / 9 | -0.002 | <0.001 | 1 / 3 | non-inferior | PASS |
 | [cauchy-logistic](#cauchy-logistic) | Cauchy prior | ML logistic | 31 | 11 / 20 / 0 | +0.000 | <0.001 | 4 / 0 | superior | PASS |
 | [dann](#dann) | DANN (k=5) | k-NN (k=5) | 68 | 28 / 25 / 15 | +0.006 | <0.001 | 7 / 5 | non-inferior | PASS |
 | [extended-iforest](#extended-iforest) | Extended IF | Isolation Forest | 46 | 16 / 20 / 10 | +0.002 | <0.001 | 5 / 5 | non-inferior | PASS |
@@ -31,25 +31,132 @@ recomputed from the per-dataset scores every time the gate is checked.
 | [flexible-nb](#flexible-nb) | Flexible NB | Gaussian NB | 68 | 39 / 13 / 16 | +0.023 | <0.001 | 26 / 6 | superior | PASS |
 | [hnb](#hnb) | Hidden NB (5 bins) | Naive Bayes (5 bins) | 68 | 40 / 21 / 7 | +0.020 | <0.001 | 20 / 0 | superior | PASS |
 | [kdb](#kdb) | KDB k=2 (5 bins) | Naive Bayes (5 bins) | 68 | 37 / 12 / 19 | +0.022 | <0.001 | 23 / 2 | superior | PASS |
-| [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 31 | 0 / 31 / 0 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [l2boost](#l2boost) | L2Boost (CV) | LassoCV | 52 | 1 / 48 / 3 | -0.000 | <0.001 | 0 / 1 | non-inferior | PASS |
 | [lesinn](#lesinn) | LeSiNN | Isolation Forest | 46 | 20 / 16 / 10 | +0.006 | <0.001 | 11 / 6 | non-inferior | PASS |
-| [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 31 | 11 / 15 / 5 | +0.006 | <0.001 | 1 / 2 | superior | PASS |
-| [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 31 | 23 / 1 / 7 | +0.028 | <0.001 | 12 / 3 | superior | PASS |
+| [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 52 | 22 / 19 / 11 | +0.006 | <0.001 | 2 / 5 | superior | PASS |
+| [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 52 | 37 / 3 / 12 | +0.030 | <0.001 | 20 / 6 | superior | PASS |
 | [logitboost](#logitboost) | LogitBoost (depth 3) | AdaBoost (depth 3) | 68 | 24 / 31 / 13 | +0.002 | <0.001 | 8 / 1 | superior | PASS |
-| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 31 | 23 / 6 / 2 | +0.044 | <0.001 | 14 / 1 | superior | PASS |
-| [mars](#mars) | MARS (additive) | LassoCV | 31 | 17 / 9 / 5 | +0.025 | <0.001 | 12 / 3 | superior | PASS |
-| [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 31 | 19 / 6 / 6 | +0.023 | 0.002 | 9 / 3 | superior | PASS |
-| [mcp](#mcp) | MCP (CV) | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 52 | 40 / 8 / 4 | +0.048 | <0.001 | 25 / 3 | superior | PASS |
+| [mars](#mars) | MARS (additive) | LassoCV | 52 | 33 / 11 / 8 | +0.026 | <0.001 | 19 / 5 | superior | PASS |
+| [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 52 | 31 / 8 / 13 | +0.025 | 0.001 | 16 / 7 | superior | PASS |
+| [mcp](#mcp) | MCP (CV) | LassoCV | 52 | 0 / 47 / 5 | -0.000 | <0.001 | 0 / 1 | non-inferior | PASS |
 | [mda](#mda) | MDA (tuned) | LDA | 68 | 24 / 36 / 8 | +0.002 | <0.001 | 9 / 1 | superior | PASS |
 | [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 68 | 20 / 34 / 14 | +0.003 | <0.001 | 3 / 2 | non-inferior | PASS |
-| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 31 | 14 / 11 / 6 | +0.003 | 0.007 | 11 / 4 | non-inferior | PASS |
+| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 52 | 23 / 15 / 14 | +0.000 | 0.023 | 17 / 9 | non-inferior | PASS |
 | [rda](#rda) | RDA (tuned) | LDA | 68 | 33 / 28 / 7 | +0.009 | <0.001 | 17 / 0 | superior | PASS |
 | [rda](#rda) | RDA (tuned) | QDA | 33 | 9 / 21 / 3 | +0.003 | <0.001 | 1 / 1 | non-inferior | PASS |
-| [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 52 | 1 / 50 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
 | [rotation-forest](#rotation-forest) | Rotation Forest | Random forest | 68 | 16 / 42 / 10 | +0.000 | <0.001 | 3 / 1 | non-inferior | PASS |
 | [rshash](#rshash) | RS-Hash | Isolation Forest | 46 | 18 / 18 / 10 | +0.006 | <0.001 | 5 / 3 | non-inferior | PASS |
-| [scad](#scad) | SCAD (CV) | LassoCV | 31 | 0 / 30 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
+| [scad](#scad) | SCAD (CV) | LassoCV | 52 | 0 / 48 / 4 | -0.000 | <0.001 | 0 / 2 | non-inferior | PASS |
 | [tan](#tan) | TAN (5 bins) | Naive Bayes (5 bins) | 68 | 36 / 19 / 13 | +0.013 | <0.001 | 19 / 1 | superior | PASS |
+
+## Leaderboards
+
+Every model run on a suite, ranked together over the datasets where all of
+them ran: the candidates, the vanilla predecessors they must keep up with,
+the references shown for context, and standard methods with default
+settings (`uv run aspective-bench standards`). Lower average rank is better. These tables are for
+orientation; the gate only compares each candidate with its own
+predecessors, configured like the candidate's building blocks.
+
+### `adbench-classical`, ROC AUC
+
+7 models on 46 of 46 datasets (Nemenyi critical difference 1.33).
+
+| Rank | Model | Role | Average rank | Mean ROC AUC | Median ROC AUC |
+|---|---|---|---|---|---|
+| 1 | LeSiNN | candidate | 3.17 | 0.772 | 0.799 |
+| 2 | RS-Hash | candidate | 3.55 | 0.764 | 0.757 |
+| 3 | Extended IF | candidate | 3.62 | 0.758 | 0.774 |
+| 4 | Isolation Forest | predecessor | 3.89 | 0.758 | 0.756 |
+| 5 | KDE (Scott) | standard | 4.05 | 0.728 | 0.745 |
+| 6 | One-class SVM | standard | 4.77 | 0.734 | 0.728 |
+| 7 | LOF | reference | 4.93 | 0.668 | 0.651 |
+
+### `pmlb-binary`, Brier score
+
+11 models on 31 of 31 datasets (Nemenyi critical difference 2.71).
+
+| Rank | Model | Role | Average rank | Mean Brier score | Median Brier score |
+|---|---|---|---|---|---|
+| 1 | Random forest | standard | 3.68 | 0.100 | 0.073 |
+| 2 | Histogram gradient boosting | standard | 4.29 | 0.100 | 0.081 |
+| 3 | Extra trees | standard | 4.32 | 0.103 | 0.067 |
+| 4 | Cauchy prior | candidate | 4.58 | 0.118 | 0.125 |
+| 5 | Ridge logistic (C=1) | reference | 5.24 | 0.122 | 0.123 |
+| 6 | Gradient boosting (depth 3) | standard | 5.50 | 0.109 | 0.091 |
+| 7 | Firth | candidate | 6.44 | 0.131 | 0.139 |
+| 8 | ML logistic | predecessor | 6.48 | 0.127 | 0.135 |
+| 9 | k-NN (k=5) | standard | 7.23 | 0.126 | 0.126 |
+| 10 | Gaussian NB | standard | 8.94 | 0.247 | 0.201 |
+| 11 | CART | standard | 9.31 | 0.189 | 0.141 |
+
+### `pmlb-classification`, accuracy
+
+25 models on 68 of 68 datasets (Nemenyi critical difference 4.62).
+
+| Rank | Model | Role | Average rank | Mean accuracy | Median accuracy |
+|---|---|---|---|---|---|
+| 1 | Rotation Forest | candidate | 7.53 | 0.833 | 0.904 |
+| 2 | Random forest | predecessor | 7.68 | 0.832 | 0.902 |
+| 3 | Extra trees | standard | 8.15 | 0.829 | 0.910 |
+| 4 | SVM (RBF) | standard | 8.44 | 0.813 | 0.862 |
+| 5 | MultiBoost (depth 3) | candidate | 9.37 | 0.823 | 0.873 |
+| 6 | Histogram gradient boosting | standard | 9.40 | 0.829 | 0.896 |
+| 7 | Gradient boosting (depth 3) | reference | 9.46 | 0.832 | 0.891 |
+| 8 | RDA (tuned) | candidate | 9.57 | 0.811 | 0.862 |
+| 9 | LogitBoost (depth 3) | candidate | 9.98 | 0.831 | 0.901 |
+| 10 | AdaBoost (depth 3) | predecessor | 11.32 | 0.818 | 0.865 |
+| 11 | Ridge logistic (C=1) | standard | 12.11 | 0.788 | 0.816 |
+| 12 | MDA (tuned) | candidate | 12.20 | 0.793 | 0.824 |
+| 13 | DANN (k=5) | candidate | 13.73 | 0.788 | 0.833 |
+| 14 | LDA | predecessor | 14.12 | 0.778 | 0.811 |
+| 15 | LDA (Ledoit-Wolf) | reference | 14.15 | 0.781 | 0.813 |
+| 16 | A2DE (5 bins) | candidate | 14.54 | 0.770 | 0.824 |
+| 17 | k-NN (k=5) | predecessor | 15.14 | 0.781 | 0.835 |
+| 18 | AODE (5 bins) | candidate | 15.53 | 0.766 | 0.815 |
+| 19 | Hidden NB (5 bins) | candidate | 15.85 | 0.765 | 0.807 |
+| 20 | Flexible NB | candidate | 16.70 | 0.763 | 0.804 |
+| 21 | KDB k=2 (5 bins) | candidate | 16.90 | 0.760 | 0.807 |
+| 22 | TAN (5 bins) | candidate | 17.04 | 0.757 | 0.806 |
+| 23 | CART | standard | 17.31 | 0.783 | 0.808 |
+| 24 | Gaussian NB | predecessor | 19.01 | 0.699 | 0.730 |
+| 25 | Naive Bayes (5 bins) | predecessor | 19.76 | 0.727 | 0.772 |
+
+Not ranked, because they fail on more than a tenth of the datasets: QDA (35 of 68).
+
+### `pmlb-ctr23-regression`, R²
+
+25 models on 52 of 52 datasets (Nemenyi critical difference 5.28).
+
+| Rank | Model | Role | Average rank | Mean R² | Median R² |
+|---|---|---|---|---|---|
+| 1 | Local linear forest | candidate | 9.00 | 0.648 | 0.738 |
+| 2 | M5 model tree | candidate | 9.09 | 0.202 | 0.718 |
+| 3 | LOESS (tuned span) | candidate | 9.40 | 0.610 | 0.673 |
+| 4 | Extra trees | standard | 9.47 | 0.627 | 0.724 |
+| 5 | Gradient boosting | standard | 10.04 | 0.626 | 0.725 |
+| 6 | Random forest (leaf 5) | predecessor | 10.35 | 0.654 | 0.723 |
+| 7 | Random forest | standard | 10.42 | 0.641 | 0.718 |
+| 8 | Histogram gradient boosting | standard | 10.77 | 0.643 | 0.717 |
+| 9 | MARS (additive) | candidate | 10.96 | 0.607 | 0.624 |
+| 10 | SVR (RBF) | standard | 11.79 | 0.615 | 0.653 |
+| 11 | LassoCV | predecessor | 12.53 | 0.564 | 0.572 |
+| 12 | P-spline GAM | candidate | 12.88 | 0.458 | 0.564 |
+| 13 | Relaxed LassoCV | candidate | 13.43 | 0.564 | 0.569 |
+| 14 | RidgeCV | standard | 13.48 | 0.563 | 0.568 |
+| 15 | L2Boost (CV) | candidate | 14.08 | 0.562 | 0.559 |
+| 16 | Bolasso-S (0.9) | reference | 14.09 | 0.566 | 0.568 |
+| 17 | k-NN (tuned k) | predecessor | 14.53 | 0.598 | 0.658 |
+| 18 | SCAD (CV) | candidate | 14.54 | 0.560 | 0.560 |
+| 19 | Linear regression | standard | 14.62 | 0.563 | 0.567 |
+| 20 | MCP (CV) | candidate | 14.85 | 0.558 | 0.561 |
+| 21 | Adaptive LassoCV | candidate | 15.17 | 0.562 | 0.565 |
+| 22 | Bolasso | candidate | 16.25 | 0.560 | 0.570 |
+| 23 | CART (tuned leaf size) | predecessor | 16.33 | 0.599 | 0.653 |
+| 24 | k-NN (k=5) | standard | 16.43 | 0.570 | 0.662 |
+| 25 | CART | standard | 20.51 | 0.370 | 0.528 |
 
 ## How reliable the gate is
 
@@ -68,7 +175,7 @@ rate without loosening the margin.
 | `adbench-classical` (margin 0.01) | 46 | 3 | 1% | 6% | 28% | 59% | 83% |
 | `pmlb-binary` (margin 0.005) | 31 | 2 | 0% | 6% | 71% | 100% | 100% |
 | `pmlb-classification` (margin 0.01) | 68 | 13 | 1% | 6% | 43% | 67% | 85% |
-| `pmlb-regression` (margin 0.01) | 31 | 12 | 2% | 6% | 56% | 66% | 70% |
+| `pmlb-ctr23-regression` (margin 0.01) | 52 | 12 | 1% | 6% | 55% | 70% | 78% |
 
 ## Details
 
@@ -159,13 +266,13 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 
 ### adaptive-lasso
 
-**Adaptive LassoCV** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Adaptive LassoCV** vs LassoCV. Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0005 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.213. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
-- Average ranks over 31 datasets where every model ran: LassoCV 1.29, Adaptive LassoCV 1.71. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: LassoCV 0.35x.
+- vs LassoCV: **non-inferior**. Median difference -0.0004, mean -0.0020 (positive favours the candidate); better on 0, within margin on 48, worse on 4 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.005. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 52 datasets where every model ran: LassoCV 1.24, Adaptive LassoCV 1.76. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: LassoCV 0.34x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -202,6 +309,27 @@ gamma in {0.5, 1, 2} and alpha chosen by 5-fold CV; ridge initial estimator.
 | 663_rabe_266 | **0.969** | **0.969** |
 | 678_visualizing_environmental | **0.345** | 0.341 |
 | 712_chscase_geyser1 | 0.756 | **0.759** |
+| openml:44956_abalone | 0.511 | **0.512** |
+| openml:44957_airfoil_self_noise | **0.509** | **0.509** |
+| openml:44959_concrete_compressive_strength | 0.598 | **0.600** |
+| openml:44962_forest_fires | -0.101 | **-0.059** |
+| openml:44963_physiochemical_protein | **0.283** | **0.284** |
+| openml:44964_superconductivity | 0.722 | **0.723** |
+| openml:44967_student_performance_por | 0.253 | **0.265** |
+| openml:44970_QSAR_fish_toxicity | 0.558 | **0.559** |
+| openml:44971_white_wine | **0.272** | **0.272** |
+| openml:44972_red_wine | 0.338 | **0.340** |
+| openml:44976_sarcos | 0.925 | **0.925** |
+| openml:44979_diamonds | **0.907** | **0.907** |
+| openml:44983_miami_housing | **0.694** | 0.691 |
+| openml:44984_cps88wages | **0.237** | 0.236 |
+| openml:44987_socmob | 0.571 | **0.577** |
+| openml:44989_kings_county | **0.690** | **0.690** |
+| openml:44990_brazilian_houses | 0.547 | **0.568** |
+| openml:44993_health_insurance | **0.355** | **0.356** |
+| openml:44994_cars | **0.907** | **0.908** |
+| openml:45012_fifa | **0.195** | **0.195** |
+| openml:45402_space_ga | 0.575 | **0.578** |
 
 </details>
 
@@ -292,13 +420,13 @@ Both use the same 5-bin quantile discretization, as in Webb et al. (2005).
 
 ### bolasso
 
-**Bolasso** vs LassoCV (references: Bolasso-S (0.9)). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Bolasso** vs LassoCV (references: Bolasso-S (0.9)). Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Bolasso is mainly a variable-selection method; this checks that its predictions keep up with the lasso.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0014, mean -0.0102 (positive favours the candidate); better on 1, within margin on 24, worse on 6 of 31 datasets; non-inferiority p = 0.004, two-sided Wilcoxon p = 0.003. Severe (beyond 5 margins): 0 wins, 3 losses, p = 0.125.
-- Average ranks over 31 datasets where every model ran: LassoCV 1.61, Bolasso-S (0.9) 2.00, Bolasso 2.39. Nemenyi critical difference 0.60, Friedman p = 0.008.
-- Total fit and score time relative to the candidate: LassoCV 0.14x.
+- vs LassoCV: **non-inferior**. Median difference -0.0021, mean -0.0043 (positive favours the candidate); better on 2, within margin on 41, worse on 9 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 1 wins, 3 losses, p = 0.312.
+- Average ranks over 52 datasets where every model ran: LassoCV 1.56, Bolasso-S (0.9) 1.94, Bolasso 2.50. Nemenyi critical difference 0.46, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: LassoCV 0.072x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -335,6 +463,27 @@ Bolasso is mainly a variable-selection method; this checks that its predictions 
 | 663_rabe_266 | **0.969** | **0.969** | **0.969** |
 | 678_visualizing_environmental | **0.355** | 0.341 | 0.332 |
 | 712_chscase_geyser1 | 0.754 | **0.759** | 0.756 |
+| openml:44956_abalone | **0.512** | **0.512** | **0.513** |
+| openml:44957_airfoil_self_noise | **0.509** | **0.509** | **0.509** |
+| openml:44959_concrete_compressive_strength | 0.599 | 0.600 | **0.601** |
+| openml:44962_forest_fires | **-0.051** | -0.059 | **-0.051** |
+| openml:44963_physiochemical_protein | 0.280 | **0.284** | **0.284** |
+| openml:44964_superconductivity | 0.708 | **0.723** | 0.722 |
+| openml:44967_student_performance_por | 0.234 | **0.265** | 0.243 |
+| openml:44970_QSAR_fish_toxicity | 0.559 | **0.559** | **0.559** |
+| openml:44971_white_wine | 0.269 | **0.272** | 0.272 |
+| openml:44972_red_wine | 0.337 | **0.340** | 0.338 |
+| openml:44976_sarcos | 0.925 | **0.925** | **0.925** |
+| openml:44979_diamonds | 0.905 | **0.907** | **0.907** |
+| openml:44983_miami_housing | 0.681 | 0.691 | **0.695** |
+| openml:44984_cps88wages | **0.237** | 0.236 | **0.237** |
+| openml:44987_socmob | 0.574 | **0.577** | 0.573 |
+| openml:44989_kings_county | 0.687 | **0.690** | **0.690** |
+| openml:44990_brazilian_houses | 0.566 | **0.568** | 0.563 |
+| openml:44993_health_insurance | 0.353 | **0.356** | **0.355** |
+| openml:44994_cars | 0.905 | **0.908** | 0.907 |
+| openml:45012_fifa | **0.364** | 0.195 | **0.364** |
+| openml:45402_space_ga | 0.576 | **0.578** | **0.578** |
 
 </details>
 
@@ -839,13 +988,13 @@ Both use the same 5-bin quantile discretization and Laplace smoothing.
 
 ### l2boost
 
-**L2Boost (CV)** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**L2Boost (CV)** vs LassoCV. Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Componentwise linear least squares, learning rate 0.1, number of steps (up to 2000) by 5-fold CV, as in mboost.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean +0.0000 (positive favours the candidate); better on 0, within margin on 31, worse on 0 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.032. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
-- Average ranks over 31 datasets where every model ran: LassoCV 1.26, L2Boost (CV) 1.74. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: LassoCV 0.6x.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0023 (positive favours the candidate); better on 1, within margin on 48, worse on 3 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.017. Severe (beyond 5 margins): 0 wins, 1 losses, p = 0.500.
+- Average ranks over 52 datasets where every model ran: LassoCV 1.31, L2Boost (CV) 1.69. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: LassoCV 0.56x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -882,6 +1031,27 @@ Componentwise linear least squares, learning rate 0.1, number of steps (up to 20
 | 663_rabe_266 | **0.969** | **0.969** |
 | 678_visualizing_environmental | **0.346** | 0.341 |
 | 712_chscase_geyser1 | **0.758** | **0.759** |
+| openml:44956_abalone | 0.503 | **0.512** |
+| openml:44957_airfoil_self_noise | 0.508 | **0.509** |
+| openml:44959_concrete_compressive_strength | **0.601** | 0.600 |
+| openml:44962_forest_fires | -0.060 | **-0.059** |
+| openml:44963_physiochemical_protein | 0.283 | **0.284** |
+| openml:44964_superconductivity | 0.690 | **0.723** |
+| openml:44967_student_performance_por | **0.266** | 0.265 |
+| openml:44970_QSAR_fish_toxicity | **0.559** | **0.559** |
+| openml:44971_white_wine | **0.275** | 0.272 |
+| openml:44972_red_wine | **0.340** | **0.340** |
+| openml:44976_sarcos | 0.925 | **0.925** |
+| openml:44979_diamonds | **0.907** | **0.907** |
+| openml:44983_miami_housing | 0.685 | **0.691** |
+| openml:44984_cps88wages | **0.236** | **0.236** |
+| openml:44987_socmob | **0.577** | **0.577** |
+| openml:44989_kings_county | **0.690** | **0.690** |
+| openml:44990_brazilian_houses | 0.522 | **0.568** |
+| openml:44993_health_insurance | **0.356** | **0.356** |
+| openml:44994_cars | **0.908** | **0.908** |
+| openml:45012_fifa | **0.241** | 0.195 |
+| openml:45402_space_ga | 0.504 | **0.578** |
 
 </details>
 
@@ -950,13 +1120,13 @@ The paper's defaults: 50 subsamples of 8 points.
 
 ### local-linear-forest
 
-**Local linear forest** vs Random forest (leaf 5). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Local linear forest** vs Random forest (leaf 5). Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 The same forest (200 trees, leaves of at least 5) supplies the weights; ridge penalty 0.1 on the local slopes, grf's default.
 
-- vs Random forest (leaf 5): **superior**. Median difference +0.0058, mean +0.0054 (positive favours the candidate); better on 11, within margin on 15, worse on 5 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.036. Severe (beyond 5 margins): 1 wins, 2 losses, p = 0.500.
-- Average ranks over 31 datasets where every model ran: Local linear forest 1.32, Random forest (leaf 5) 1.68. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: Random forest (leaf 5) 0.85x.
+- vs Random forest (leaf 5): **superior**. Median difference +0.0064, mean -0.0059 (positive favours the candidate); better on 22, within margin on 19, worse on 11 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.040. Severe (beyond 5 margins): 2 wins, 5 losses, p = 0.227.
+- Average ranks over 52 datasets where every model ran: Local linear forest 1.33, Random forest (leaf 5) 1.67. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: Random forest (leaf 5) 0.84x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -993,18 +1163,39 @@ The same forest (200 trees, leaves of at least 5) supplies the weights; ridge pe
 | 663_rabe_266 | **0.980** | 0.938 |
 | 678_visualizing_environmental | **0.303** | 0.286 |
 | 712_chscase_geyser1 | **0.753** | 0.748 |
+| openml:44956_abalone | 0.535 | **0.555** |
+| openml:44957_airfoil_self_noise | **0.898** | 0.876 |
+| openml:44959_concrete_compressive_strength | **0.901** | 0.884 |
+| openml:44962_forest_fires | -1.023 | **-0.458** |
+| openml:44963_physiochemical_protein | **0.512** | 0.496 |
+| openml:44964_superconductivity | **0.884** | 0.879 |
+| openml:44967_student_performance_por | 0.148 | **0.304** |
+| openml:44970_QSAR_fish_toxicity | **0.619** | 0.605 |
+| openml:44971_white_wine | **0.498** | 0.482 |
+| openml:44972_red_wine | **0.454** | 0.447 |
+| openml:44976_sarcos | **0.958** | 0.928 |
+| openml:44979_diamonds | **0.969** | 0.967 |
+| openml:44983_miami_housing | **0.896** | 0.875 |
+| openml:44984_cps88wages | 0.215 | **0.232** |
+| openml:44987_socmob | 0.656 | **0.719** |
+| openml:44989_kings_county | **0.860** | 0.815 |
+| openml:44990_brazilian_houses | **0.550** | 0.413 |
+| openml:44993_health_insurance | 0.360 | **0.376** |
+| openml:44994_cars | **0.953** | 0.928 |
+| openml:45012_fifa | 0.723 | **0.727** |
+| openml:45402_space_ga | **0.663** | 0.652 |
 
 </details>
 
 ### loess
 
-**LOESS (tuned span)** vs k-NN (tuned k). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**LOESS (tuned span)** vs k-NN (tuned k). Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Local linear fits with tricube weights. Both tune their neighbourhood size over five values by inner 3-fold CV on standardized inputs.
 
-- vs k-NN (tuned k): **superior**. Median difference +0.0284, mean +0.0137 (positive favours the candidate); better on 23, within margin on 1, worse on 7 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.010. Severe (beyond 5 margins): 12 wins, 3 losses, p = 0.996.
-- Average ranks over 31 datasets where every model ran: LOESS (tuned span) 1.26, k-NN (tuned k) 1.74. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: k-NN (tuned k) 0.045x.
+- vs k-NN (tuned k): **superior**. Median difference +0.0301, mean +0.0114 (positive favours the candidate); better on 37, within margin on 3, worse on 12 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.002. Severe (beyond 5 margins): 20 wins, 6 losses, p = 0.999.
+- Average ranks over 52 datasets where every model ran: LOESS (tuned span) 1.27, k-NN (tuned k) 1.73. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: k-NN (tuned k) 0.03x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1041,6 +1232,27 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 | 663_rabe_266 | **0.998** | 0.986 |
 | 678_visualizing_environmental | **0.291** | 0.266 |
 | 712_chscase_geyser1 | **0.766** | 0.731 |
+| openml:44956_abalone | **0.578** | 0.521 |
+| openml:44957_airfoil_self_noise | **0.714** | 0.712 |
+| openml:44959_concrete_compressive_strength | **0.810** | 0.691 |
+| openml:44962_forest_fires | -0.866 | **-0.485** |
+| openml:44963_physiochemical_protein | **0.485** | 0.453 |
+| openml:44964_superconductivity | 0.824 | **0.834** |
+| openml:44967_student_performance_por | 0.035 | **0.213** |
+| openml:44970_QSAR_fish_toxicity | 0.598 | **0.617** |
+| openml:44971_white_wine | **0.382** | 0.339 |
+| openml:44972_red_wine | **0.376** | 0.322 |
+| openml:44976_sarcos | **0.964** | 0.886 |
+| openml:44979_diamonds | 0.948 | **0.949** |
+| openml:44983_miami_housing | **0.870** | 0.824 |
+| openml:44984_cps88wages | **0.270** | 0.259 |
+| openml:44987_socmob | 0.627 | **0.707** |
+| openml:44989_kings_county | **0.802** | 0.715 |
+| openml:44990_brazilian_houses | **0.492** | 0.433 |
+| openml:44993_health_insurance | **0.384** | 0.356 |
+| openml:44994_cars | **0.951** | 0.924 |
+| openml:45012_fifa | **0.670** | 0.585 |
+| openml:45402_space_ga | **0.687** | 0.573 |
 
 </details>
 
@@ -1131,13 +1343,13 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 
 ### m5
 
-**M5 model tree** vs CART (tuned leaf size) (references: LassoCV). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**M5 model tree** vs CART (tuned leaf size) (references: LassoCV). Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its minimum leaf size from five values by inner 3-fold CV.
 
-- vs CART (tuned leaf size): **superior**. Median difference +0.0441, mean +0.0542 (positive favours the candidate); better on 23, within margin on 6, worse on 2 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 14 wins, 1 losses, p = 1.000.
-- Average ranks over 31 datasets where every model ran: M5 model tree 1.42, LassoCV 2.00, CART (tuned leaf size) 2.58. Nemenyi critical difference 0.60, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: CART (tuned leaf size) 1.1x.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0478, mean -0.3973 (positive favours the candidate); better on 40, within margin on 8, worse on 4 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 25 wins, 3 losses, p = 1.000.
+- Average ranks over 52 datasets where every model ran: M5 model tree 1.38, LassoCV 2.17, CART (tuned leaf size) 2.44. Nemenyi critical difference 0.46, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: CART (tuned leaf size) 1x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1174,19 +1386,40 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 | 663_rabe_266 | **0.980** | 0.977 | 0.969 |
 | 678_visualizing_environmental | **0.342** | 0.276 | 0.341 |
 | 712_chscase_geyser1 | 0.749 | 0.730 | **0.759** |
+| openml:44956_abalone | **0.536** | 0.490 | 0.512 |
+| openml:44957_airfoil_self_noise | 0.823 | **0.830** | 0.509 |
+| openml:44959_concrete_compressive_strength | **0.859** | 0.817 | 0.600 |
+| openml:44962_forest_fires | -0.101 | -0.308 | **-0.059** |
+| openml:44963_physiochemical_protein | **0.402** | 0.307 | 0.284 |
+| openml:44964_superconductivity | -22.730 | **0.811** | 0.723 |
+| openml:44967_student_performance_por | 0.264 | 0.199 | **0.265** |
+| openml:44970_QSAR_fish_toxicity | **0.577** | 0.525 | 0.559 |
+| openml:44971_white_wine | **0.378** | 0.309 | 0.272 |
+| openml:44972_red_wine | **0.357** | 0.299 | 0.340 |
+| openml:44976_sarcos | **0.939** | 0.859 | 0.925 |
+| openml:44979_diamonds | 0.948 | **0.956** | 0.907 |
+| openml:44983_miami_housing | **0.834** | 0.794 | 0.691 |
+| openml:44984_cps88wages | **0.258** | 0.242 | 0.236 |
+| openml:44987_socmob | 0.616 | **0.678** | 0.577 |
+| openml:44989_kings_county | **0.796** | 0.715 | 0.690 |
+| openml:44990_brazilian_houses | **0.602** | 0.472 | 0.568 |
+| openml:44993_health_insurance | **0.365** | 0.346 | 0.356 |
+| openml:44994_cars | **0.948** | 0.915 | 0.908 |
+| openml:45012_fifa | **0.722** | 0.627 | 0.195 |
+| openml:45402_space_ga | **0.714** | 0.565 | 0.578 |
 
 </details>
 
 ### mars
 
-**MARS (additive)** vs LassoCV, CART (tuned leaf size). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**MARS (additive)** vs LassoCV, CART (tuned leaf size). Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes both stepwise linear regression and recursive partitioning, so it must keep up with both.
 
-- vs LassoCV: **superior**. Median difference +0.0246, mean +0.0453 (positive favours the candidate); better on 17, within margin on 9, worse on 5 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.023. Severe (beyond 5 margins): 12 wins, 3 losses, p = 0.996.
-- vs CART (tuned leaf size): **superior**. Median difference +0.0233, mean +0.0119 (positive favours the candidate); better on 19, within margin on 6, worse on 6 of 31 datasets; non-inferiority p = 0.002, two-sided Wilcoxon p = 0.014. Severe (beyond 5 margins): 9 wins, 3 losses, p = 0.981.
-- Average ranks over 31 datasets where every model ran: MARS (additive) 1.61, LassoCV 1.97, CART (tuned leaf size) 2.42. Nemenyi critical difference 0.60, Friedman p = 0.006.
-- Total fit and score time relative to the candidate: LassoCV 0.41x, CART (tuned leaf size) 0.96x.
+- vs LassoCV: **superior**. Median difference +0.0258, mean +0.0426 (positive favours the candidate); better on 33, within margin on 11, worse on 8 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 19 wins, 5 losses, p = 0.999.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0249, mean +0.0071 (positive favours the candidate); better on 31, within margin on 8, worse on 13 of 52 datasets; non-inferiority p = 0.001, two-sided Wilcoxon p = 0.018. Severe (beyond 5 margins): 16 wins, 7 losses, p = 0.983.
+- Average ranks over 52 datasets where every model ran: MARS (additive) 1.60, LassoCV 2.15, CART (tuned leaf size) 2.25. Nemenyi critical difference 0.46, Friedman p = 0.002.
+- Total fit and score time relative to the candidate: LassoCV 0.31x, CART (tuned leaf size) 0.97x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1223,18 +1456,39 @@ Degree 1 (earth's default), terms pruned by GCV with penalty 2. MARS generalizes
 | 663_rabe_266 | **0.979** | 0.969 | 0.977 |
 | 678_visualizing_environmental | 0.248 | **0.341** | 0.276 |
 | 712_chscase_geyser1 | 0.756 | **0.759** | 0.730 |
+| openml:44956_abalone | **0.561** | 0.512 | 0.490 |
+| openml:44957_airfoil_self_noise | 0.541 | 0.509 | **0.830** |
+| openml:44959_concrete_compressive_strength | **0.866** | 0.600 | 0.817 |
+| openml:44962_forest_fires | -0.466 | **-0.059** | -0.308 |
+| openml:44963_physiochemical_protein | 0.306 | 0.284 | **0.307** |
+| openml:44964_superconductivity | 0.778 | 0.723 | **0.811** |
+| openml:44967_student_performance_por | 0.227 | **0.265** | 0.199 |
+| openml:44970_QSAR_fish_toxicity | **0.585** | 0.559 | 0.525 |
+| openml:44971_white_wine | **0.337** | 0.272 | 0.309 |
+| openml:44972_red_wine | **0.356** | 0.340 | 0.299 |
+| openml:44976_sarcos | **0.935** | 0.925 | 0.859 |
+| openml:44979_diamonds | 0.923 | 0.907 | **0.956** |
+| openml:44983_miami_housing | 0.783 | 0.691 | **0.794** |
+| openml:44984_cps88wages | **0.265** | 0.236 | 0.242 |
+| openml:44987_socmob | 0.621 | 0.577 | **0.678** |
+| openml:44989_kings_county | **0.773** | 0.690 | 0.715 |
+| openml:44990_brazilian_houses | **0.627** | 0.568 | 0.472 |
+| openml:44993_health_insurance | **0.376** | 0.356 | 0.346 |
+| openml:44994_cars | 0.909 | 0.908 | **0.915** |
+| openml:45012_fifa | **0.713** | 0.195 | 0.627 |
+| openml:45402_space_ga | 0.434 | **0.578** | 0.565 |
 
 </details>
 
 ### mcp
 
-**MCP (CV)** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**MCP (CV)** vs LassoCV. Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0008 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.125. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
-- Average ranks over 31 datasets where every model ran: LassoCV 1.32, MCP (CV) 1.68. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: LassoCV 0.08x.
+- vs LassoCV: **non-inferior**. Median difference -0.0004, mean -0.0060 (positive favours the candidate); better on 0, within margin on 47, worse on 5 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.003. Severe (beyond 5 margins): 0 wins, 1 losses, p = 0.500.
+- Average ranks over 52 datasets where every model ran: LassoCV 1.27, MCP (CV) 1.73. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: LassoCV 0.039x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1271,6 +1525,27 @@ gamma = 3, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 | 663_rabe_266 | **0.969** | **0.969** |
 | 678_visualizing_environmental | **0.345** | 0.341 |
 | 712_chscase_geyser1 | 0.756 | **0.759** |
+| openml:44956_abalone | **0.513** | **0.512** |
+| openml:44957_airfoil_self_noise | **0.509** | **0.509** |
+| openml:44959_concrete_compressive_strength | 0.598 | **0.600** |
+| openml:44962_forest_fires | -0.059 | **-0.059** |
+| openml:44963_physiochemical_protein | **0.283** | **0.284** |
+| openml:44964_superconductivity | **0.727** | 0.723 |
+| openml:44967_student_performance_por | 0.250 | **0.265** |
+| openml:44970_QSAR_fish_toxicity | 0.558 | **0.559** |
+| openml:44971_white_wine | **0.274** | 0.272 |
+| openml:44972_red_wine | 0.339 | **0.340** |
+| openml:44976_sarcos | **0.925** | **0.925** |
+| openml:44979_diamonds | **0.907** | **0.907** |
+| openml:44983_miami_housing | 0.684 | **0.691** |
+| openml:44984_cps88wages | **0.236** | **0.236** |
+| openml:44987_socmob | 0.563 | **0.577** |
+| openml:44989_kings_county | **0.690** | **0.690** |
+| openml:44990_brazilian_houses | 0.520 | **0.568** |
+| openml:44993_health_insurance | 0.355 | **0.356** |
+| openml:44994_cars | **0.908** | **0.908** |
+| openml:45012_fifa | -0.001 | **0.195** |
+| openml:45402_space_ga | 0.575 | **0.578** |
 
 </details>
 
@@ -1446,13 +1721,13 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 
 ### pspline-gam
 
-**P-spline GAM** vs LassoCV (references: MARS (additive)). Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**P-spline GAM** vs LassoCV (references: MARS (additive)). Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter chosen by GCV; the strongest smoothing is linear regression.
 
-- vs LassoCV: **non-inferior**. Median difference +0.0034, mean -0.0320 (positive favours the candidate); better on 14, within margin on 11, worse on 6 of 31 datasets; non-inferiority p = 0.007, two-sided Wilcoxon p = 0.247. Severe (beyond 5 margins): 11 wins, 4 losses, p = 0.982.
-- Average ranks over 31 datasets where every model ran: MARS (additive) 1.90, P-spline GAM 1.94, LassoCV 2.16. Nemenyi critical difference 0.60, Friedman p = 0.542.
-- Total fit and score time relative to the candidate: LassoCV 0.31x.
+- vs LassoCV: **non-inferior**. Median difference +0.0001, mean -0.1060 (positive favours the candidate); better on 23, within margin on 15, worse on 14 of 52 datasets; non-inferiority p = 0.023, two-sided Wilcoxon p = 0.434. Severe (beyond 5 margins): 17 wins, 9 losses, p = 0.962.
+- Average ranks over 52 datasets where every model ran: MARS (additive) 1.79, P-spline GAM 2.00, LassoCV 2.21. Nemenyi critical difference 0.46, Friedman p = 0.098.
+- Total fit and score time relative to the candidate: LassoCV 0.47x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1489,6 +1764,27 @@ Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter 
 | 663_rabe_266 | **0.980** | 0.969 | 0.979 |
 | 678_visualizing_environmental | **0.344** | 0.341 | 0.248 |
 | 712_chscase_geyser1 | **0.764** | 0.759 | 0.756 |
+| openml:44956_abalone | 0.557 | 0.512 | **0.561** |
+| openml:44957_airfoil_self_noise | **0.565** | 0.509 | 0.541 |
+| openml:44959_concrete_compressive_strength | **0.886** | 0.600 | 0.866 |
+| openml:44962_forest_fires | -0.260 | **-0.059** | -0.466 |
+| openml:44963_physiochemical_protein | 0.239 | 0.284 | **0.306** |
+| openml:44964_superconductivity | **0.801** | 0.723 | 0.778 |
+| openml:44967_student_performance_por | 0.256 | **0.265** | 0.227 |
+| openml:44970_QSAR_fish_toxicity | 0.170 | 0.559 | **0.585** |
+| openml:44971_white_wine | 0.224 | 0.272 | **0.337** |
+| openml:44972_red_wine | 0.336 | 0.340 | **0.356** |
+| openml:44976_sarcos | **0.941** | 0.925 | 0.935 |
+| openml:44979_diamonds | 0.871 | 0.907 | **0.923** |
+| openml:44983_miami_housing | **0.813** | 0.691 | 0.783 |
+| openml:44984_cps88wages | 0.163 | 0.236 | **0.265** |
+| openml:44987_socmob | -4.248 | 0.577 | **0.621** |
+| openml:44989_kings_county | 0.518 | 0.690 | **0.773** |
+| openml:44990_brazilian_houses | 0.559 | 0.568 | **0.627** |
+| openml:44993_health_insurance | **0.378** | 0.356 | 0.376 |
+| openml:44994_cars | 0.908 | 0.908 | **0.909** |
+| openml:45012_fifa | **0.729** | 0.195 | 0.713 |
+| openml:45402_space_ga | **0.709** | 0.578 | 0.434 |
 
 </details>
 
@@ -1580,11 +1876,11 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 
 ### relaxed-lasso
 
-**Relaxed LassoCV** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**Relaxed LassoCV** vs LassoCV. Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0000, mean -0.0006 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.480. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
-- Average ranks over 31 datasets where every model ran: LassoCV 1.35, Relaxed LassoCV 1.65. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: LassoCV 0.019x.
+- vs LassoCV: **non-inferior**. Median difference -0.0000, mean -0.0003 (positive favours the candidate); better on 1, within margin on 50, worse on 1 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.270. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
+- Average ranks over 52 datasets where every model ran: LassoCV 1.35, Relaxed LassoCV 1.65. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: LassoCV 0.015x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1621,6 +1917,27 @@ RDA picks (lambda, gamma) by inner 3-fold CV, as in Friedman (1989); lambda=1, g
 | 663_rabe_266 | **0.969** | **0.969** |
 | 678_visualizing_environmental | **0.344** | 0.341 |
 | 712_chscase_geyser1 | 0.757 | **0.759** |
+| openml:44956_abalone | **0.513** | **0.512** |
+| openml:44957_airfoil_self_noise | **0.509** | **0.509** |
+| openml:44959_concrete_compressive_strength | **0.600** | **0.600** |
+| openml:44962_forest_fires | **-0.057** | -0.059 |
+| openml:44963_physiochemical_protein | **0.284** | **0.284** |
+| openml:44964_superconductivity | **0.726** | 0.723 |
+| openml:44967_student_performance_por | 0.259 | **0.265** |
+| openml:44970_QSAR_fish_toxicity | **0.559** | **0.559** |
+| openml:44971_white_wine | **0.275** | 0.272 |
+| openml:44972_red_wine | 0.339 | **0.340** |
+| openml:44976_sarcos | **0.925** | **0.925** |
+| openml:44979_diamonds | 0.906 | **0.907** |
+| openml:44983_miami_housing | 0.686 | **0.691** |
+| openml:44984_cps88wages | **0.237** | 0.236 |
+| openml:44987_socmob | **0.576** | **0.577** |
+| openml:44989_kings_county | **0.689** | **0.690** |
+| openml:44990_brazilian_houses | 0.563 | **0.568** |
+| openml:44993_health_insurance | 0.355 | **0.356** |
+| openml:44994_cars | **0.908** | **0.908** |
+| openml:45012_fifa | **0.212** | 0.195 |
+| openml:45402_space_ga | 0.575 | **0.578** |
 
 </details>
 
@@ -1772,13 +2089,13 @@ Both grow 200 unpruned trees; groups of 3 features, as in the paper.
 
 ### scad
 
-**SCAD (CV)** vs LassoCV. Suite `pmlb-regression` (31 real-world PMLB regression datasets), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
+**SCAD (CV)** vs LassoCV. Suite `pmlb-ctr23-regression` (52 real-world regression datasets (31 from PMLB, 21 from OpenML-CTR23)), 2x repeated 5-fold CV. Metric: R², higher is better; margin 0.01.
 
 gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 
-- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0006 (positive favours the candidate); better on 0, within margin on 30, worse on 1 of 31 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.146. Severe (beyond 5 margins): 0 wins, 0 losses, p = 1.000.
-- Average ranks over 31 datasets where every model ran: LassoCV 1.35, SCAD (CV) 1.65. Nemenyi critical difference 0.35.
-- Total fit and score time relative to the candidate: LassoCV 0.072x.
+- vs LassoCV: **non-inferior**. Median difference -0.0001, mean -0.0044 (positive favours the candidate); better on 0, within margin on 48, worse on 4 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.015. Severe (beyond 5 margins): 0 wins, 2 losses, p = 0.250.
+- Average ranks over 52 datasets where every model ran: LassoCV 1.33, SCAD (CV) 1.67. Nemenyi critical difference 0.27.
+- Total fit and score time relative to the candidate: LassoCV 0.036x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1815,6 +2132,27 @@ gamma = 3.7, penalty chosen by 5-fold CV from 50 values, as ncvreg does.
 | 663_rabe_266 | **0.969** | **0.969** |
 | 678_visualizing_environmental | **0.345** | 0.341 |
 | 712_chscase_geyser1 | 0.756 | **0.759** |
+| openml:44956_abalone | **0.513** | **0.512** |
+| openml:44957_airfoil_self_noise | **0.509** | **0.509** |
+| openml:44959_concrete_compressive_strength | 0.598 | **0.600** |
+| openml:44962_forest_fires | **-0.057** | -0.059 |
+| openml:44963_physiochemical_protein | **0.283** | **0.284** |
+| openml:44964_superconductivity | **0.728** | 0.723 |
+| openml:44967_student_performance_por | 0.255 | **0.265** |
+| openml:44970_QSAR_fish_toxicity | 0.558 | **0.559** |
+| openml:44971_white_wine | **0.274** | 0.272 |
+| openml:44972_red_wine | **0.341** | **0.340** |
+| openml:44976_sarcos | 0.925 | **0.925** |
+| openml:44979_diamonds | 0.906 | **0.907** |
+| openml:44983_miami_housing | 0.685 | **0.691** |
+| openml:44984_cps88wages | **0.237** | 0.236 |
+| openml:44987_socmob | 0.563 | **0.577** |
+| openml:44989_kings_county | **0.690** | **0.690** |
+| openml:44990_brazilian_houses | 0.494 | **0.568** |
+| openml:44993_health_insurance | 0.355 | **0.356** |
+| openml:44994_cars | **0.908** | **0.908** |
+| openml:45012_fifa | 0.091 | **0.195** |
+| openml:45402_space_ga | 0.575 | **0.578** |
 
 </details>
 

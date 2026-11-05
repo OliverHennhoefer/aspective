@@ -20,6 +20,7 @@ from .suites import get_suite
 # holds the code, bench/results/ and bench/RESULTS.md the committed output.
 BENCH_DIR = Path(__file__).resolve().parents[2]
 RESULTS_DIR = BENCH_DIR / "results"
+STANDARDS_DIR = RESULTS_DIR / "standards"  # leaderboard-only runs; never gated
 ALPHA = 0.05
 MIN_DATASETS = 10
 
@@ -121,11 +122,17 @@ def _round(values, digits=6):
     return [None if np.isnan(v) else round(float(v), digits) for v in values]
 
 
-def save(summary):
-    RESULTS_DIR.mkdir(exist_ok=True)
-    path = RESULTS_DIR / f"{summary['name']}.json"
+def save(summary, standards=False):
+    folder = STANDARDS_DIR if standards else RESULTS_DIR
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{summary['name']}.json"
     path.write_text(json.dumps(summary, indent=1, allow_nan=True) + "\n")
     return path
+
+
+def load_standards():
+    """Committed runs of the standard methods, for the leaderboards only."""
+    return [json.loads(p.read_text()) for p in sorted(STANDARDS_DIR.glob("*.json"))]
 
 
 def load_results():

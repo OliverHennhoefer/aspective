@@ -14,6 +14,7 @@ are in [`RESULTS.md`](RESULTS.md).
 | `pmlb-classification` | 68 (31 binary, 37 multiclass) | [PMLB](https://github.com/EpistasisLab/pmlb) (Olson et al. 2017; Romano et al. 2022) |
 | `pmlb-binary` | the 31 binary ones | PMLB |
 | `pmlb-regression` | 31 | PMLB |
+| `pmlb-ctr23-regression` | 52 (31 PMLB, 21 OpenML-CTR23) | PMLB and [OpenML-CTR23](https://www.openml.org/search?type=study&study_type=task&id=353) (Fischer, Feurer & Bischl 2023) |
 | `adbench-classical` | 46 | [ADBench](https://github.com/Minqi824/ADBench) Classical, which includes ODDS (Han et al. 2022) |
 
 Only real-world datasets are used, without missing values, and duplicates
@@ -22,10 +23,15 @@ least 10 rows in the smallest class and are dropped when a default decision
 tree already reaches 99.5% accuracy, since every model ties on them. The
 full rule is in `suites.py`; it was fixed before the added datasets were
 run, and the suites change only on purpose, never to rescue a model.
-PMLB has no more real regression datasets that meet the rule; growing that
-suite further would need a second source such as OpenML-CTR23. Datasets above 5000 rows are
+PMLB has no more real regression datasets that meet the rule, so the
+regression benchmarks run on `pmlb-ctr23-regression`, which adds the 21
+OpenML-CTR23 datasets that meet it. Of CTR23's 35, six were produced by a
+simulator, four are already in PMLB, two have missing values and two have
+more than 60k rows; `suites.py` names them. OpenML files are pinned by data
+id, file id and MD5, categorical features are coded as integers as in PMLB,
+and the attributes OpenML marks to ignore are dropped. Datasets above 5000 rows are
 subsampled once with a fixed seed, stratified by class. Files are downloaded
-from GitHub on first use and cached in `$ASPECTIVE_BENCH_CACHE` (default
+from GitHub or openml.org on first use and cached in `$ASPECTIVE_BENCH_CACHE` (default
 `~/.cache/aspective-bench`) with a SHA-256 check.
 
 **Evaluation.** 2x repeated 5-fold cross-validation, stratified for
@@ -99,6 +105,15 @@ Verdicts are never read from the committed files: `check`, the tests and the
 report recompute them from the committed per-dataset scores, so a change to
 the statistics applies to every result without rerunning a model.
 
+**Leaderboards.** `RESULTS.md` also ranks every model run on a suite
+together: the candidates, their predecessors and references, and a fixed
+set of standard methods with default settings (linear and ridge models,
+CART, k-NN, SVMs, random forest, extra trees, gradient boosting and
+histogram gradient boosting; Isolation Forest, LOF, one-class SVM and KDE for
+anomaly detection; an elliptic envelope did not finish on InternetAds, whose
+1555 features make its robust covariance fit impractical). The standards are defined in
+`specs.py`, saved under `results/standards/` and never affect the gate.
+
 **How reliable the gate is.** `RESULTS.md` has a table of the gate's pass
 rate for a candidate whose true typical difference is known, simulated per
 suite from the committed comparisons (their per-dataset differences,
@@ -106,13 +121,16 @@ centred at zero and resampled, so the real spread and tails between
 datasets are kept). At one margin worse the gate passes about 6% of
 candidates, close to the 5% it is designed for. An exactly equivalent
 candidate, though, is still missed about a third of the time (33% on
-classification, 34% on regression, 41% on anomaly detection; almost never
+classification, 30% on regression, 41% on anomaly detection; almost never
 on the binary Brier suite). Most of the spread is genuine variation between
 datasets, not fold noise (fold noise is 15 to 50% of it), so more CV
 repeats do not help; only more datasets do. Growing the suites from
 43/25/37 to 68/31/46 datasets lowered the miss rate less than hoped,
-because the added datasets also widened the spread. A candidate that is
-genuinely better by half a margin passes 70 to 85% of the time.
+because the added datasets also widened the spread. Adding the 21
+OpenML-CTR23 datasets to the 31 PMLB ones lowered the regression miss rate
+from 34% to 30% and raised the pass rate at half a margin better from 70% to
+78%; no regression verdict changed. A candidate that is genuinely better by
+half a margin passes 78 to 85% of the time.
 
 ## Adding a model
 
@@ -212,6 +230,7 @@ uv run aspective-bench list            # benchmarks and suites
 uv run aspective-bench fetch           # download all datasets
 uv run aspective-bench run [names]     # run (all by default), save, report
 uv run aspective-bench run name --quick
+uv run aspective-bench standards [suites]  # run the standard methods for the leaderboards
 uv run aspective-bench report          # rebuild RESULTS.md
 uv run aspective-bench check           # exit 1 unless the gate passes
 ```
