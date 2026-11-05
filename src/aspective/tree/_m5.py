@@ -49,9 +49,15 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
     comparable to neural networks, with much smaller trees; this is the
     M5' variant of Weka's M5P.
 
+    A leaf's linear model is fitted on few rows and can have very large
+    coefficients, so a new point slightly off those rows could get a wild
+    prediction. As in Quinlan's Cubist, predictions are therefore bounded
+    to the range of the training targets, widened by ``extrapolation``
+    times that range.
+
     Prefer it over a regression tree whenever the response varies
     smoothly with the features; it stays interpretable and extrapolates
-    linearly within each leaf.
+    linearly within each leaf, up to those bounds.
 
     Parameters
     ----------
@@ -62,6 +68,10 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
     smoothing : float, default=15.0
         Smoothing constant ``k``; 0 disables smoothing.
     prune : bool, default=True
+    extrapolation : float or None, default=0.1
+        How far predictions may go beyond the range of the training
+        targets, as a fraction of that range. None removes the bounds
+        (plain M5).
 
     Attributes
     ----------
@@ -70,6 +80,8 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
     is_leaf_ : ndarray of bool, shape (n_nodes,)
         Nodes that are leaves after pruning.
     n_leaves_ : int
+    bounds_ : tuple of float
+        Lower and upper bound on the predictions.
 
     References
     ----------
@@ -87,13 +99,17 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
         "max_depth": [Interval(Integral, 1, None, closed="left"), None],
         "smoothing": [Interval(Real, 0, None, closed="left")],
         "prune": ["boolean"],
+        "extrapolation": [Interval(Real, 0, None, closed="left"), None],
     }
 
-    def __init__(self, min_samples_leaf=4, max_depth=None, smoothing=15.0, prune=True):
+    def __init__(
+        self, min_samples_leaf=4, max_depth=None, smoothing=15.0, prune=True, extrapolation=0.1
+    ):
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = max_depth
         self.smoothing = smoothing
         self.prune = prune
+        self.extrapolation = extrapolation
 
     def fit(self, X, y):
         self._validate_params()
@@ -107,6 +123,11 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
         paths = grower.decision_path(X).tocsc()
         samples = [paths.indices[paths.indptr[k] : paths.indptr[k + 1]] for k in range(n_nodes)]
         self._n_node = np.array([len(s) for s in samples])
+        # Predictions are bounded to the training target range, widened by
+        # ``extrapolation`` times that range, as Cubist bounds its predictions.
+        y_min, y_max = float(y.min()), float(y.max())  # as floats: integer targets can overflow
+        widen = np.inf if self.extrapolation is None else self.extrapolation * (y_max - y_min)
+        self.bounds_ = (y_min - widen, y_max + widen)
 
         self._intercepts = np.zeros(n_nodes)
         self._coefs = [np.zeros(0)] * n_nodes
@@ -207,4 +228,4 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
                 p = (n * p + k * self._model(X[rows], parent)) / (n + k)
                 child, parent = parent, self._parent[parent]
             pred[rows] = p
-        return pred
+        return np.clip(pred, *self.bounds_)

@@ -27,3 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the 21 OpenML-CTR23 datasets that meet the suite rule. `RESULTS.md` has
   per-suite leaderboards that rank every model, including standard methods
   with default settings (`uv run aspective-bench standards`).
+
+### Fixed
+
+- `M5ModelTreeRegressor` bounds its predictions to the training target
+  range widened by 10% (new `extrapolation` parameter, as in Cubist). A leaf
+  model fitted on few, nearly collinear rows had predicted R² −234 on one
+  fold of superconductivity.
+- `PSplineGAMRegressor` keeps each curve constant outside the training
+  range instead of extrapolating it linearly, which had produced R² −46 on
+  one fold of socmob.
