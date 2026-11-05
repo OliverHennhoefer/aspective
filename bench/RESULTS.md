@@ -36,13 +36,13 @@ recomputed from the per-dataset scores every time the gate is checked.
 | [local-linear-forest](#local-linear-forest) | Local linear forest | Random forest (leaf 5) | 52 | 22 / 19 / 11 | +0.006 | <0.001 | 2 / 5 | superior | PASS |
 | [loess](#loess) | LOESS (tuned span) | k-NN (tuned k) | 52 | 37 / 3 / 12 | +0.030 | <0.001 | 20 / 6 | superior | PASS |
 | [logitboost](#logitboost) | LogitBoost (depth 3) | AdaBoost (depth 3) | 68 | 24 / 31 / 13 | +0.002 | <0.001 | 8 / 1 | superior | PASS |
-| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 52 | 40 / 8 / 4 | +0.048 | <0.001 | 25 / 3 | superior | PASS |
+| [m5](#m5) | M5 model tree | CART (tuned leaf size) | 52 | 42 / 8 / 2 | +0.052 | <0.001 | 27 / 1 | superior | PASS |
 | [mars](#mars) | MARS (additive) | LassoCV | 52 | 33 / 11 / 8 | +0.026 | <0.001 | 19 / 5 | superior | PASS |
 | [mars](#mars) | MARS (additive) | CART (tuned leaf size) | 52 | 31 / 8 / 13 | +0.025 | 0.001 | 16 / 7 | superior | PASS |
 | [mcp](#mcp) | MCP (CV) | LassoCV | 52 | 0 / 47 / 5 | -0.000 | <0.001 | 0 / 1 | non-inferior | PASS |
 | [mda](#mda) | MDA (tuned) | LDA | 68 | 24 / 36 / 8 | +0.002 | <0.001 | 9 / 1 | superior | PASS |
 | [multiboost](#multiboost) | MultiBoost (depth 3) | AdaBoost (depth 3) | 68 | 20 / 34 / 14 | +0.003 | <0.001 | 3 / 2 | non-inferior | PASS |
-| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 52 | 23 / 15 / 14 | +0.000 | 0.023 | 17 / 9 | non-inferior | PASS |
+| [pspline-gam](#pspline-gam) | P-spline GAM | LassoCV | 52 | 27 / 18 / 7 | +0.011 | <0.001 | 19 / 6 | superior | PASS |
 | [rda](#rda) | RDA (tuned) | LDA | 68 | 33 / 28 / 7 | +0.009 | <0.001 | 17 / 0 | superior | PASS |
 | [rda](#rda) | RDA (tuned) | QDA | 33 | 9 / 21 / 3 | +0.003 | <0.001 | 1 / 1 | non-inferior | PASS |
 | [relaxed-lasso](#relaxed-lasso) | Relaxed LassoCV | LassoCV | 52 | 1 / 50 / 1 | -0.000 | <0.001 | 0 / 0 | non-inferior | PASS |
@@ -132,31 +132,31 @@ Not ranked, because they fail on more than a tenth of the datasets: QDA (35 of 6
 
 | Rank | Model | Role | Average rank | Mean R² | Median R² |
 |---|---|---|---|---|---|
-| 1 | Local linear forest | candidate | 9.00 | 0.648 | 0.738 |
-| 2 | M5 model tree | candidate | 9.09 | 0.202 | 0.718 |
-| 3 | LOESS (tuned span) | candidate | 9.40 | 0.610 | 0.673 |
-| 4 | Extra trees | standard | 9.47 | 0.627 | 0.724 |
-| 5 | Gradient boosting | standard | 10.04 | 0.626 | 0.725 |
-| 6 | Random forest (leaf 5) | predecessor | 10.35 | 0.654 | 0.723 |
-| 7 | Random forest | standard | 10.42 | 0.641 | 0.718 |
-| 8 | Histogram gradient boosting | standard | 10.77 | 0.643 | 0.717 |
-| 9 | MARS (additive) | candidate | 10.96 | 0.607 | 0.624 |
-| 10 | SVR (RBF) | standard | 11.79 | 0.615 | 0.653 |
-| 11 | LassoCV | predecessor | 12.53 | 0.564 | 0.572 |
-| 12 | P-spline GAM | candidate | 12.88 | 0.458 | 0.564 |
-| 13 | Relaxed LassoCV | candidate | 13.43 | 0.564 | 0.569 |
-| 14 | RidgeCV | standard | 13.48 | 0.563 | 0.568 |
-| 15 | L2Boost (CV) | candidate | 14.08 | 0.562 | 0.559 |
-| 16 | Bolasso-S (0.9) | reference | 14.09 | 0.566 | 0.568 |
-| 17 | k-NN (tuned k) | predecessor | 14.53 | 0.598 | 0.658 |
-| 18 | SCAD (CV) | candidate | 14.54 | 0.560 | 0.560 |
-| 19 | Linear regression | standard | 14.62 | 0.563 | 0.567 |
-| 20 | MCP (CV) | candidate | 14.85 | 0.558 | 0.561 |
-| 21 | Adaptive LassoCV | candidate | 15.17 | 0.562 | 0.565 |
-| 22 | Bolasso | candidate | 16.25 | 0.560 | 0.570 |
-| 23 | CART (tuned leaf size) | predecessor | 16.33 | 0.599 | 0.653 |
-| 24 | k-NN (k=5) | standard | 16.43 | 0.570 | 0.662 |
-| 25 | CART | standard | 20.51 | 0.370 | 0.528 |
+| 1 | M5 model tree | candidate | 8.47 | 0.658 | 0.732 |
+| 2 | Local linear forest | candidate | 9.06 | 0.648 | 0.738 |
+| 3 | LOESS (tuned span) | candidate | 9.46 | 0.610 | 0.673 |
+| 4 | Extra trees | standard | 9.49 | 0.627 | 0.724 |
+| 5 | Gradient boosting | standard | 10.10 | 0.626 | 0.725 |
+| 6 | Random forest (leaf 5) | predecessor | 10.38 | 0.654 | 0.723 |
+| 7 | Random forest | standard | 10.44 | 0.641 | 0.718 |
+| 8 | Histogram gradient boosting | standard | 10.81 | 0.643 | 0.717 |
+| 9 | MARS (additive) | candidate | 11.10 | 0.607 | 0.624 |
+| 10 | P-spline GAM | candidate | 11.11 | 0.582 | 0.666 |
+| 11 | SVR (RBF) | standard | 11.88 | 0.615 | 0.653 |
+| 12 | LassoCV | predecessor | 12.68 | 0.564 | 0.572 |
+| 13 | Relaxed LassoCV | candidate | 13.59 | 0.564 | 0.569 |
+| 14 | RidgeCV | standard | 13.63 | 0.563 | 0.568 |
+| 15 | L2Boost (CV) | candidate | 14.21 | 0.562 | 0.559 |
+| 16 | Bolasso-S (0.9) | reference | 14.24 | 0.566 | 0.568 |
+| 17 | k-NN (tuned k) | predecessor | 14.59 | 0.598 | 0.658 |
+| 18 | SCAD (CV) | candidate | 14.67 | 0.560 | 0.560 |
+| 19 | Linear regression | standard | 14.78 | 0.563 | 0.567 |
+| 20 | MCP (CV) | candidate | 14.98 | 0.558 | 0.561 |
+| 21 | Adaptive LassoCV | candidate | 15.33 | 0.562 | 0.565 |
+| 22 | Bolasso | candidate | 16.40 | 0.560 | 0.570 |
+| 23 | CART (tuned leaf size) | predecessor | 16.50 | 0.599 | 0.653 |
+| 24 | k-NN (k=5) | standard | 16.51 | 0.570 | 0.662 |
+| 25 | CART | standard | 20.59 | 0.370 | 0.528 |
 
 ## How reliable the gate is
 
@@ -175,7 +175,7 @@ rate without loosening the margin.
 | `adbench-classical` (margin 0.01) | 46 | 3 | 1% | 6% | 28% | 59% | 83% |
 | `pmlb-binary` (margin 0.005) | 31 | 2 | 0% | 6% | 71% | 100% | 100% |
 | `pmlb-classification` (margin 0.01) | 68 | 13 | 1% | 6% | 43% | 67% | 85% |
-| `pmlb-ctr23-regression` (margin 0.01) | 52 | 12 | 1% | 6% | 55% | 70% | 78% |
+| `pmlb-ctr23-regression` (margin 0.01) | 52 | 12 | 1% | 6% | 55% | 70% | 76% |
 
 ## Details
 
@@ -1347,9 +1347,9 @@ Local linear fits with tricube weights. Both tune their neighbourhood size over 
 
 M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its minimum leaf size from five values by inner 3-fold CV.
 
-- vs CART (tuned leaf size): **superior**. Median difference +0.0478, mean -0.3973 (positive favours the candidate); better on 40, within margin on 8, worse on 4 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 25 wins, 3 losses, p = 1.000.
-- Average ranks over 52 datasets where every model ran: M5 model tree 1.38, LassoCV 2.17, CART (tuned leaf size) 2.44. Nemenyi critical difference 0.46, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: CART (tuned leaf size) 1x.
+- vs CART (tuned leaf size): **superior**. Median difference +0.0523, mean +0.0583 (positive favours the candidate); better on 42, within margin on 8, worse on 2 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 27 wins, 1 losses, p = 1.000.
+- Average ranks over 52 datasets where every model ran: M5 model tree 1.33, LassoCV 2.19, CART (tuned leaf size) 2.48. Nemenyi critical difference 0.46, Friedman p = <0.001.
+- Total fit and score time relative to the candidate: CART (tuned leaf size) 0.93x.
 
 <details><summary>Per-dataset scores</summary>
 
@@ -1359,10 +1359,10 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 | 1028_SWD | 0.387 | 0.373 | **0.393** |
 | 1029_LEV | **0.558** | 0.509 | **0.558** |
 | 1030_ERA | 0.344 | 0.342 | **0.357** |
-| 197_cpu_act | **0.977** | 0.970 | 0.722 |
-| 201_pol | **0.965** | 0.956 | 0.475 |
+| 197_cpu_act | **0.978** | 0.970 | 0.722 |
+| 201_pol | **0.966** | 0.956 | 0.475 |
 | 210_cloud | 0.819 | 0.614 | **0.838** |
-| 218_house_8L | **0.580** | 0.529 | 0.367 |
+| 218_house_8L | **0.582** | 0.529 | 0.367 |
 | 225_puma8NH | **0.647** | 0.644 | 0.376 |
 | 230_machine_cpu | **0.831** | 0.707 | 0.793 |
 | 294_satellite_image | **0.849** | 0.813 | 0.700 |
@@ -1371,10 +1371,10 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 | 505_tecator | 0.995 | 0.979 | **0.996** |
 | 522_pm10 | **0.263** | 0.167 | 0.145 |
 | 529_pollen | **0.793** | 0.671 | **0.793** |
-| 537_houses | **0.741** | 0.662 | 0.631 |
+| 537_houses | **0.742** | 0.662 | 0.631 |
 | 547_no2 | **0.537** | 0.407 | 0.485 |
-| 560_bodyfat | **0.972** | 0.959 | 0.968 |
-| 574_house_16H | **0.462** | 0.422 | 0.265 |
+| 560_bodyfat | **0.970** | 0.959 | 0.968 |
+| 574_house_16H | **0.477** | 0.422 | 0.265 |
 | 665_sleuth_case2002 | **0.345** | 0.220 | 0.286 |
 | 666_rmftsa_ladata | **0.584** | 0.448 | 0.547 |
 | 690_visualizing_galaxy | **0.964** | 0.955 | 0.894 |
@@ -1391,22 +1391,22 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 | openml:44959_concrete_compressive_strength | **0.859** | 0.817 | 0.600 |
 | openml:44962_forest_fires | -0.101 | -0.308 | **-0.059** |
 | openml:44963_physiochemical_protein | **0.402** | 0.307 | 0.284 |
-| openml:44964_superconductivity | -22.730 | **0.811** | 0.723 |
+| openml:44964_superconductivity | **0.841** | 0.811 | 0.723 |
 | openml:44967_student_performance_por | 0.264 | 0.199 | **0.265** |
 | openml:44970_QSAR_fish_toxicity | **0.577** | 0.525 | 0.559 |
 | openml:44971_white_wine | **0.378** | 0.309 | 0.272 |
 | openml:44972_red_wine | **0.357** | 0.299 | 0.340 |
 | openml:44976_sarcos | **0.939** | 0.859 | 0.925 |
-| openml:44979_diamonds | 0.948 | **0.956** | 0.907 |
-| openml:44983_miami_housing | **0.834** | 0.794 | 0.691 |
+| openml:44979_diamonds | **0.972** | 0.956 | 0.907 |
+| openml:44983_miami_housing | **0.854** | 0.794 | 0.691 |
 | openml:44984_cps88wages | **0.258** | 0.242 | 0.236 |
-| openml:44987_socmob | 0.616 | **0.678** | 0.577 |
+| openml:44987_socmob | 0.675 | **0.678** | 0.577 |
 | openml:44989_kings_county | **0.796** | 0.715 | 0.690 |
-| openml:44990_brazilian_houses | **0.602** | 0.472 | 0.568 |
+| openml:44990_brazilian_houses | **0.605** | 0.472 | 0.568 |
 | openml:44993_health_insurance | **0.365** | 0.346 | 0.356 |
 | openml:44994_cars | **0.948** | 0.915 | 0.908 |
 | openml:45012_fifa | **0.722** | 0.627 | 0.195 |
-| openml:45402_space_ga | **0.714** | 0.565 | 0.578 |
+| openml:45402_space_ga | **0.710** | 0.565 | 0.578 |
 
 </details>
 
@@ -1725,66 +1725,66 @@ Same depth-3 trees and SAMME weights; MultiBoost restarts with wagging weights a
 
 Cubic P-splines on 10 equally spaced knots per feature, one smoothing parameter chosen by GCV; the strongest smoothing is linear regression.
 
-- vs LassoCV: **non-inferior**. Median difference +0.0001, mean -0.1060 (positive favours the candidate); better on 23, within margin on 15, worse on 14 of 52 datasets; non-inferiority p = 0.023, two-sided Wilcoxon p = 0.434. Severe (beyond 5 margins): 17 wins, 9 losses, p = 0.962.
-- Average ranks over 52 datasets where every model ran: MARS (additive) 1.79, P-spline GAM 2.00, LassoCV 2.21. Nemenyi critical difference 0.46, Friedman p = 0.098.
-- Total fit and score time relative to the candidate: LassoCV 0.47x.
+- vs LassoCV: **superior**. Median difference +0.0111, mean +0.0175 (positive favours the candidate); better on 27, within margin on 18, worse on 7 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = 0.006. Severe (beyond 5 margins): 19 wins, 6 losses, p = 0.998.
+- Average ranks over 52 datasets where every model ran: P-spline GAM 1.77, MARS (additive) 1.88, LassoCV 2.35. Nemenyi critical difference 0.46, Friedman p = 0.008.
+- Total fit and score time relative to the candidate: LassoCV 0.42x.
 
 <details><summary>Per-dataset scores</summary>
 
 | Dataset | P-spline GAM | LassoCV | MARS (additive) |
 |---|---|---|---|
-| 1027_ESL | 0.844 | **0.855** | 0.850 |
+| 1027_ESL | 0.846 | **0.855** | 0.850 |
 | 1028_SWD | 0.393 | 0.393 | **0.417** |
 | 1029_LEV | **0.558** | **0.558** | 0.552 |
 | 1030_ERA | 0.351 | **0.357** | 0.346 |
-| 197_cpu_act | 0.951 | 0.722 | **0.957** |
-| 201_pol | **0.740** | 0.475 | 0.736 |
-| 210_cloud | -1.112 | **0.838** | 0.591 |
-| 218_house_8L | 0.564 | 0.367 | **0.571** |
+| 197_cpu_act | **0.972** | 0.722 | 0.957 |
+| 201_pol | **0.741** | 0.475 | 0.736 |
+| 210_cloud | -0.649 | **0.838** | 0.591 |
+| 218_house_8L | 0.570 | 0.367 | **0.571** |
 | 225_puma8NH | 0.438 | 0.376 | **0.440** |
-| 230_machine_cpu | 0.525 | 0.793 | **0.837** |
+| 230_machine_cpu | 0.545 | 0.793 | **0.837** |
 | 294_satellite_image | **0.831** | 0.700 | 0.819 |
-| 4544_GeographicalOriginalofMusic | 0.786 | **0.795** | 0.764 |
+| 4544_GeographicalOriginalofMusic | 0.787 | **0.795** | 0.764 |
 | 503_wind | **0.787** | 0.758 | 0.785 |
-| 505_tecator | 0.958 | **0.996** | 0.994 |
-| 522_pm10 | 0.319 | 0.145 | **0.335** |
+| 505_tecator | 0.978 | **0.996** | 0.994 |
+| 522_pm10 | 0.322 | 0.145 | **0.335** |
 | 529_pollen | **0.793** | **0.793** | 0.792 |
-| 537_houses | 0.697 | 0.631 | **0.698** |
-| 547_no2 | **0.559** | 0.485 | 0.543 |
-| 560_bodyfat | 0.748 | **0.968** | **0.968** |
-| 574_house_16H | **0.456** | 0.265 | 0.419 |
-| 665_sleuth_case2002 | 0.281 | 0.286 | **0.324** |
-| 666_rmftsa_ladata | **0.644** | 0.547 | 0.616 |
+| 537_houses | **0.700** | 0.631 | 0.698 |
+| 547_no2 | **0.561** | 0.485 | 0.543 |
+| 560_bodyfat | 0.811 | **0.968** | **0.968** |
+| 574_house_16H | **0.460** | 0.265 | 0.419 |
+| 665_sleuth_case2002 | 0.280 | 0.286 | **0.324** |
+| 666_rmftsa_ladata | **0.643** | 0.547 | 0.616 |
 | 690_visualizing_galaxy | **0.961** | 0.894 | 0.958 |
-| 695_chatfield_4 | 0.761 | **0.858** | 0.781 |
+| 695_chatfield_4 | 0.776 | **0.858** | 0.781 |
 | solar_flare | **0.147** | 0.128 | 0.139 |
 | 519_vinnie | 0.740 | **0.743** | 0.734 |
 | 523_analcatdata_neavote | 0.927 | 0.927 | **0.928** |
 | 556_analcatdata_apnea2 | -0.034 | -0.028 | **0.218** |
 | 663_rabe_266 | **0.980** | 0.969 | 0.979 |
-| 678_visualizing_environmental | **0.344** | 0.341 | 0.248 |
+| 678_visualizing_environmental | **0.345** | 0.341 | 0.248 |
 | 712_chscase_geyser1 | **0.764** | 0.759 | 0.756 |
-| openml:44956_abalone | 0.557 | 0.512 | **0.561** |
+| openml:44956_abalone | 0.561 | 0.512 | **0.561** |
 | openml:44957_airfoil_self_noise | **0.565** | 0.509 | 0.541 |
 | openml:44959_concrete_compressive_strength | **0.886** | 0.600 | 0.866 |
-| openml:44962_forest_fires | -0.260 | **-0.059** | -0.466 |
-| openml:44963_physiochemical_protein | 0.239 | 0.284 | **0.306** |
+| openml:44962_forest_fires | -0.258 | **-0.059** | -0.466 |
+| openml:44963_physiochemical_protein | **0.330** | 0.284 | 0.306 |
 | openml:44964_superconductivity | **0.801** | 0.723 | 0.778 |
 | openml:44967_student_performance_por | 0.256 | **0.265** | 0.227 |
-| openml:44970_QSAR_fish_toxicity | 0.170 | 0.559 | **0.585** |
-| openml:44971_white_wine | 0.224 | 0.272 | **0.337** |
-| openml:44972_red_wine | 0.336 | 0.340 | **0.356** |
-| openml:44976_sarcos | **0.941** | 0.925 | 0.935 |
-| openml:44979_diamonds | 0.871 | 0.907 | **0.923** |
-| openml:44983_miami_housing | **0.813** | 0.691 | 0.783 |
-| openml:44984_cps88wages | 0.163 | 0.236 | **0.265** |
-| openml:44987_socmob | -4.248 | 0.577 | **0.621** |
-| openml:44989_kings_county | 0.518 | 0.690 | **0.773** |
-| openml:44990_brazilian_houses | 0.559 | 0.568 | **0.627** |
+| openml:44970_QSAR_fish_toxicity | 0.552 | 0.559 | **0.585** |
+| openml:44971_white_wine | **0.345** | 0.272 | 0.337 |
+| openml:44972_red_wine | 0.346 | 0.340 | **0.356** |
+| openml:44976_sarcos | **0.942** | 0.925 | 0.935 |
+| openml:44979_diamonds | 0.916 | 0.907 | **0.923** |
+| openml:44983_miami_housing | **0.817** | 0.691 | 0.783 |
+| openml:44984_cps88wages | 0.248 | 0.236 | **0.265** |
+| openml:44987_socmob | **0.689** | 0.577 | 0.621 |
+| openml:44989_kings_county | 0.698 | 0.690 | **0.773** |
+| openml:44990_brazilian_houses | 0.490 | 0.568 | **0.627** |
 | openml:44993_health_insurance | **0.378** | 0.356 | 0.376 |
 | openml:44994_cars | 0.908 | 0.908 | **0.909** |
-| openml:45012_fifa | **0.729** | 0.195 | 0.713 |
-| openml:45402_space_ga | **0.709** | 0.578 | 0.434 |
+| openml:45012_fifa | **0.733** | 0.195 | 0.713 |
+| openml:45402_space_ga | **0.714** | 0.578 | 0.434 |
 
 </details>
 

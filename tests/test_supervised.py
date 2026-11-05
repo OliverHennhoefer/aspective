@@ -573,6 +573,25 @@ def test_m5_unpruned_unsmoothed_leaves_are_constant_models():
     np.testing.assert_allclose(model.predict(X), leaf_tree.predict(X))
 
 
+def test_m5_predictions_stay_near_the_training_target_range():
+    # Few rows per leaf and two nearly collinear features: an unbounded leaf model can
+    # predict far outside the targets on a point slightly off its rows.
+    rng = np.random.RandomState(0)
+    x = rng.uniform(0, 1, 300)
+    X = np.column_stack([x, x + 1e-6 * rng.randn(300)])
+    y = np.sin(6 * x)
+    model = M5ModelTreeRegressor(min_samples_leaf=2).fit(X, y)
+    lo, hi = model.bounds_
+    assert lo == pytest.approx(y.min() - 0.1 * np.ptp(y)) and hi == pytest.approx(
+        y.max() + 0.1 * np.ptp(y)
+    )
+    Xt = np.column_stack([x, x + 1e-2])  # off the training manifold
+    pred = model.predict(Xt)
+    assert pred.min() >= lo and pred.max() <= hi
+    plain = M5ModelTreeRegressor(min_samples_leaf=2, extrapolation=None).fit(X, y)
+    np.testing.assert_allclose(model.predict(X), np.clip(plain.predict(X), lo, hi))
+
+
 def test_mars_recovers_a_hinge():
     rng = np.random.RandomState(0)
     X = rng.uniform(-1, 1, size=(400, 3))
@@ -668,7 +687,7 @@ def test_pspline_gam_strong_smoothing_is_linear_regression():
     y = X @ [1.0, -2.0, 0.5] + rng.randn(200)
     model = PSplineGAMRegressor(alphas=[1e10]).fit(X, y)
     ols = LinearRegression().fit(X, y)
-    Xt = rng.randn(50, 3)
+    Xt = np.clip(rng.randn(50, 3), X.min(axis=0), X.max(axis=0))  # within the training range
     np.testing.assert_allclose(model.predict(Xt), ols.predict(Xt), atol=0.02)
 
 
@@ -678,6 +697,15 @@ def test_pspline_gam_low_cardinality_features_enter_linearly():
     y = X[:, 0] + 3 * X[:, 1]
     model = PSplineGAMRegressor().fit(X, y)
     np.testing.assert_array_equal(model.spline_features_, [0])
+
+
+def test_pspline_gam_is_constant_outside_the_training_range():
+    rng = np.random.RandomState(0)
+    X = rng.uniform(0, 1, size=(200, 1))
+    y = np.sin(6 * X[:, 0]) + 0.1 * rng.randn(200)
+    model = PSplineGAMRegressor().fit(X, y)
+    edges = model.predict([[X.min()], [X.max()]])
+    np.testing.assert_allclose(model.predict([[-5.0], [6.0]]), edges)
 
 
 def test_pspline_gam_edf_counts_only_identifiable_directions():

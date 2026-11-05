@@ -41,7 +41,7 @@ and the committed benchmark results; do not edit by hand.
 | `CauchyLogisticRegression` | classification | Gelman, Jakulin, Pittau & Su, Annals of Applied Statistics 2008 | Logistic regression | superior vs ML logistic (median Brier score -0.000, 31 datasets) |
 | `LoessRegressor` | regression | Cleveland & Devlin, JASA 1988 | k-NN regression | superior vs k-NN (tuned k) (median R² +0.030, 52 datasets) |
 | `LocalLinearForestRegressor` | regression | Friedberg, Tibshirani, Athey & Wager, JCGS 2020 | Random forest | superior vs Random forest (leaf 5) (median R² +0.006, 52 datasets) |
-| `M5ModelTreeRegressor` | regression | Quinlan 1992; Wang & Witten, ECML 1997 | CART | superior vs CART (tuned leaf size) (median R² +0.048, 52 datasets) |
+| `M5ModelTreeRegressor` | regression | Quinlan 1992; Wang & Witten, ECML 1997 | CART | superior vs CART (tuned leaf size) (median R² +0.052, 52 datasets) |
 | `RelaxedLasso, RelaxedLassoCV` | regression | Meinshausen, CSDA 2007 | Lasso | non-inferior vs LassoCV (median R² -0.000, 52 datasets) |
 | `AdaptiveLasso, AdaptiveLassoCV` | regression | Zou, JASA 2006 | Lasso | non-inferior vs LassoCV (median R² -0.000, 52 datasets) |
 | `NonconvexPenaltyRegressionCV (MCP)` | regression | Zhang, Annals of Statistics 2010 | Lasso | non-inferior vs LassoCV (median R² -0.000, 52 datasets) |
@@ -49,7 +49,7 @@ and the committed benchmark results; do not edit by hand.
 | `Bolasso` | regression | Bach, ICML 2008 | Lasso | non-inferior vs LassoCV (median R² -0.002, 52 datasets) |
 | `L2BoostRegressor` | regression | Bühlmann & Yu, JASA 2003; Bühlmann, Annals of Statistics 2006 | Lasso | non-inferior vs LassoCV (median R² -0.000, 52 datasets) |
 | `MARSRegressor` | regression | Friedman, Annals of Statistics 1991 | Linear regression, CART | superior vs LassoCV (median R² +0.026, 52 datasets); superior vs CART (tuned leaf size) (median R² +0.025, 52 datasets) |
-| `PSplineGAMRegressor` | regression | Hastie & Tibshirani, Statistical Science 1986; Eilers & Marx, Statistical Science 1996 | Linear regression | non-inferior vs LassoCV (median R² +0.000, 52 datasets) |
+| `PSplineGAMRegressor` | regression | Hastie & Tibshirani, Statistical Science 1986; Eilers & Marx, Statistical Science 1996 | Linear regression | superior vs LassoCV (median R² +0.011, 52 datasets) |
 | `RSHashDetector` | anomaly detection | Sathe & Aggarwal, ICDM 2016 | Isolation Forest | non-inferior vs Isolation Forest (median ROC AUC +0.006, 46 datasets) |
 | `LeSiNNDetector` | anomaly detection | Pang, Ting & Albrecht, ICDM Workshops 2015 | Isolation Forest | non-inferior vs Isolation Forest (median ROC AUC +0.006, 46 datasets) |
 | `ExtendedIsolationForestDetector` | anomaly detection | Hariri, Carrasco Kind & Brunner, IEEE TKDE 2021 | Isolation Forest | non-inferior vs Isolation Forest (median ROC AUC +0.002, 46 datasets) |

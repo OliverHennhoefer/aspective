@@ -21,15 +21,17 @@ class PSplineGAMRegressor(RegressorMixin, BaseEstimator):
     B-spline on ``n_knots`` equally spaced knots with a second-order
     difference penalty on neighbouring coefficients. The penalty shrinks
     every curve toward a straight line, so the strongest smoothing gives
-    back ordinary linear regression. The penalty weight is chosen by
-    generalized cross-validation from a log-spaced grid, all at the cost
-    of one eigendecomposition.
+    back ordinary linear regression within the training range. The penalty
+    weight is chosen by generalized cross-validation from a log-spaced
+    grid, all at the cost of one eigendecomposition.
 
     Features with fewer than ``min_unique`` distinct values enter
-    linearly. Outside the training range the curves are extrapolated
-    linearly. One smoothing parameter is shared by all features (on
-    standardized curves), as in the ``mgcv`` "one smoothing parameter"
-    setting; use it for moderate numbers of features.
+    linearly. Outside the training range each curve stays at its value at
+    the boundary: a linearly extrapolated spline can reach values far
+    outside anything seen in training on a single unusual point. One
+    smoothing parameter is shared by all features (on standardized
+    curves), as in the ``mgcv`` "one smoothing parameter" setting; use it
+    for moderate numbers of features.
 
     Parameters
     ----------
@@ -95,7 +97,7 @@ class PSplineGAMRegressor(RegressorMixin, BaseEstimator):
         for j in range(p):
             if len(np.unique(X[:, j])) >= self.min_unique:
                 spline = SplineTransformer(
-                    n_knots=self.n_knots, degree=3, knots="uniform", extrapolation="linear"
+                    n_knots=self.n_knots, degree=3, knots="uniform", extrapolation="constant"
                 ).fit(X[:, [j]])
                 self._splines.append((j, spline))
                 k = spline.n_features_out_
