@@ -125,9 +125,9 @@ class M5ModelTreeRegressor(RegressorMixin, BaseEstimator):
         self._n_node = np.array([len(s) for s in samples])
         # Predictions are bounded to the training target range, widened by
         # ``extrapolation`` times that range, as Cubist bounds its predictions.
-        y_range = float(y.max() - y.min())
-        widen = np.inf if self.extrapolation is None else self.extrapolation * y_range
-        self.bounds_ = (float(y.min()) - widen, float(y.max()) + widen)
+        y_min, y_max = float(y.min()), float(y.max())  # as floats: integer targets can overflow
+        widen = np.inf if self.extrapolation is None else self.extrapolation * (y_max - y_min)
+        self.bounds_ = (y_min - widen, y_max + widen)
 
         self._intercepts = np.zeros(n_nodes)
         self._coefs = [np.zeros(0)] * n_nodes

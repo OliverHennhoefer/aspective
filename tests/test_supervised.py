@@ -592,6 +592,12 @@ def test_m5_predictions_stay_near_the_training_target_range():
     np.testing.assert_allclose(model.predict(X), np.clip(plain.predict(X), lo, hi))
 
 
+def test_m5_bounds_do_not_overflow_on_integer_targets():
+    X = np.arange(20.0).reshape(-1, 1)
+    y = np.linspace(-100, 100, 20).astype(np.int8)
+    assert M5ModelTreeRegressor().fit(X, y).bounds_ == pytest.approx((-120.0, 120.0))
+
+
 def test_mars_recovers_a_hinge():
     rng = np.random.RandomState(0)
     X = rng.uniform(-1, 1, size=(400, 3))

@@ -1349,7 +1349,7 @@ M5 with its defaults (leaves of 4, pruning, smoothing k = 15). CART picks its mi
 
 - vs CART (tuned leaf size): **superior**. Median difference +0.0523, mean +0.0583 (positive favours the candidate); better on 42, within margin on 8, worse on 2 of 52 datasets; non-inferiority p = <0.001, two-sided Wilcoxon p = <0.001. Severe (beyond 5 margins): 27 wins, 1 losses, p = 1.000.
 - Average ranks over 52 datasets where every model ran: M5 model tree 1.33, LassoCV 2.19, CART (tuned leaf size) 2.48. Nemenyi critical difference 0.46, Friedman p = <0.001.
-- Total fit and score time relative to the candidate: CART (tuned leaf size) 0.93x.
+- Total fit and score time relative to the candidate: CART (tuned leaf size) 0.9x.
 
 <details><summary>Per-dataset scores</summary>
 
