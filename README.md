@@ -1,4 +1,8 @@
-<h1 align="center">aspective</h1>
+<h1 align="center">
+  <a href="https://oliverhennhoefer.github.io/aspective/">
+    <img src="docs/img/aspective.png" alt="aspective" width="600">
+  </a>
+</h1>
 
 <p align="center">
   <strong>Peer-reviewed variants of classic estimators that never made it into scikit-learn,<br>
